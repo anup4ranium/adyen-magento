@@ -662,7 +662,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $this->createInvoice($order, $response);
 
         $_paymentCode = $this->_paymentMethodCode($order);
-        if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos') && $_paymentCode = "adyen_pos"))
+        if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos') && $_paymentCode == "adyen_pos"))
         {
             $this->createShipment($order);
         }
