@@ -27,28 +27,6 @@
  */
 class Adyen_Payment_Model_Observer {
 
-    /**
-     * @param Mage_Sales_Model_Order_Invoice $observer
-     * @desc online capture only
-     */
-    public function capture(Varien_Event_Observer $observer) {
-        $event = $observer->getEvent();
-        $eventNameCmp = strcmp($event->getName(), 'sales_order_invoice_pay');
-        $onlineCmp = strcmp($event->getInvoice()->getData('requested_capture_case'), 'online');
-        if ($onlineCmp === 0 && $eventNameCmp === 0) {
-            $order = $event->getInvoice()->getOrder();
-            $isAdyen = $this->isPaymentMethodAdyen($order);
-            if (!$isAdyen)
-                return false;
-            $grandTotal = $event->getInvoice()->getGrandTotal();
-            $payment = $order->getPayment();
-            $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
-            $order->getPayment()->getMethodInstance()->sendCaptureRequest($payment, $grandTotal, $pspReference);
-            return true;
-        }
-        return false;
-    }
-
     public function salesOrderPaymentCancel(Varien_Event_Observer $observer) {
         // observer is payment object
         $payment = $observer->getEvent()->getPayment();
