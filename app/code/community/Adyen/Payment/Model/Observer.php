@@ -56,7 +56,7 @@ class Adyen_Payment_Model_Observer {
         $order = $payment->getOrder();
 //        print_r($payment);
         $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
-        $payment->getMethodInstance()->SendCancelOrRefund($payment, null, $pspReference);
+        $payment->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
     }
 
     /**
