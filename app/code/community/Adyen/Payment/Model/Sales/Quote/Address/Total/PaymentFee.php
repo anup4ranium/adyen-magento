@@ -28,7 +28,7 @@
 class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
     protected $_code = 'payment_fee';
-
+    
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
         parent::collect($address);
@@ -57,11 +57,14 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sale
     {
         $amt = $address->getPaymentFeeAmount();
 
-        $address->addTotal(array(
-                'code'=>$this->getCode(),
-                'title'=> Mage::helper('adyen')->__('Payment Fee'),
-                'value'=> $amt
-        ));
+        if ($amt != 0) {
+            $address->addTotal(array(
+                    'code'=>$this->getCode(),
+                    'title'=> Mage::helper('adyen')->__('Payment Fee'),
+                    'value'=> $amt
+            ));
+        }
+
         return $this;
     }
 }
