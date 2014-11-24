@@ -92,7 +92,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $grandTotal = $order->getGrandTotal();
 
         if($grandTotal == $amount) {
-            $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, null, $pspReference);
+            $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
         } else {
             $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $pspReference);
         }
@@ -157,7 +157,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         return $this->_processRequest($payment, $amount, "refund", $pspReference);
     }
 
-    public function SendCancelOrRefund(Varien_Object $payment, $amount, $pspReference) {
+    public function SendCancelOrRefund(Varien_Object $payment, $pspReference) {
         if (empty($pspReference)) {
             $this->writeLog('oops empty pspReference');
             return $this;
