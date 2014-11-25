@@ -517,8 +517,8 @@ function get_save_billing_function(url, set_methods_url, update_payments, trigge
 
                     if(update_payments){
                         $$('div.payment-methods input[name="payment\[method\]"]').invoke('observe', 'click', get_separate_save_methods_function(set_methods_url));
-                        $$('div.payment-methods input[name="payment[hpp_type]"]').invoke('observe', 'click', get_separate_save_methods_function(url, 'undefined', 'adyen_hpp')); // for Adyen onchange oneclick method reload
-                        $$('div.payment-methods input[name="payment[recurring]"]').invoke('observe', 'click', get_separate_save_methods_function(url, 'undefined', 'adyen_recurring')); // for Adyen onchange oneclick method reload
+                        $$('div.payment-methods input[name="payment[hpp_type]"]').invoke('observe', 'click', get_separate_save_methods_function(set_methods_url, 'undefined', 'adyen_hpp')); // for Adyen onchange oneclick method reload
+                        $$('div.payment-methods input[name="payment[recurring]"]').invoke('observe', 'click', get_separate_save_methods_function(set_methods_url, 'undefined', 'adyen_recurring')); // for Adyen onchange oneclick method reload
 
                         $$('div.payment-methods input[name="payment\[method\]"]').invoke('observe', 'click', function() {
                             $$('div.onestepcheckout-payment-method-error').each(function(item) {
