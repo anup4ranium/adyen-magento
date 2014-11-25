@@ -28,6 +28,8 @@
 
 /* Adyen Customs */
 
+.sp-methods #payment_form_adyen_cc .v-fix label { float:none; vertical-align: middle;}
+
 /* Checkout */
 .sp-methods #payment_form_adyen_hpp { }
 .sp-methods #payment_form_adyen_hpp .input-box table { margin-bottom: 5px; }
