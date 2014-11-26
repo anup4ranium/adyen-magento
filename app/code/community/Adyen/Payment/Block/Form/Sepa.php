@@ -32,4 +32,45 @@ class Adyen_Payment_Block_Form_Sepa extends Mage_Payment_Block_Form {
         $this->setTemplate('adyen/form/sepa.phtml');
     }
 
+
+    public function getCountries() {
+
+        $sepaCountriesAllowed = array("AT", "BE", "BG", "CH", "CY","CZ","DE","DK","EE","ES","FI","FR",
+                                      "GB","GF","GI","GP","GR","HR","HU","IE","IS","IT","LI","LT","LU",
+                                      "LV","MC","MQ","MT","NL","NO","PL","PT","RE","RO","SE","SI","SK");
+
+       $countryList = Mage::getResourceModel('directory/country_collection')
+            ->loadData()
+            ->toOptionArray(false);
+
+        $sepaCountries = array();
+
+        foreach($countryList as $key => $country) {
+
+            $value = $country['value'];
+            if(!in_array($value, $sepaCountriesAllowed)) {
+                unset($countryList[$key]);
+            }
+        }
+        return $countryList;
+    }
+
+    public function getShopperCountryId() {
+        $country = "";
+        if(Mage::app()->getStore()->isAdmin())
+        {
+            $quote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
+        } else {
+            $quote = Mage::helper('checkout/cart')->getQuote();
+        }
+
+        if($quote) {
+            $billingAddress = $quote->getBillingAddress();
+            if($billingAddress) {
+                $country = $billingAddress->getCountryId();
+            }
+        }
+        return $country;
+    }
+
 }
