@@ -75,7 +75,10 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     }
 
     public function hasEnableScanner() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/enable_scanner');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/enable_scanner');
+        }
+        return false;
     }
 
     public function hasAutoSubmitScanner() {
@@ -83,11 +86,17 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     }
 
     public function hasExpressCheckout() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/express_checkout');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/express_checkout');
+        }
+        return false;
     }
 
     public function hasCashExpressCheckout() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/cash_express_checkout');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/cash_express_checkout');
+        }
+        return false;
     }
 
     public function getOrderStatus() {
