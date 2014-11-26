@@ -889,7 +889,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if ($order->canInvoice()) {
             $invoice = $order->prepareInvoice();
             $invoice->getOrder()->setIsInProcess(true);
-            $invoice->register()->capture();
+            $invoice->register()->pay();
             try {
                 Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
