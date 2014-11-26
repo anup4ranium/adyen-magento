@@ -32,6 +32,7 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_formBlockType = 'adyen/form_pos';
     protected $_infoBlockType = 'adyen/info_pos';
     protected $_paymentMethod = 'pos';
+    protected $_isInitializeNeeded = true;
     
     /**
      * @var GUEST_ID , used when order is placed by guests
@@ -119,17 +120,9 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
         return $this->_redirectBlockType;
     }
 
-    public function isInitializeNeeded() {
-        return true;
-    }
-
     public function initialize($paymentAction, $stateObject) {
         $state = Mage_Sales_Model_Order::STATE_NEW;
         $stateObject->setState($state);
         $stateObject->setStatus($this->_getConfigData('order_status'));
-    }
-
-    public function getConfigPaymentAction() {
-        return true;
     }
 }

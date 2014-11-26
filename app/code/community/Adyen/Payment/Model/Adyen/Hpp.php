@@ -42,7 +42,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_paymentMethod = 'hpp';
     protected $_testModificationUrl = 'https://pal-test.adyen.com/pal/adapter/httppost';
     protected $_liveModificationUrl = 'https://pal-live.adyen.com/pal/adapter/httppost';
-
+    protected $_isInitializeNeeded = true;
     /**
      * @desc Get checkout session namespace
      *
@@ -155,7 +155,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         $adyFields['sessionValidity'] = date(DATE_ATOM, mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y")));
         $adyFields['shopperEmail'] = $shopperEmail;
 
-        // recurring    	
+        // recurring
         $recurringType = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference'] = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
@@ -175,7 +175,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             $adyFields['shopperType'] = "";
         }
 
-        //the data that needs to be signed is a concatenated string of the form data 
+        //the data that needs to be signed is a concatenated string of the form data
         $sign = $adyFields['paymentAmount'] .
             $adyFields['currencyCode'] .
             $adyFields['shipBeforeDate'] .
@@ -300,20 +300,11 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         return $this->_redirectBlockType;
     }
 
-    public function isInitializeNeeded() {
-        return true;
-    }
-
     public function initialize($paymentAction, $stateObject) {
         $state = Mage_Sales_Model_Order::STATE_NEW;
         $stateObject->setState($state);
         $stateObject->setStatus($this->_getConfigData('order_status'));
     }
-
-    public function getConfigPaymentAction() {
-        return true;
-    }
-
 
     public function getAvailableHPPTypes() {
 
