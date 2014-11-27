@@ -125,7 +125,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
 
         $adyFields = array();
         $deliveryDays = (int) $this->_getConfigData('delivery_days', 'adyen_hpp');
-        $deliveryDays = (!empty($deliveryDays)) ? $deliveryDays : 55;
+        $deliveryDays = (!empty($deliveryDays)) ? $deliveryDays : 5;
         $adyFields['merchantAccount'] = $merchantAccount;
         $adyFields['merchantReference'] = $realOrderId;
         $adyFields['paymentAmount'] = (int)$amount;
