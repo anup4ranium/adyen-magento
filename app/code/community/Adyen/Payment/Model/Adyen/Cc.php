@@ -115,6 +115,16 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
     }
 
     public function getCsePublicKey() {
+
+        if (Mage::app()->getStore()->isAdmin()) {
+            $storeId = $this->_order->getStoreId();
+        } else {
+            $storeId = null;
+        }
+
+        if (Mage::helper('adyen')->getConfigDataDemoMode($storeId)) {
+            return trim(Mage::getStoreConfig("payment/adyen_cc/cse_publickey_test"));
+        }
         return trim(Mage::getStoreConfig("payment/adyen_cc/cse_publickey"));
     }
 
@@ -161,5 +171,5 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
 		
         return $adyFields;
 	}
-	
+
 }

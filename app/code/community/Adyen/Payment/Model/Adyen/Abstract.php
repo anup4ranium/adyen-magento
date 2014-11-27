@@ -125,7 +125,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 ->setTransactionId($this->getTransactionId())
                 ->setIsTransactionClosed(0);
 
-        // do refund request to adyen
+        // do capture request to adyen
         $order = $payment->getOrder();
         $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
         $order->getPayment()->getMethodInstance()->sendCaptureRequest($payment, $amount, $pspReference);
