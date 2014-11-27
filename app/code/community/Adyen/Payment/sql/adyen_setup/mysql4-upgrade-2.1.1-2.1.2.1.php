@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -29,19 +28,12 @@ $installer = $this;
 /* @var $installer Adyen_Payment_Model_Mysql4_Setup */
 
 $installer->startSetup();
-$installer->run("
-DROP TABLE IF EXISTS `{$this->getTable('adyen/event')}`;
-CREATE TABLE `{$this->getTable('adyen/event')}` (
-`event_id` int(11) NOT NULL AUTO_INCREMENT,
-`psp_reference` varchar(55) DEFAULT NULL COMMENT 'pspReference',
-`adyen_event_code` varchar(55) DEFAULT NULL COMMENT 'Adyen Event Code',
-`adyen_event_result` text DEFAULT NULL COMMENT 'Adyen Event Result',
-`increment_id` varchar(50) DEFAULT NULL COMMENT 'Increment Id',
-`payment_method` varchar(50) DEFAULT NULL COMMENT 'Payment Method',
-`created_at` datetime NULL DEFAULT NULL COMMENT 'Created At',
-PRIMARY KEY (`event_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE `{$this->getTable('adyen/event')}` ADD INDEX(adyen_event_code, psp_reference);
-");
+$installer->run("ALTER TABLE adyen_event_data ADD INDEX `adyen_event_result`
+(`increment_id`, `adyen_event_result`(32));");
+
+$installer->run("ALTER TABLE `adyen_event_data` CHANGE `adyen_event_result` `adyen_event_result` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Adyen Event Result';");
 
 $installer->endSetup();
+
+
+
