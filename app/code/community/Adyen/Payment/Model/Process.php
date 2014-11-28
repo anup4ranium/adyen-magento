@@ -108,6 +108,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $helper = Mage::helper('adyen');
         $response = $_REQUEST;
 
+        Mage::log("PosResonse:".print_r($response, true), Zend_Log::DEBUG, "adyen_notification.log", true);
 
         $varienObj = new Varien_Object();
         foreach ($response as $code => $value) {
@@ -169,7 +170,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $session_id_checksum = 0;
             for($i=0;$i<strlen($session_id);$i++)
             {
-                $checksum_calc = ord($session_id[$i]) - 48;
+                $checksum_calc = $this->getAscii2Int($session_id[$i]);
                 $session_id_checksum += $checksum_calc;
             }
 
@@ -240,6 +241,15 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 		    		</body></html>";
 
         return $html;
+    }
+
+    public function getAscii2Int($ascii){
+        if (is_numeric($ascii)){
+            $int = ord($ascii) - 48;
+        } else {
+            $int = ord($ascii) - 64;
+        }
+        return $int;
     }
 
     public function processCashResponse()
