@@ -252,6 +252,7 @@
                 <sort_order>30</sort_order>
                 <cache_directory_lookup>0</cache_directory_lookup>
                 <return_url_in_request>0</return_url_in_request>
+                <show_ideal_logos>0</show_ideal_logos>
             </adyen_hpp>
             <adyen_pos translate="title" module="adyen">
                 <active>0</active>

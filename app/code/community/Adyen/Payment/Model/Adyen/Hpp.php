@@ -73,6 +73,22 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         return $this;
     }
 
+    public function validate()
+    {
+        parent::validate();
+
+        $info = $this->getInfoInstance();
+        $hppType = $info->getCcType();
+
+        // validate if the ideal bank is chosen
+        if($hppType == "ideal") {
+            if($info->getPoNumber() == "") {
+                // hpp type is empty throw error
+                Mage::throwException(Mage::helper('adyen')->__('You chose an invalid bank'));
+            }
+        }
+    }
+
     /**
      * @desc Called just after asssign data
      */
@@ -442,6 +458,10 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
 
     public function getHppOptionsDisabled() {
         return Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
+    }
+
+    public function getShowIdealLogos() {
+        return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
     }
 
     // Function to get the client ip address
