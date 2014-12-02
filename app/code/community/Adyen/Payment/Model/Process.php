@@ -404,7 +404,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      */
     protected function _addAdyenAttributes(Varien_Object $order, $response, $updateAdyenStatus = true) {
         $klarnaReservationNumber = $response->getData('additionalData_additionalData_acquirerReference');
-        $ccLast4 = $response->getData('additionalData_cardSummary');
         $avsResult = $response->getData('additionalData_avsResult');
         $cvcResult = $response->getData('additionalData_cvcResult');
         $boletoPaidAmount = $response->getData('additionalData_boletobancario_paidAmount');
@@ -417,6 +416,20 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $eventData = (!empty($eventCode)) ? $eventCode : $authResult;
         $paymentObj = $order->getPayment();
         $_paymentCode = $this->_paymentMethodCode($order);
+
+        $ccLast4 = $response->getData('additionalData_cardSummary');
+        // if there is no server communication setup try to get last4 digits from reason field
+        if($ccLast4 == "") {
+            $reason = trim($response->getData('reason'));
+            if($reason != "") {
+                $reasonArray = explode(":", $reason);
+                if($reasonArray != null && is_array($reasonArray)) {
+                    if(isset($reasonArray[1])) {
+                        $ccLast4 = $reasonArray[1];
+                    }
+                }
+            }
+        }
 
         $paymentObj->setLastTransId($incrementId)
             ->setAdyenPaymentMethod($paymentMethod)
