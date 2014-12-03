@@ -30,7 +30,8 @@ class Adyen_Payment_Block_Adminhtml_Sales_Order_Filter_Adyen extends Mage_Adminh
     protected function _getOptions() {
         $events = Mage::getResourceModel('adyen/adyen_event')->getAllDistinctEvents();
         $select = array(
-            array('label' => '', 'value' => null),
+            array('label' => '', 'value' => ''),
+            array('label' => 'N.A', 'value' => 'N.A'),
         );
         foreach ($events as $event) {
 
@@ -61,14 +62,17 @@ class Adyen_Payment_Block_Adminhtml_Sales_Order_Filter_Adyen extends Mage_Adminh
                     $select[] = array('label' => $event['adyen_event_result'], 'value' => $event['adyen_event_result']);
                     break;
             }
-
-
-
-
-
-
         }
         return $select;
+    }
+
+
+    public function getCondition()
+    {
+        if($this->getValue() == "N.A") {
+            return array('null' => "");
+        }
+        return $this->getValue();
     }
 
 }
