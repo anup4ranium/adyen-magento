@@ -140,10 +140,9 @@ class Adyen_Payment_Model_Mysql4_Adyen_Event extends Mage_Core_Model_Mysql4_Abst
     public function getAllDistinctEvents() {
         $db = $this->_getReadAdapter();
         $sql = $db->select()
-                ->from($this->getMainTable(), array('adyen_event_result'))
-                ->distinct()
-        ;
-        return $db->fetchAll($sql);      
+            ->from($this->getMainTable(), array('adyen_event_result'))
+            ->group('adyen_event_result');
+        return $db->fetchAll($sql);
     }
 
 }
