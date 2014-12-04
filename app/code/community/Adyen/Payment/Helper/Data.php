@@ -179,8 +179,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
                                 "discover" => "DI",
                                 "diners" => "DC",
                                 "maestro" => "SM",
-                                "jcb" => "JCB",
-//                                "" => "CB" cart blue is just visa
+                                "jcb" => "JCB"
         );
 
         if(isset($ccTypesMapper[$ccType])) {

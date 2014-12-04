@@ -62,6 +62,7 @@
 
     <checkout_onepage_index>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
             <block type="core/text" name="adyen.diners.validation">
@@ -85,6 +86,7 @@
 
     <onestepcheckout_index_index>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
             <block type="core/text" name="adyen.diners.validation">
@@ -102,6 +104,7 @@
 
     <checkout_multishipping_billing>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
         </reference>

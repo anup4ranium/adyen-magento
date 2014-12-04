@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -25,23 +24,8 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Pos extends Mage_Payment_Block_Form {
+?>
 
-    protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
-        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_pos");
+<img class="adyen-payment-method-icon v-middle <?php echo $this->getPaymentMethodClass(); ?>" src="<?php echo $this->getPaymentMethodIcon(); ?>" width="66" height="43" alt="<?php echo $this->getPaymentMethodLabel() ?>" border="0"/>
+<span><?php echo $this->getPaymentMethodLabel(); ?></span>
 
-        $mark = Mage::getConfig()->getBlockClassName('core/template');
-        $mark = new $mark;
-        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
-            ->setPaymentMethodIcon($paymentMethodIcon)
-            ->setPaymentMethodLabel($label)
-            ->setPaymentMethodClass("adyen_pos");
-
-        $this->setTemplate('adyen/form/pos.phtml')
-            ->setMethodTitle('')
-            ->setMethodLabelAfterHtml($mark->toHtml());
-
-        parent::_construct();
-    }
-}
