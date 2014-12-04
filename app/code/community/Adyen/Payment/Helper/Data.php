@@ -244,8 +244,6 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
                 // convert to array
                 parse_str($result,$result);
 
-                Mage::log("List recurring result is: " . curl_error($ch), self::DEBUG_LEVEL, 'http-request.log',true);
-
                 foreach($result as $key => $value) {
                     // strip the key
                     $key = str_replace("recurringDetailsResult_details_", "", $key);
