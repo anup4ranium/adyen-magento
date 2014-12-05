@@ -30,11 +30,12 @@ class Adyen_Payment_Model_Observer {
     public function salesOrderPaymentCancel(Varien_Event_Observer $observer) {
         // observer is payment object
         $payment = $observer->getEvent()->getPayment();
-
         $order = $payment->getOrder();
-//        print_r($payment);
-        $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
-        $payment->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
+
+        if($this->isPaymentMethodAdyen($order)) {
+            $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
+            $payment->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
+        }
     }
 
     /**
@@ -45,5 +46,4 @@ class Adyen_Payment_Model_Observer {
     public function isPaymentMethodAdyen($order) {
         return ( strpos($order->getPayment()->getMethod(), 'adyen') !== false ) ? true : false;
     }
-
 }
