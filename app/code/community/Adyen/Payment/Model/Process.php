@@ -605,7 +605,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $eventCode = trim($response->getData('eventCode'));
 
             $success = (bool) trim($response->getData('success'));
-            $payment_method = trim($response->getData('paymentMethod'));
+            $paymentMethod = trim($response->getData('paymentMethod'));
             $_paymentCode = $this->_paymentMethodCode($order);
             switch ($eventCode) {
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND:
@@ -615,13 +615,19 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     $this->setRefundAuthorized($order, $success);
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING:
-                    //add comment to the order
+                    if($this->_getConfigData('send_email_bank_sepa_on_pending', 'adyen_abstract')) {
+                        // Check if payment is banktransfer or sepa if true then send out order confirmation email
+                        $isBankTransfer = $this->isBankTransfer($paymentMethod);
+                        if($isBankTransfer || $paymentMethod == 'sepadirectdebit') {
+                            $order->sendNewOrderEmail(); // send order email
+                        }
+                    }
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY:
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION:
                     // for POS don't do anything on the AUTHORIZATION
                     if($_paymentCode != "adyen_pos") {
-                        $this->authorizePayment($order, $success, $payment_method, $response);
+                        $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
@@ -629,7 +635,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $this->setPaymentAuthorized($order, $success, $response);
                     } else {
                         // FOR POS authorize the payment on the CAPTURE notification
-                        $this->authorizePayment($order, $success, $payment_method, $response);
+                        $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE_FAILED:
@@ -818,6 +824,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         } else {
             $isBankTransfer = false;
         }
+        return $isBankTransfer;
     }
 
     /**
