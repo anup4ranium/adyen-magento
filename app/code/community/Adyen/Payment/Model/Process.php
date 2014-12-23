@@ -919,6 +919,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if ($order->canInvoice()) {
             $invoice = $order->prepareInvoice();
             $invoice->getOrder()->setIsInProcess(true);
+            // set transaction id so you can do a online refund this is used instead of online capture
+            // because it is already auto capture in Adyen Backoffice
+            $invoice->setTransactionId(1);
             $invoice->register()->pay();
             try {
                 Mage::getModel('core/resource_transaction')
