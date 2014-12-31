@@ -29,6 +29,13 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
 
     protected $_dateInputs = array();
 
+    /**
+     * Sales Qoute Billing Address instance
+     *
+     * @var Mage_Sales_Model_Quote_Address
+     */
+    protected $_address;
+
     protected function _construct() {
         $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
         $label = Mage::helper('adyen')->_getConfigData("title", "adyen_openinvoice");
@@ -133,6 +140,24 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
 
     public function dobShow() {
         return $this->getMethod()->dobShow();
+    }
+
+    public function telephoneShow() {
+        return $this->getMethod()->telephoneShow();
+    }
+
+    public function getAddress()
+    {
+        if (is_null($this->_address)) {
+            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $quote = Mage::helper('checkout/cart')->getQuote();
+                $this->_address = $quote->getBillingAddress();
+            } else {
+                $this->_address = Mage::getModel('sales/quote_address');
+            }
+        }
+
+        return $this->_address;
     }
 
 }

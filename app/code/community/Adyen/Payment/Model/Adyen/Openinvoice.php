@@ -76,8 +76,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         // check if option gender or date of birth is enabled
         $genderShow = $this->genderShow();
         $dobShow = $this->dobShow();
+        $telephoneShow = $this->telephoneShow();
 
-        if($genderShow || $dobShow) {
+        if($genderShow || $dobShow || $telephoneShow) {
 
             // set gender and dob to the quote
             $quote = $this->getQuote();
@@ -94,6 +95,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 $info->setAdditionalInformation('customerGender', $data->getGender());
             }
 
+            if($telephoneShow) {
+                $telephone = $data->getTelephone();
+                $quote->getBillingAddress()->setTelephone($data->getTelephone());
+            }
+
             /* Check if the customer is logged in or not */
             if (Mage::getSingleton('customer/session')->isLoggedIn()) {
 
@@ -101,11 +107,20 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 $customer = Mage::getSingleton('customer/session')->getCustomer();
 
                 // set the email and/or gender
-                if($dobShow)
+                if($dobShow) {
                     $customer->setDob($dob);
+                }
 
-                if($genderShow)
+                if($genderShow) {
                     $customer->setGender($data->getGender());
+                }
+
+                if($telephoneShow) {
+                    $billingAddress = $customer->getPrimaryBillingAddress();
+                    if($billingAddress) {
+                        $billingAddress->setTelephone($data->getTelephone());
+                    }
+                }
 
                 // save changes into customer
                 $customer->save();
@@ -398,7 +413,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $street = self::formatStreet($address->getStreet());
         $streetName = $street['0'];
         unset($street['0']);
-        $streetNr = implode('',$street);		
+//        $streetNr = implode('',$street);
+        $streetNr = implode(' ',$street); // webprint aanpassing lijkt niet goed
+
         return new Varien_Object(array('name' => $streetName, 'house_number' => $streetNr));
     }
     
@@ -428,5 +445,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
 
     public function dobShow() {
         return $this->_getConfigData('dob_show', 'adyen_openinvoice');
+    }
+
+    public function telephoneShow() {
+        return $this->_getConfigData('telephone_show', 'adyen_openinvoice');
     }
 }
