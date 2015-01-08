@@ -25,10 +25,8 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Debug_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract {
-
-    protected function _construct() {
-        $this->_init('adyen/adyen_api_debug');
-    }
-
+class Adyen_Payment_Model_Resource_Setup
+    extends Mage_Sales_Model_Resource_Setup
+{
+    
 }

@@ -25,7 +25,9 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Event extends Mage_Core_Model_Mysql4_Abstract {
+class Adyen_Payment_Model_Resource_Adyen_Event
+    extends Mage_Core_Model_Resource_Db_Abstract
+{
 
     const COLLECTION_LIMIT = 1000;
 

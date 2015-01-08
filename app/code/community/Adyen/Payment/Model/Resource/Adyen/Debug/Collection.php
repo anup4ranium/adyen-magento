@@ -25,19 +25,13 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Debug extends Mage_Core_Model_Mysql4_Abstract {
+class Adyen_Payment_Model_Resource_Adyen_Debug_Collection
+    extends Mage_Core_Model_Resource_Db_Collection_Abstract
+{
 
-    protected function _construct() {
-        $this->_init('adyen/api_debug', 'debug_id');
-    }
-
-    /**
-     * @since 0.0.2
-     * @param array $response
-     */
-    public function assignData($response) {
-        $db = $this->_getWriteAdapter();
-        $db->insert($this->getMainTable(), array('adyen_response' => serialize($response)));
+    protected function _construct()
+    {
+        $this->_init('adyen/adyen_api_debug');
     }
 
 }

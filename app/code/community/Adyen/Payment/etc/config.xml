@@ -36,10 +36,10 @@
         <models>
             <adyen>
                 <class>Adyen_Payment_Model</class>
-                <resourceModel>adyen_mysql4</resourceModel>
+                <resourceModel>adyen_resource</resourceModel>
             </adyen>
-            <adyen_mysql4>
-                <class>Adyen_Payment_Model_Mysql4</class>
+            <adyen_resource>
+                <class>Adyen_Payment_Model_Resource</class>
                 <entities>
                     <api_debug>
                         <table>adyen_api_debug</table>
@@ -48,7 +48,7 @@
                         <table>adyen_event_data</table>
                     </event>
                 </entities>
-            </adyen_mysql4>
+            </adyen_resource>
         </models>
         <helpers>
             <adyen>
@@ -59,7 +59,7 @@
             <adyen_setup>
                 <setup>
                     <module>Adyen_Payment</module>
-                    <class>Adyen_Payment_Model_Mysql4_Setup</class>
+                    <class>Adyen_Payment_Model_Resource_Setup</class>
                 </setup>
                 <connection>
                     <use>core_setup</use>

@@ -25,11 +25,27 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Event_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
+class Adyen_Payment_Model_Mysql4_Order
+    extends Mage_Core_Model_Resource_Db_Abstract
 {
-    protected function _construct()
-    {
-        $this->_init('adyen/adyen_event');
-        $this->setItemObjectClass('adyen/event');
+
+    protected function _construct() {
+        $this->_init('sales/order', 'entity_id');
     }
+
+    /**
+     * IncrementId exist on the system
+     * @param type $incrementId
+     * @return array
+     */
+    public function orderExist($incrementId) {
+        $db = $this->_getReadAdapter();
+        $sql = $db->select()
+                ->from($this->getMainTable(), array('entity_id', 'increment_id'))
+                ->where('increment_id = ?', $incrementId)
+        ;
+        $stmt = $db->query($sql);
+        return $stmt->fetch();
+    }
+
 }
