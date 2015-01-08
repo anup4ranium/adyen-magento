@@ -33,15 +33,6 @@ class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
     }
 
     /**
-     * Retrieve available payment methods
-     *
-     * @return array
-     */
-    public function getHppAvailableTypes() {
-        return $this->getMethod()->getAvailableHPPTypes();
-    }
-
-    /**
      * @since 0.1.0.4
      * @return type 
      */

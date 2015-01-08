@@ -54,6 +54,11 @@
             <adyen>
                 <class>Adyen_Payment_Helper</class>
             </adyen>
+            <payment>
+                <rewrite>
+                    <data>Adyen_Payment_Helper_Payment_Data</data>
+                </rewrite>
+            </payment>
         </helpers>
         <resources>
             <adyen_setup>
@@ -159,6 +164,16 @@
                 </totals>
             </order_creditmemo>
         </sales>
+        <events>
+            <controller_front_init_before>
+                <observers>
+                    <adyen_payment>
+                        <class>adyen/observer</class>
+                        <method>addHppMethodsToConfig</method>
+                    </adyen_payment>
+                </observers>
+            </controller_front_init_before>
+        </events>
     </global>
 
     <frontend>
