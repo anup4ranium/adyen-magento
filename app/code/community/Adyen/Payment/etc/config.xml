@@ -136,9 +136,12 @@
                 <totals>
                     <payment_fee>
                         <class>adyen/total_paymentFee_invoice</class>
+                        <after>subtotal,discount</after>
+                        <before>grand_total,tax</before>
                     </payment_fee>
                     <payment_installment_fee>
                         <class>adyen/total_paymentInstallmentFee_invoice</class>
+                        <after>grand_total</after>
                     </payment_installment_fee>
                 </totals>
             </order_invoice>
@@ -146,9 +149,12 @@
                 <totals>
                     <payment_fee>
                         <class>adyen/total_paymentFee_creditmemo</class>
+                        <after>subtotal,discount</after>
+                        <before>grand_total,tax</before>
                     </payment_fee>
                     <payment_installment_fee>
                         <class>adyen/total_paymentInstallmentFee_creditmemo</class>
+                        <after>grand_total</after>
                     </payment_installment_fee>
                 </totals>
             </order_creditmemo>
