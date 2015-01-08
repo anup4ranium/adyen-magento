@@ -22,11 +22,31 @@
 class Adyen_Payment_Model_Adyen_Hpp_Ideal
     extends Adyen_Payment_Model_Adyen_Hpp_Default
 {
+    protected $_formBlockType = 'adyen/form_hpp_ideal';
+
     /**
      * @return mixed
      */
     public function getShowIdealLogos()
     {
         return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
+    }
+
+    public function getIssuers()
+    {
+        $issuerData = json_decode($this->getConfigData('issuers'), true);
+        $issuers = array();
+        foreach ($issuerData as $issuer) {
+            $issuers[$issuer['issuerId'].'/'.$issuer['name']] = array(
+                'label' => $issuer['name']
+            );
+        }
+
+        if (isset($issuers[$this->getInfoInstance()->getPoNumber()])) {
+            $issuers[$this->getInfoInstance()->getPoNumber()]['selected'] = true;
+        }
+        Mage::log($this->getInfoInstance()->getPoNumber());
+        ksort($issuers);
+        return $issuers;
     }
 }

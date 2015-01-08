@@ -25,7 +25,7 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Order
+class Adyen_Payment_Model_Resource_Order
     extends Mage_Core_Model_Resource_Db_Abstract
 {
 

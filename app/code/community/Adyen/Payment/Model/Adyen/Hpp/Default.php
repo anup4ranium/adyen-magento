@@ -22,12 +22,6 @@
 class Adyen_Payment_Model_Adyen_Hpp_Default
     extends Adyen_Payment_Model_Adyen_Hpp
 {
-    public function __construct()
-    {
-        parent::__construct();
-//        var_dump($this);exit;
-    }
-
     public function setCode($code)
     {
         $this->_code = $code;

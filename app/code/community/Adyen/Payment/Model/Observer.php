@@ -45,15 +45,16 @@ class Adyen_Payment_Model_Observer {
         $paymentConfig = Mage::getStoreConfig('payment/adyen_hpp', $store);
 
         $configBase = $paymentConfig;
-        Mage::getConfig()->setNode('default/payment/adyen_hpp/is_active', 0);
-        $paymentConfig['adyen_hpp']['active'] = 0;
+        Mage::getConfig()->setNode('stores/'.$store->getCode().'/payment/adyen_hpp/is_active', 0);
 
         foreach ($this->_fetchHppMethods($store) as $methodCode => $methodData) {
             $methodNewCode = 'adyen_hpp_'.$methodCode;
             $methodData = $methodData + $configBase;
 
+            // @todo load this through configuration, allows for easier extensions
+            // @todo remove the silencer before class_exists
             $className = Mage::getConfig()->getModelClassName('adyen/adyen_hpp_'. $methodCode);
-            if (class_exists($className, false)) {
+            if (@class_exists($className)) {
                 $methodData['model'] = 'adyen/adyen_hpp_'.$methodCode;
             } else {
                 $methodData['model'] = 'adyen/adyen_hpp_default';
@@ -251,6 +252,15 @@ class Adyen_Payment_Model_Observer {
         'deliveryAddressType'
     );
 
+
+    /**
+     * Communication between Adyen and the shop must be encoded with Hmac.
+     * @param                       $fields
+     * @param Mage_Core_Model_Store $store
+     *
+     * @throws Mage_Core_Exception
+     * @throws Zend_Crypt_Hmac_Exception
+     */
     protected function _signRequestParams(&$fields, Mage_Core_Model_Store $store)
     {
         unset($fields['merchantSig']);
@@ -277,6 +287,12 @@ class Adyen_Payment_Model_Observer {
         $fields['merchantSig'] = base64_encode(pack('H*', $signMac));
     }
 
+
+    /**
+     * Get the Hmac key from the config
+     * @param Mage_Core_Model_Store $store
+     * @return string
+     */
     protected function _getHmacKey(Mage_Core_Model_Store $store)
     {
         $adyenHelper = Mage::helper('adyen');

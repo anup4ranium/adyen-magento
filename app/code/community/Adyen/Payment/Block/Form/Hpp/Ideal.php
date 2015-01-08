@@ -25,22 +25,28 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
 
-    protected function _construct() {
-        $this->setTemplate('adyen/form/hpp.phtml');
+
+
+/**
+ * Class Adyen_Payment_Block_Form_Hpp_Ideal
+ * @method Adyen_Payment_Model_Adyen_Hpp_Ideal getMethod()
+ */
+class Adyen_Payment_Block_Form_Hpp_Ideal extends Mage_Payment_Block_Form {
+
+    protected function _construct()
+    {
+        $this->setTemplate('adyen/form/hpp/ideal.phtml');
         parent::_construct();
     }
 
-    /**
-     * @since 0.1.0.4
-     * @return type 
-     */
-    public function getHppOptionsDisabled() {
-        return $this->getMethod()->getHppOptionsDisabled();
+    public function getShowIdealLogos()
+    {
+        return $this->getMethod()->getShowIdealLogos();
     }
 
-    public function getShowIdealLogos() {
-        return $this->getMethod()->getShowIdealLogos();
+    public function getIssuers()
+    {
+        return $this->getMethod()->getIssuers();
     }
 }
