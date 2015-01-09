@@ -28,26 +28,30 @@
 
 /* Adyen Customs */
 
-#co-payment-form .sp-methods dt { margin:0px 0 5px;}
-#co-payment-form .sp-methods dt input.radio { margin:20px 0 0 ; padding:0; }
-#co-payment-form .sp-methods dt label {background:none; padding:0 0 0 6px; }
-#co-payment-form .sp-methods dt label span { display:block; padding-top:9px;}
+/* Checkout Page */
+#co-payment-form .sp-methods dt img {
+    vertical-align: middle; display:inline-block;
+}
+/*#co-payment-form .sp-methods dt { margin:0px 0 5px;}*/
+/*#co-payment-form .sp-methods dt input.radio { margin:20px 0 0 ; padding:0; }*/
+/*#co-payment-form .sp-methods dt label {background:none; padding:0 0 0 6px; }*/
+/*#co-payment-form .sp-methods dt label span { display:block; padding-top:9px;}*/
 
-.sp-methods #payment_form_adyen_cc .v-fix label { float:none; vertical-align: middle;}
+/*.sp-methods #payment_form_adyen_cc .v-fix label { float:none; vertical-align: middle;}*/
 
-.sp-methods img.adyen-payment-method-icon { margin-right: 14px; margin-left:2px; border:none !important; width:66px; height:43px; background:url(../images/adyen/pm_gloss.png) left top no-repeat; }
-.sp-methods img.adyen-payment-method-icon.adyen_cc { background-position: 0px -272px; }
-.sp-methods img.adyen-payment-method-icon.adyen_boleto { background-position: 0px -2092px; }
-.sp-methods img.adyen-payment-method-icon.adyen_elv {background-position: 0px -2000px; }
-.sp-methods img.adyen-payment-method-icon.adyen_openinvoice_afterpay_default {background-position: 0px -1637px; }
-.sp-methods img.adyen-payment-method-icon.adyen_openinvoice_klarna {background-position: 0px -1728px; }
-.sp-methods img.adyen-payment-method-icon.adyen_pos { background-position: 0px -1818px; }
-.sp-methods img.adyen-payment-method-icon.adyen_sepa { background-position: 0px -1910px; }
+.adyen-payment-method-icon { margin-right: 6px; margin-left:2px; border:none !important; width:66px; height:43px; background:url(../images/adyen/pm_gloss.png) left top no-repeat; }
+.adyen-payment-method-icon.adyen_cc { background-position: 0px -272px; }
+.adyen-payment-method-icon.adyen_boleto { background-position: 0px -2092px; }
+.adyen-payment-method-icon.adyen_elv {background-position: 0px -2000px; }
+.adyen-payment-method-icon.adyen_openinvoice_afterpay_default {background-position: 0px -1637px; }
+.adyen-payment-method-icon.adyen_openinvoice_klarna {background-position: 0px -1728px; }
+.adyen-payment-method-icon.adyen_pos { background-position: 0px -1818px; }
+.adyen-payment-method-icon.adyen_sepa { background-position: 0px -1910px; }
 
-.sp-methods .adyen-payment-method-icon .no-mc { background-position: left top;  }
-.sp-methods dd { clear:both; }
-.sp-methods dd li { margin:5px 0 -10px 0px;}
+.adyen-payment-method-icon .no-mc { background-position: left top;  }
 
+
+/* Credit Cards */
 .sp-methods .form-list li.adyen_payment_creditcard_labels { margin-top:15px; }
 .adyen_payment_creditcard_labels img.grey {
     -webkit-filter: grayscale(100%);
@@ -62,15 +66,23 @@
 .sp-methods #payment_form_adyen_hpp { }
 .sp-methods #payment_form_adyen_hpp .input-box table { margin-bottom: 5px; }
 .sp-methods #payment_form_adyen_hpp .input-box table td { vertical-align: middle;}
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal { width: 160px; margin-top:5px; display: block; position: relative; z-index: 1; }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal label.required { border: 0; padding: 0; background: none; }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal label { }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks { padding: 5px; border: 1px solid #bebebe; width: 175px; margin-bottom: 5px; background: #fff; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks label { font-weight: normal; line-height: 42px; float: none; }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks td.label_hpp_ideal_type { width: 100px; }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal table td input { margin-top: 15px; margin-left: 4px; /*margin-top: -38px; margin-left: 2px; position: relative; z-index: 1;*/ }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal table td img { /*margin-left: -25px;*/ }
-.sp-methods #payment_form_adyen_hpp #payment_form_ideal .adyen_select_ideal { margin-bottom:10px;}
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal { width: 160px; margin-top:5px; display: block; position: relative; z-index: 1; }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal label.required { border: 0; padding: 0; background: none; }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal label { }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks { padding: 5px; border: 1px solid #bebebe; width: 175px; margin-bottom: 5px; background: #fff; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks label { font-weight: normal; line-height: 42px; float: none; }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal table.banks td.label_hpp_ideal_type { width: 100px; }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal table td input { margin-top: 15px; margin-left: 4px; *//*margin-top: -38px; margin-left: 2px; position: relative; z-index: 1;*//* }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal table td img { *//*margin-left: -25px;*//* }*/
+/*.sp-methods #payment_form_adyen_hpp #payment_form_ideal .adyen_select_ideal { margin-bottom:10px;}*/
+.adyen-ideal-image-label {
+    display: block;
+}
+.adyen-ideal-image-label img {
+    display: inline;
+    vertical-align: middle;
+}
+
 
 /* for onepagecheckout */
 .payment-methods dd#container_payment_method_adyen_hpp { margin:0; padding:0;}

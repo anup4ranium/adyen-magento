@@ -22,6 +22,25 @@
  */
  
 class Adyen_Payment_Helper_Payment_Data extends Mage_Payment_Helper_Data {
+
+    /**
+     * Retrieve method model object
+     *
+     * @param   string $code
+     * @return  Mage_Payment_Model_Method_Abstract|false
+     */
+    public function getMethodInstance($code)
+    {
+        $key = self::XML_PATH_PAYMENT_METHODS.'/'.$code.'/model';
+        $class = Mage::getStoreConfig($key);
+        $methodInstance = Mage::getModel($class);
+        if (method_exists($methodInstance, 'setCode')) {
+            $methodInstance->setCode($code);
+        }
+
+        return $methodInstance;
+    }
+
     /**
      * Get and sort available payment methods for specified or current store
      *

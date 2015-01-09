@@ -45,7 +45,7 @@ class Adyen_Payment_Model_Observer {
         $paymentConfig = Mage::getStoreConfig('payment/adyen_hpp', $store);
 
         $configBase = $paymentConfig;
-        Mage::getConfig()->setNode('stores/'.$store->getCode().'/payment/adyen_hpp/is_active', 0);
+        $store->setConfig('payment/adyen_hpp/active', 0);
 
         foreach ($this->_fetchHppMethods($store) as $methodCode => $methodData) {
             $methodNewCode = 'adyen_hpp_'.$methodCode;
@@ -64,7 +64,7 @@ class Adyen_Payment_Model_Observer {
                 if (is_object($value) || is_array($value)) {
                     $value = json_encode($value);
                 }
-                Mage::getConfig()->setNode('stores/'.$store->getCode().'/payment/'.$methodNewCode.'/'.$key, $value);
+                $store->setConfig('payment/'.$methodNewCode.'/'.$key, $value);
             }
         }
     }
@@ -141,12 +141,15 @@ class Adyen_Payment_Model_Observer {
             $paymentMethodCode = $paymentMethod['brandCode'];
 
             //Skip open invoice methods if they are enabled
-            if (Mage::getStoreConfig("payment/adyen_openinvoice/active")
+            if (Mage::getStoreConfigFlag("payment/adyen_openinvoice/active")
                 && Mage::getStoreConfig("payment/adyen_openinvoice/openinvoicetypes") == $paymentMethodCode) {
                 continue;
             }
 
-            //@todo Skip credit card methods if they are enabled.
+            if (Mage::getStoreConfigFlag("payment/adyen_cc/active") &&
+                in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro'))) {
+                continue;
+            }
 
             unset($paymentMethod['brandCode']);
             $paymentMethods[$paymentMethodCode] = $paymentMethod;

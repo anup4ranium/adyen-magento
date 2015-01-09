@@ -49,4 +49,9 @@ class Adyen_Payment_Block_Form_Hpp_Ideal extends Mage_Payment_Block_Form {
     {
         return $this->getMethod()->getIssuers();
     }
+
+    public function getIssuerImageUrl($issuer) {
+        $_bankFile = strtoupper(str_replace(" ", '', $issuer['label']));
+        return $this->getSkinUrl('images'.DS.'adyen'.DS. $_bankFile . ".png");
+    }
 }

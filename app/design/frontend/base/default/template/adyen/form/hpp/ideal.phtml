@@ -36,14 +36,13 @@
             <?php echo $this->__('You will be redirected to your bank when you place an order.') ?>
         </label>
         <?php if($this->getShowIdealLogos()): ?>
-            <?php foreach ($this->getIssuers() as $_issueId => $_IssueLabel): ?>
-                <?php
-                $_bankFile = strtoupper(str_replace(" ", '', $_IssueLabel));
-                $_filename = $this->getSkinUrl('images'.DS.'adyen'.DS. $_bankFile . ".png");
-                ?>
-                <label for="hpp_ideal_type_<?php echo $_issueId ?>">
-                    <input type="radio" id="hpp_ideal_type_<?php echo $_issueId ?>" name="payment[hpp_ideal_type]" value="<?php echo $_issueId .DS. $_IssueLabel ?>"/>
-                    <img src="<?php echo $this->getSkinUrl('images'.DS.'adyen'.DS."$_bankFile.png") ?>" alt="<?php echo $_IssueLabel ?>" label="<?php echo $_IssueLabel ?>" />
+            <?php foreach ($this->getIssuers() as $_issueId => $_issuerData): ?>
+                <label class="adyen-ideal-image-label">
+                    <input type="radio" id="hpp_ideal_type_<?php echo $_issueId ?>"
+                           name="payment[hpp_ideal_type]" value="<?php echo $_issueId ?>"
+                           <?php if (isset($_issuerData['selected'])): ?>checked<?php endif; ?> />
+                    <img src="<?php echo $this->getIssuerImageUrl($_issuerData); ?>"
+                         alt="<?php echo $_issuerData['label'] ?>" />
                 </label>
             <?php endforeach; ?>
         <?php else:?>
