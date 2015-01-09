@@ -28,19 +28,33 @@
 class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
 
     protected function _construct() {
-        $this->setTemplate('adyen/form/hpp.phtml');
         parent::_construct();
+        $this->setTemplate('adyen/form/hpp.phtml');
+        $this->setMethodTitle('');
+    }
+
+    public function getMethodLabelAfterHtml()
+    {
+        if (! $this->hasData('_method_label_html')) {
+            $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
+                'template' => 'adyen/payment/payment_method_label.phtml',
+                'payment_method_icon' =>  $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif"),
+                'payment_method_label' => Mage::helper('adyen')->getConfigData('title', $this->getMethod()->getCode()),
+                'payment_method_class' => $this->getMethod()->getCode()
+            ));
+
+            $this->setData('_method_label_html', $labelBlock->toHtml());
+        }
+
+        return $this->getData('_method_label_html');
     }
 
     /**
      * @since 0.1.0.4
      * @return type 
      */
-    public function getHppOptionsDisabled() {
+    public function getHppOptionsDisabled()
+    {
         return $this->getMethod()->getHppOptionsDisabled();
-    }
-
-    public function getShowIdealLogos() {
-        return $this->getMethod()->getShowIdealLogos();
     }
 }

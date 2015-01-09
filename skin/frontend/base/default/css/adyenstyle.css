@@ -46,7 +46,16 @@
 .adyen-payment-method-icon.adyen_openinvoice_afterpay_default {background-position: 0px -1637px; }
 .adyen-payment-method-icon.adyen_openinvoice_klarna {background-position: 0px -1728px; }
 .adyen-payment-method-icon.adyen_pos { background-position: 0px -1818px; }
+
+.adyen-payment-method-icon.adyen_hpp_ideal { background: url(../images/adyen/ideal.png) 0 1px no-repeat; }
 .adyen-payment-method-icon.adyen_sepa { background-position: 0px -1910px; }
+.adyen-payment-method-icon.adyen_hpp_bankTransfer_IBAN { background: url(../images/adyen/bankTransfer_IBAN.png) 0 1px no-repeat; }
+.adyen-payment-method-icon.adyen_hpp_elv { background-position: 0px -1910px; }
+.adyen-payment-method-icon.adyen_hpp_giropay { background: url(../images/adyen/giropay.png) 0 1px no-repeat; }
+.adyen-payment-method-icon.adyen_hpp_directEbanking { background: url(../images/adyen/directEbanking_de.png) 0 1px no-repeat; }
+.adyen-payment-method-icon.adyen_hpp_sepadirectdebit { background-position: 0px -1910px; }
+.adyen-payment-method-icon.adyen_hpp_bcmc { background: url(../images/adyen/bcmc.png) 0 1px no-repeat; }
+
 
 .adyen-payment-method-icon .no-mc { background-position: left top;  }
 

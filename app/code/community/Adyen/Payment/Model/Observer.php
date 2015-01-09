@@ -27,7 +27,9 @@
  */
 class Adyen_Payment_Model_Observer {
 
-
+    /**
+     * @param Varien_Event_Observer $observer
+     */
     public function addHppMethodsToConfig(Varien_Event_Observer $observer)
     {
         $store = Mage::app()->getStore();
@@ -40,6 +42,10 @@ class Adyen_Payment_Model_Observer {
         }
     }
 
+
+    /**
+     * @param Mage_Core_Model_Store $store
+     */
     protected function _addHppMethodsToConfig(Mage_Core_Model_Store $store)
     {
         $paymentConfig = Mage::getStoreConfig('payment/adyen_hpp', $store);
@@ -74,8 +80,6 @@ class Adyen_Payment_Model_Observer {
     {
         $adyenHelper = Mage::helper('adyen');
 
-        //@todo currency code filter, move to loading of payment method.
-        $orderCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode(); //Mage::helper('checkout/cart')->getQuote()->getQuoteCurrencyCode();
 
         $skinCode          = $adyenHelper->_getConfigData('skinCode', 'adyen_hpp', $store);
         $merchantAccount   = $adyenHelper->_getConfigData('merchantAccount', null, $store);
@@ -86,43 +90,9 @@ class Adyen_Payment_Model_Observer {
 //            $orderCurrencyCode
 //        );
 
-        //@todo implement proper caching, remove config setting for the caching.
-//        $cacheDirectoryLookup = trim($this->_getConfigData('cache_directory_lookup', 'adyen_hpp'));
-
-
-        //@todo country code filter, move to loading of payment method
-//        $countryCode = Mage::helper('adyen')->_getConfigData('countryCode');
-//        if (empty($countryCode)) {
-//            // check if billingcountry is filled in
-//            if (is_object(Mage::helper('checkout/cart')->getQuote()->getBillingAddress())
-//                && Mage::helper('checkout/cart')->getQuote()->getBillingAddress()->getCountry() != ""
-//            ) {
-//                $countryCode = Mage::helper('checkout/cart')->getQuote()->getBillingAddress()->getCountry();
-//            } else {
-//                $countryCode = ""; // don't set countryCode so you get all the payment methods
-//                // You could do ip lookup but availability and performace is not guaranteed
-////         		$ip = $this->getClientIp();
-////         		$countryCode = file_get_contents('http://api.hostip.info/country.php?ip='.$ip);
-//            }
-//        }
-//        // check if cache setting is on
-//        if ($cacheDirectoryLookup) {
-//            // cache name has variables merchantAccount, skinCode, currencycode and country code. Amound is not cached because of performance issues
-//            $cacheId
-//                =
-//                'cache_directory_lookup_request_' . $merchantAccount . "_" . $skinCode . "_" . $orderCurrencyCode . "_"
-//                . $countryCode;
-//            // check if this request is already cached
-//            if (false !== ($data = Mage::app()->getCache()->load($cacheId))) {
-//                // return result from cache
-//                return unserialize($data);
-//            }
-//        }
-        // directory lookup to search for available payment methods
-
         $adyFields = array(
-            "paymentAmount"     => '10',
-            "currencyCode"      => $orderCurrencyCode,
+            "paymentAmount"     => $this->_getCurrentPaymentAmount(),
+            "currencyCode"      => $this->_getCurrentCurrencyCode(),
             "merchantReference" => "Get Payment methods",
             "skinCode"          => $skinCode,
             "merchantAccount"   => $merchantAccount,
@@ -130,8 +100,8 @@ class Adyen_Payment_Model_Observer {
                 DATE_ATOM,
                 mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y"))
             ),
-//            "countryCode"       => 'DE',//$countryCode,
-            "shopperLocale"     => Mage::app()->getLocale()->getLocaleCode(),//$countryCode,
+            "countryCode"       => $this->_getCurrentCountryCode(),
+            "shopperLocale"     => Mage::app()->getLocale()->getLocaleCode()
         );
         $responseData = $this->_getResponse($adyFields, $store);
 
@@ -141,13 +111,23 @@ class Adyen_Payment_Model_Observer {
             $paymentMethodCode = $paymentMethod['brandCode'];
 
             //Skip open invoice methods if they are enabled
-            if (Mage::getStoreConfigFlag("payment/adyen_openinvoice/active")
-                && Mage::getStoreConfig("payment/adyen_openinvoice/openinvoicetypes") == $paymentMethodCode) {
+            if (Mage::getStoreConfigFlag('payment/adyen_openinvoice/active')
+                && Mage::getStoreConfig('payment/adyen_openinvoice/openinvoicetypes') == $paymentMethodCode) {
                 continue;
             }
 
-            if (Mage::getStoreConfigFlag("payment/adyen_cc/active") &&
-                in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro'))) {
+            if (Mage::getStoreConfigFlag('payment/adyen_cc/active')
+                && in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro'))) {
+                continue;
+            }
+
+            if (Mage::getStoreConfigFlag('payment/adyen_elv/active')
+                && $paymentMethodCode == 'elv') {
+                continue;
+            }
+
+            if (Mage::getStoreConfigFlag('payment/adyen_sepa/active')
+                && $paymentMethodCode == 'sepadirectdebit') {
                 continue;
             }
 
@@ -156,34 +136,38 @@ class Adyen_Payment_Model_Observer {
         }
 
         return $paymentMethods;
+    }
 
+    protected function _getQuote()
+    {
+        return Mage::getSingleton('checkout/session')->getQuote();
+    }
 
-//            $payment_methods = $results_json->paymentMethods;
-//            $result_array = array();
-//            foreach ($payment_methods as $payment_method) {
-//                // if openinvoice is activated don't show this in HPP options
-//                if (Mage::getStoreConfig("payment/adyen_openinvoice/active")) {
-//                    if (Mage::getStoreConfig("payment/adyen_openinvoice/openinvoicetypes")
-//                        == $payment_method->brandCode
-//                    ) {
-//                        continue;
-//                    }
-//                }
-//                $result_array[$payment_method->brandCode]['name'] = $payment_method->name;
-//                if (isset($payment_method->issuers)) {
-//                    // for ideal go through the issuers
-//                    if (count($payment_method->issuers) > 0) {
-//                        foreach ($payment_method->issuers as $issuer) {
-//                            $result_array[$payment_method->brandCode]['issuers'][$issuer->issuerId] = $issuer->name;
-//                        }
-//                    }
-//                    ksort($result_array[$payment_method->brandCode]['issuers']); // sort on key
-//                }
-//            }
-//        // if cache is on cache this result
-//        if ($cacheDirectoryLookup) {
-//            Mage::app()->getCache()->save(serialize($result_array), $cacheId);
-//        }
+    protected function _getCurrentLocaleCode()
+    {
+        return Mage::app()->getLocale()->getLocaleCode();
+    }
+
+    protected function _getCurrentCurrencyCode()
+    {
+        return $this->_getQuote()->getQuoteCurrencyCode();
+    }
+
+    protected function _getCurrentCountryCode()
+    {
+        if ($country = $this->_getQuote()->getBillingAddress()->getCountry()) {
+            return $country;
+        }
+
+        return Mage::getStoreConfig('payemnt/account/merchant_country');
+    }
+
+    protected function _getCurrentPaymentAmount()
+    {
+        if ($grandTotal = $this->_getQuote()->getGrandTotal() > 0) {
+            return $grandTotal;
+        }
+        return 10;
     }
 
 
@@ -191,6 +175,7 @@ class Adyen_Payment_Model_Observer {
      * @param $requestParams
      * @return array
      * @throws Mage_Core_Exception
+     * @todo implement caching, exclude sessionValidity
      */
     protected function _getResponse($requestParams, Mage_Core_Model_Store $store)
     {

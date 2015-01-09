@@ -44,9 +44,9 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
     protected $_code = 'adyen_hpp';
 
-//    protected $_formBlockType = 'adyen/form_hpp';
+    protected $_formBlockType = 'adyen/form_hpp';
 
-//    protected $_infoBlockType = 'adyen/info_hpp';
+    protected $_infoBlockType = 'adyen/info_hpp';
 
     protected $_paymentMethod = 'hpp';
 

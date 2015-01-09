@@ -342,15 +342,27 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
         return $this->_getConfigData('ws_password_live', null, $storeId);
     }
 
+
+    /**
+     * @param      $code
+     * @param null $paymentMethodCode
+     * @param null $storeId
+     * @deprecated please use getConfigData
+     * @return mixed
+     */
+    public function _getConfigData($code, $paymentMethodCode = null, $storeId = null)
+    {
+        return $this->getConfigData($code, $paymentMethodCode, $storeId);
+    }
+
     /**
      * @desc Give Default settings
      * @example $this->_getConfigData('demoMode','adyen_abstract')
      * @since 0.0.2
      * @param string $code
-     * @todo refactor method name to getConfigCode, underscores are for private methods.
      * @todo implement trim method for config value.
      */
-    public function _getConfigData($code, $paymentMethodCode = null, $storeId = null) {
+    public function getConfigData($code, $paymentMethodCode = null, $storeId = null) {
         if (null === $storeId) {
             $storeId = Mage::app()->getStore()->getStoreId();
         }
