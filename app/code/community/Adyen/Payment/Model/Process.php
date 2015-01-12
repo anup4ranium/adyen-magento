@@ -227,6 +227,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         }
                     }
                 }
+            } else {
+                $incrementId = $varienObj->getData('originalCustomMerchantReference');
+                Mage::log("Checksum failed for :".$incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
             }
         }
         // close the window
