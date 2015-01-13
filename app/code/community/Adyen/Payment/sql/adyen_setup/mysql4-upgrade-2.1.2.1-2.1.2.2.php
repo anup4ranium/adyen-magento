@@ -28,6 +28,6 @@ $installer = $this;
 /* @var $installer Adyen_Payment_Model_Mysql4_Setup */
 
 $installer->startSetup();
-$installer->run("ALTER TABLE `adyen_event_data` ADD INDEX (`adyen_event_result`);");
+$installer->run("ALTER TABLE `{$this->getTable('adyen/event')}` ADD INDEX (`adyen_event_result`);");
 
 $installer->endSetup();
