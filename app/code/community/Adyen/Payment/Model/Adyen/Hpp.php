@@ -179,6 +179,13 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         //blocked methods
         $adyFields['blockedMethods'] = "";
 
+        /*
+         * This feld will be appended as-is to the return URL when the shopper completes, or abandons, the payment and
+         * returns to your shop; it is typically used to transmit a session ID. This feld has a maximum of 128 characters
+         * This is an optional field and not necessary by default
+         */
+        $adyFields['merchantReturnData'] = "test";
+
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
 
         if($this->_code == "adyen_openinvoice" || $this->getInfoInstance()->getCcType() == "klarna" || $this->getInfoInstance()->getCcType() == "afterpay_default") {
@@ -203,6 +210,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             $adyFields['shopperReference'] .
             $adyFields['recurringContract'] .
             $adyFields['blockedMethods'] .
+            $adyFields['merchantReturnData'] .
             $adyFields['billingAddressType'] .
             $adyFields['deliveryAddressType'] .
             $adyFields['shopperType'];
