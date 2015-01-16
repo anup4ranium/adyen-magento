@@ -54,7 +54,7 @@
                         </version>
                         <merchantAccount translate="label">
                             <label>Merchant Account</label>
-                            <comment>You can find this in the Adyen backoffice.</comment>
+                            <comment><![CDATA[You can find this in the Adyen back-office. The Adyen back-office can be found on <a target="_blank" href="https://ca-test.adyen.com">https://ca-test.adyen.com</a> for test or <a target="_blank" href="https://ca-live.adyen.com">https://ca-live.adyen.com</a> for live.]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
