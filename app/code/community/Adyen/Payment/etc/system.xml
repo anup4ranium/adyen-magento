@@ -143,7 +143,8 @@
                         <notification_password translate="label">
                             <label>Notification Password</label>
                             <comment>Should match your "notifications settings" in your Adyen account.</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>76</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -180,7 +181,8 @@
                         <ws_password_test translate="label">
                             <label>Adyen ws password for Test</label>
                             <comment>The password of the ws user for Test</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>90</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -198,7 +200,8 @@
                         <ws_password_live translate="label">
                             <label>Adyen ws password for Live</label>
                             <comment>The password of the ws user for Live</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>110</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

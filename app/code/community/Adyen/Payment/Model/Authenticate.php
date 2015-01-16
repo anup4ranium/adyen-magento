@@ -93,7 +93,7 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         $this->fixCgiHttpAuthentication(); //add cgi support
         $internalMerchantAccount = $this->_getConfigData('merchantAccount');
         $username = $this->_getConfigData('notification_username');
-        $password = $this->_getConfigData('notification_password');
+        $password = Mage::helper('core')->decrypt($this->_getConfigData('notification_password'));
         $submitedMerchantAccount = $response->getData('merchantAccountCode');
         
         if (empty($submitedMerchantAccount) && empty($internalMerchantAccount)) {

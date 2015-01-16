@@ -337,9 +337,9 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
 
     public function getConfigDataWsPassword($storeId = null) {
         if ($this->getConfigDataDemoMode($storeId)) {
-            return $this->_getConfigData('ws_password_test', null, $storeId);
+            return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_test', null, $storeId));
         }
-        return $this->_getConfigData('ws_password_live', null, $storeId);
+        return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_live', null, $storeId));
     }
 
     /**
