@@ -184,7 +184,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
          * returns to your shop; it is typically used to transmit a session ID. This feld has a maximum of 128 characters
          * This is an optional field and not necessary by default
          */
-        $adyFields['merchantReturnData'] = "test";
+        $adyFields['merchantReturnData'] = "";
 
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
 
