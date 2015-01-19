@@ -21,7 +21,6 @@
  * @category   Payment Gateway
  * @package    Adyen_Payment
  * @author     Adyen
- * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
 class Adyen_Payment_Model_Observer {
@@ -59,7 +58,7 @@ class Adyen_Payment_Model_Observer {
      * @param array $methodData
      * @param       $store
      */
-    public function createPaymentMethodFromHpp($methodCode, $methodData = array(), $store)
+    public function createPaymentMethodFromHpp($methodCode, $methodData = array(), Mage_Core_Model_Store $store)
     {
         $methodNewCode = 'adyen_hpp_'.$methodCode;
 
@@ -80,6 +79,10 @@ class Adyen_Payment_Model_Observer {
     }
 
 
+    /**
+     * @param Mage_Core_Model_Store $store
+     * @return array
+     */
     protected function _fetchHppMethods(Mage_Core_Model_Store $store)
     {
         $adyenHelper = Mage::helper('adyen');
@@ -87,12 +90,6 @@ class Adyen_Payment_Model_Observer {
 
         $skinCode          = $adyenHelper->_getConfigData('skinCode', 'adyen_hpp', $store);
         $merchantAccount   = $adyenHelper->_getConfigData('merchantAccount', null, $store);
-
-        //@todo amount filtering, move to loading of payment method.
-//        $amount               = Mage::helper('adyen')->formatAmount(
-//            Mage::helper('checkout/cart')->getQuote()->getGrandTotal(),
-//            $orderCurrencyCode
-//        );
 
         $adyFields = array(
             "paymentAmount"     => $this->_getCurrentPaymentAmount(),
@@ -130,21 +127,37 @@ class Adyen_Payment_Model_Observer {
         return $paymentMethods;
     }
 
+
+    /**
+     * @return Mage_Sales_Model_Quote
+     */
     protected function _getQuote()
     {
         return Mage::getSingleton('checkout/session')->getQuote();
     }
 
+
+    /**
+     * @return string
+     */
     protected function _getCurrentLocaleCode()
     {
         return Mage::app()->getLocale()->getLocaleCode();
     }
 
+
+    /**
+     * @return string
+     */
     protected function _getCurrentCurrencyCode()
     {
         return $this->_getQuote()->getQuoteCurrencyCode() ?: Mage::app()->getBaseCurrencyCode();
     }
 
+
+    /**
+     * @return string
+     */
     protected function _getCurrentCountryCode()
     {
         $billingParams = Mage::app()->getRequest()->getParam('billing');
@@ -163,6 +176,10 @@ class Adyen_Payment_Model_Observer {
         return null;
     }
 
+
+    /**
+     * @return bool|int
+     */
     protected function _getCurrentPaymentAmount()
     {
         if ($grandTotal = $this->_getQuote()->getGrandTotal() > 0) {
@@ -173,22 +190,24 @@ class Adyen_Payment_Model_Observer {
 
 
     /**
-     * @param $requestParams
+     * @param                       $requestParams
+     * @param Mage_Core_Model_Store $store
+     *
      * @return array
      * @throws Mage_Core_Exception
-     * @todo implement caching, exclude sessionValidity
      */
     protected function _getResponse($requestParams, Mage_Core_Model_Store $store)
     {
         $cacheKey = $this->_getCacheKeyForRequest($requestParams, $store);
+
+        // Load response from cache.
         if ($responseData = Mage::app()->getCache()->load($cacheKey)) {
-            Mage::log('loadcache');
             return unserialize($responseData);
         }
 
         $this->_signRequestParams($requestParams, $store);
-        $ch = curl_init();
 
+        $ch = curl_init();
         $url = Mage::helper('adyen')->getConfigDataDemoMode()
             ? "https://test.adyen.com/hpp/directory.shtml"
             : "https://live.adyen.com/hpp/directory.shtml";
@@ -216,19 +235,21 @@ class Adyen_Payment_Model_Observer {
 
         $responseData = json_decode($results, true);
         if (! $responseData || !isset($responseData['paymentMethods'])) {
-            Mage::throwException(
-                Mage::helper('adyen')->__('Did not receive JSON, could not retrieve payment methods, received %s', $results)
-            );
+            Mage::throwException(Mage::helper('adyen')->__(
+                'Did not receive JSON, could not retrieve payment methods, received %s', $results
+            ));
         }
 
-        Mage::app()->getCache()->save(serialize($responseData), $cacheKey, array(Mage_Core_Model_Config::CACHE_TAG));
+        // Save response to cache.
+        Mage::app()->getCache()->save(
+            serialize($responseData),
+            $cacheKey,
+            array(Mage_Core_Model_Config::CACHE_TAG),
+            60 * 60 * 6
+        );
 
         return $responseData;
     }
-
-    protected $_requestFields = array(
-
-    );
 
     protected $_cacheParams = array(
         'currencyCode',
@@ -257,6 +278,7 @@ class Adyen_Payment_Model_Observer {
 
         return md5(implode('|', $cacheParams));
     }
+
 
     protected $_requiredHmacFields = array(
         'merchantReference',
@@ -353,10 +375,14 @@ class Adyen_Payment_Model_Observer {
     }
 
 
-
-    public function salesOrderPaymentCancel(Varien_Event_Observer $observer) {
-        // observer is payment object
+    /**
+     * @param Varien_Event_Observer $observer
+     */
+    public function salesOrderPaymentCancel(Varien_Event_Observer $observer)
+    {
         $payment = $observer->getEvent()->getPayment();
+
+        /** @var Mage_Sales_Model_Order $order */
         $order = $payment->getOrder();
 
         if($this->isPaymentMethodAdyen($order)) {
@@ -367,10 +393,11 @@ class Adyen_Payment_Model_Observer {
 
     /**
      * Determine if the payment method is Adyen
-     * @param type $order
+     * @param Mage_Sales_Model_Order $order
      * @return boolean
      */
-    public function isPaymentMethodAdyen($order) {
-        return ( strpos($order->getPayment()->getMethod(), 'adyen') !== false ) ? true : false;
+    public function isPaymentMethodAdyen(Mage_Sales_Model_Order $order)
+    {
+        return strpos($order->getPayment()->getMethod(), 'adyen') !== false;
     }
 }
