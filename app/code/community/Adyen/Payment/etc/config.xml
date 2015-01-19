@@ -165,14 +165,14 @@
             </order_creditmemo>
         </sales>
         <events>
-            <controller_front_init_before>
+            <controller_action_predispatch>
                 <observers>
                     <adyen_payment>
                         <class>adyen/observer</class>
                         <method>addHppMethodsToConfig</method>
                     </adyen_payment>
                 </observers>
-            </controller_front_init_before>
+            </controller_action_predispatch>
         </events>
     </global>
 

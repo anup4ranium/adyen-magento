@@ -38,6 +38,9 @@ class Adyen_Payment_Model_Adyen_Ideal
     {
         $issuerData = json_decode($this->getConfigData('issuers'), true);
         $issuers = array();
+        if (! $issuerData) {
+            return $issuers;
+        }
         foreach ($issuerData as $issuer) {
             $issuers[$issuer['issuerId'].'/'.$issuer['name']] = array(
                 'label' => $issuer['name']
@@ -47,7 +50,6 @@ class Adyen_Payment_Model_Adyen_Ideal
         if (isset($issuers[$this->getInfoInstance()->getPoNumber()])) {
             $issuers[$this->getInfoInstance()->getPoNumber()]['selected'] = true;
         }
-        Mage::log($this->getInfoInstance()->getPoNumber());
         ksort($issuers);
         return $issuers;
     }

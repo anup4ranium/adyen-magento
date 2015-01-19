@@ -50,11 +50,6 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract 
         parent::__construct();
     }
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * 1)Called everytime the adyen_sepa is called or used in checkout
      * @descrition Assign data to info model instance

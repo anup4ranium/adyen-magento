@@ -27,6 +27,7 @@
 class Adyen_Payment_Model_Observer {
 
     /**
+     * @event controller_action_predispatch
      * @param Varien_Event_Observer $observer
      */
     public function addHppMethodsToConfig(Varien_Event_Observer $observer)
@@ -158,6 +159,11 @@ class Adyen_Payment_Model_Observer {
 
     protected function _getCurrentCountryCode()
     {
+        $billingParams = Mage::app()->getRequest()->getParam('billing');
+        if (isset($billingParams['country_id'])) {
+            return $billingParams['country_id'];
+        }
+
         if ($country = $this->_getQuote()->getBillingAddress()->getCountry()) {
             return $country;
         }
