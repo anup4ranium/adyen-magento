@@ -20,7 +20,7 @@
  */
  
 class Adyen_Payment_Model_Adyen_Ideal
-    extends Adyen_Payment_Model_Adyen_Hpp_Default
+    extends Adyen_Payment_Model_Adyen_Hpp
 {
     protected $_code = 'adyen_ideal';
 
@@ -31,7 +31,7 @@ class Adyen_Payment_Model_Adyen_Ideal
      */
     public function getShowIdealLogos()
     {
-        return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
+        return $this->_getConfigData('show_ideal_logos', 'adyen_ideal');
     }
 
     public function getIssuers()

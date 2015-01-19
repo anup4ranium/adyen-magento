@@ -58,6 +58,17 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
 
     /**
+     * Ability to set the code, for dynamic payment methods.
+     * @param $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        $this->_code = $code;
+        return $this;
+    }
+
+    /**
      * @desc Get checkout session namespace
      *
      * @return Mage_Checkout_Model_Session
