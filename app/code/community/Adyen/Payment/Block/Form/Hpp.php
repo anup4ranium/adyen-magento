@@ -30,11 +30,20 @@ class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
     protected function _construct() {
         parent::_construct();
         $this->setTemplate('adyen/form/hpp.phtml');
-        $this->setMethodTitle('');
+
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE_IMAGE) {
+            $this->setMethodTitle('');
+        }
     }
 
     public function getMethodLabelAfterHtml()
     {
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE) {
+            return '';
+        }
+
         if (! $this->hasData('_method_label_html')) {
             $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
                 'template' => 'adyen/payment/payment_method_label.phtml',

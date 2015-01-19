@@ -36,24 +36,14 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
      */
     protected $_address;
 
-    protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
-        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_openinvoice");
-        // check if klarna or afterpay is selected for showing correct logo
-        $openinvoiceType = Mage::helper('adyen')->_getConfigData("openinvoicetypes", "adyen_openinvoice");
+    protected function _construct()
+    {
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE_IMAGE) {
+            $this->setMethodTitle('');
+        }
 
-        $mark = Mage::app()->getLayout()->createBlock('core/template', null, array(
-            'template' => 'adyen/payment/payment_method_label.phtml',
-            'payment_method_icon' =>  $paymentMethodIcon,
-            'payment_method_label' => $label,
-            'payment_method_class' => 'adyen_openinvoice_' . $openinvoiceType
-        ));
-
-        $this->setTemplate('adyen/form/openinvoice.phtml')
-            ->setMethodTitle('')
-            ->setMethodLabelAfterHtml($mark->toHtml());
-
-        /* Check if the customer is logged in or not */
+                /* Check if the customer is logged in or not */
         if (Mage::getSingleton('customer/session')->isLoggedIn()) {
 
             /* Get the customer data */
@@ -64,7 +54,31 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
             $this->setGender($customer->getGender());
         }
 
+
         parent::_construct();
+    }
+
+    public function getMethodLabelAfterHtml()
+    {
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE) {
+            return '';
+        }
+
+        if (! $this->hasData('_method_label_html')) {
+            $openinvoiceType = Mage::helper('adyen')->_getConfigData("openinvoicetypes", "adyen_openinvoice");
+
+            $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
+                'template' => 'adyen/payment/payment_method_label.phtml',
+                'payment_method_icon' =>  $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif"),
+                'payment_method_label' => Mage::helper('adyen')->getConfigData('title', $this->getMethod()->getCode()),
+                'payment_method_class' => 'adyen_openinvoice_' . $openinvoiceType
+            ));
+
+            $this->setData('_method_label_html', $labelBlock->toHtml());
+        }
+
+        return $this->getData('_method_label_html');
     }
 
 

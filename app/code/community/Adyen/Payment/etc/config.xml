@@ -255,6 +255,7 @@
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
+                <title_renderer>title_image</title_renderer>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">
                 <customer_id backend_model="adminhtml/system_config_backend_encrypted"/>
@@ -274,7 +275,6 @@
                 <sort_order>30</sort_order>
                 <cache_directory_lookup>0</cache_directory_lookup>
                 <return_url_in_request>0</return_url_in_request>
-                <show_ideal_logos>0</show_ideal_logos>
             </adyen_hpp>
             <adyen_ideal>
                 <active>0</active>

@@ -25,22 +25,38 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc {
+class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
+{
 
-    protected function _construct() {
+    protected function _construct()
+    {
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE_IMAGE) {
+            $this->setMethodTitle('');
+        }
+
         parent::_construct();
+    }
 
-        $this->setTemplate('adyen/form/cc.phtml');
+    public function getMethodLabelAfterHtml()
+    {
+        if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
+            == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE) {
+            return '';
+        }
 
-        $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
-            'template' => 'adyen/payment/payment_method_label.phtml',
-            'payment_method_icon' =>  $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif"),
-            'payment_method_label' => Mage::helper('adyen')->_getConfigData("title", "adyen_cc"),
-            'payment_method_class' => 'adyen_cc'
-        ));
+        if (! $this->hasData('_method_label_html')) {
+            $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
+                'template' => 'adyen/payment/payment_method_label.phtml',
+                'payment_method_icon' =>  $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif"),
+                'payment_method_label' => Mage::helper('adyen')->getConfigData('title', $this->getMethod()->getCode()),
+                'payment_method_class' => $this->getMethod()->getCode()
+            ));
 
-        $this->setMethodTitle('')
-             ->setMethodLabelAfterHtml($labelBlock->toHtml());
+            $this->setData('_method_label_html', $labelBlock->toHtml());
+        }
+
+        return $this->getData('_method_label_html');
     }
 	
     /**
