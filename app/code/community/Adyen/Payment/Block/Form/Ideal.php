@@ -32,14 +32,13 @@
  * Class Adyen_Payment_Block_Form_Hpp_Ideal
  * @method Adyen_Payment_Model_Adyen_Hpp_Ideal getMethod()
  */
-class Adyen_Payment_Block_Form_Hpp_Ideal extends Adyen_Payment_Block_Form_Hpp {
+class Adyen_Payment_Block_Form_Ideal extends Adyen_Payment_Block_Form_Hpp {
 
     protected function _construct()
     {
         parent::_construct();
         $this->setTemplate('adyen/form/hpp/ideal.phtml');
     }
-
 
     public function getShowIdealLogos()
     {

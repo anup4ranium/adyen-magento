@@ -19,10 +19,12 @@
  * @license   H&O Commercial License (http://www.h-o.nl/license)
  */
  
-class Adyen_Payment_Model_Adyen_Hpp_Ideal
+class Adyen_Payment_Model_Adyen_Ideal
     extends Adyen_Payment_Model_Adyen_Hpp_Default
 {
-    protected $_formBlockType = 'adyen/form_hpp_ideal';
+    protected $_code = 'adyen_ideal';
+
+    protected $_formBlockType = 'adyen/form_ideal';
 
     /**
      * @return mixed

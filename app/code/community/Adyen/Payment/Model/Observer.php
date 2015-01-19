@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -33,13 +32,7 @@ class Adyen_Payment_Model_Observer {
     public function addHppMethodsToConfig(Varien_Event_Observer $observer)
     {
         $store = Mage::app()->getStore();
-        if ($store->isAdmin()) {
-            foreach (Mage::app()->getStores() as $store) {
-                $this->_addHppMethodsToConfig($store);
-            }
-        } else {
-            $this->_addHppMethodsToConfig($store);
-        }
+        $this->_addHppMethodsToConfig($store);
     }
 
 
@@ -48,30 +41,42 @@ class Adyen_Payment_Model_Observer {
      */
     protected function _addHppMethodsToConfig(Mage_Core_Model_Store $store)
     {
-        $paymentConfig = Mage::getStoreConfig('payment/adyen_hpp', $store);
-
-        $configBase = $paymentConfig;
-        $store->setConfig('payment/adyen_hpp/active', 0);
+        Varien_Profiler::start(__CLASS__.'::'.__FUNCTION__);
 
         foreach ($this->_fetchHppMethods($store) as $methodCode => $methodData) {
-            $methodNewCode = 'adyen_hpp_'.$methodCode;
-            $methodData = $methodData + $configBase;
+            $this->createPaymentMethodFromHpp($methodCode, $methodData, $store);
+        }
 
-            // @todo load this through configuration, allows for easier extensions
-            // @todo remove the silencer before class_exists
-            $className = Mage::getConfig()->getModelClassName('adyen/adyen_hpp_'. $methodCode);
-            if (@class_exists($className)) {
-                $methodData['model'] = 'adyen/adyen_hpp_'.$methodCode;
-            } else {
-                $methodData['model'] = 'adyen/adyen_hpp_default';
-            }
+        $store->setConfig('payment/adyen_hpp/active', 0);
 
-            foreach ($methodData as $key => $value) {
-                if (is_object($value) || is_array($value)) {
-                    $value = json_encode($value);
-                }
-                $store->setConfig('payment/'.$methodNewCode.'/'.$key, $value);
+        Varien_Profiler::stop(__CLASS__.'::'.__FUNCTION__);
+    }
+
+
+    /**
+     * @param string $methodCode ideal,mc,etc.
+     * @param array $methodData
+     * @param       $store
+     */
+    public function createPaymentMethodFromHpp($methodCode, $methodData = array(), $store)
+    {
+        $methodNewCode = 'adyen_hpp_'.$methodCode;
+        $methodData = $methodData + Mage::getStoreConfig('payment/adyen_hpp', $store);
+
+        // @todo load this through configuration, allows for easier customization
+        // @todo remove the silencer before class_exists
+        $className = Mage::getConfig()->getModelClassName('adyen/adyen_hpp_'. $methodCode);
+        if (@class_exists($className)) {
+            $methodData['model'] = 'adyen/adyen_hpp_'.$methodCode;
+        } else {
+            $methodData['model'] = 'adyen/adyen_hpp_default';
+        }
+
+        foreach ($methodData as $key => $value) {
+            if (is_object($value) || is_array($value)) {
+                $value = json_encode($value);
             }
+            $store->setConfig('payment/'.$methodNewCode.'/'.$key, $value);
         }
     }
 
@@ -150,7 +155,7 @@ class Adyen_Payment_Model_Observer {
 
     protected function _getCurrentCurrencyCode()
     {
-        return $this->_getQuote()->getQuoteCurrencyCode();
+        return $this->_getQuote()->getQuoteCurrencyCode() ?: Mage::app()->getBaseCurrencyCode();
     }
 
     protected function _getCurrentCountryCode()

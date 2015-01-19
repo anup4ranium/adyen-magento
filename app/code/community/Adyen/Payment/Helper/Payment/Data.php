@@ -1,24 +1,21 @@
 <?php
 /**
- * ${Namespace}_${Module}
+ * Adyen Payment Module
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the H&O Commercial License
- * that is bundled with this package in the file LICENSE_HO.txt.
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://www.h-o.nl/license
+ * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to info@h-o.com so we can send you a copy immediately.
+ * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category  ${Namespace}
- * @package   ${Namespace}_${Module}
- * @author    Paul Hachmang – H&O <info@h-o.nl>
- * @copyright 2015 Copyright © H&O (http://www.h-o.nl/)
- * @license   H&O Commercial License (http://www.h-o.nl/license)
- *
- * ${Description}
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
  
 class Adyen_Payment_Helper_Payment_Data extends Mage_Payment_Helper_Data {
@@ -33,6 +30,13 @@ class Adyen_Payment_Helper_Payment_Data extends Mage_Payment_Helper_Data {
     {
         $key = self::XML_PATH_PAYMENT_METHODS.'/'.$code.'/model';
         $class = Mage::getStoreConfig($key);
+
+        if (! $class && strpos($code, 'adyen_hpp') !== false) {
+            $methodCode = substr($code, strlen('adyen_hpp_'));
+            Mage::getSingleton('adyen/observer')->createPaymentMethodFromHpp($methodCode, array(), Mage::app()->getStore());
+            $class = Mage::getStoreConfig($key);
+        }
+
         $methodInstance = Mage::getModel($class);
         if (method_exists($methodInstance, 'setCode')) {
             $methodInstance->setCode($code);
@@ -79,5 +83,31 @@ class Adyen_Payment_Helper_Payment_Data extends Mage_Payment_Helper_Data {
 
         usort($res, array($this, '_sortMethods'));
         return $res;
+    }
+
+    /**
+     * Retrieve payment information block
+     *
+     * @param   Mage_Payment_Model_Info $info
+     * @return  Mage_Core_Block_Template
+     */
+    public function getInfoBlock(Mage_Payment_Model_Info $info)
+    {
+        $instance = $this->getMethodInstance($info->getMethod());
+        if ($instance) {
+            $instance->setInfoInstance($info);
+            $info->setMethodInstance($instance);
+        }
+
+        $blockType = $instance->getInfoBlockType();
+        if ($this->getLayout()) {
+            $block = $this->getLayout()->createBlock($blockType);
+        }
+        else {
+            $className = Mage::getConfig()->getBlockClassName($blockType);
+            $block = new $className;
+        }
+        $block->setInfo($info);
+        return $block;
     }
 }

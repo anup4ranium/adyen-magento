@@ -276,6 +276,15 @@
                 <return_url_in_request>0</return_url_in_request>
                 <show_ideal_logos>0</show_ideal_logos>
             </adyen_hpp>
+            <adyen_ideal>
+                <active>0</active>
+                <model>adyen/adyen_ideal</model>
+                <title>Adyen iDEAL</title>
+                <show_ideal_logos>0</show_ideal_logos>
+                <sort_order>35</sort_order>
+                <allowspecific>1</allowspecific>
+                <specificcountry>NL</specificcountry>
+            </adyen_ideal>
             <adyen_pos translate="title" module="adyen">
                 <active>0</active>
                 <model>adyen/adyen_pos</model>

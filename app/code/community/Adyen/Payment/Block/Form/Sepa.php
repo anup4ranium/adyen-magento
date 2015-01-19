@@ -13,11 +13,14 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category	Adyen
- * @package	Adyen_Payment
- * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category     Adyen
+ * @package      Adyen_Payment
+ * @copyright    Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
+
+
 /**
  * @category   Payment Gateway
  * @package    Adyen_Payment
@@ -25,7 +28,8 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Sepa extends Mage_Payment_Block_Form {
+class Adyen_Payment_Block_Form_Sepa extends Mage_Payment_Block_Form
+{
 
     protected function _construct() {
         $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
@@ -46,44 +50,82 @@ class Adyen_Payment_Block_Form_Sepa extends Mage_Payment_Block_Form {
     }
 
 
-    public function getCountries() {
-
-        $sepaCountriesAllowed = array("AT", "BE", "BG", "CH", "CY","CZ","DE","DK","EE","ES","FI","FR",
-                                      "GB","GF","GI","GP","GR","HR","HU","IE","IS","IT","LI","LT","LU",
-                                      "LV","MC","MQ","MT","NL","NO","PL","PT","RE","RO","SE","SI","SK");
-
-       $countryList = Mage::getResourceModel('directory/country_collection')
+    public function getCountries()
+    {
+        $sepaCountriesAllowed = array(
+            "AT",
+            "BE",
+            "BG",
+            "CH",
+            "CY",
+            "CZ",
+            "DE",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GB",
+            "GF",
+            "GI",
+            "GP",
+            "GR",
+            "HR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LI",
+            "LT",
+            "LU",
+            "LV",
+            "MC",
+            "MQ",
+            "MT",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RE",
+            "RO",
+            "SE",
+            "SI",
+            "SK"
+        );
+        $countryList = Mage::getResourceModel('directory/country_collection')
             ->loadData()
             ->toOptionArray(false);
-
         $sepaCountries = array();
-
-        foreach($countryList as $key => $country) {
-
+        foreach ($countryList as $key => $country) {
             $value = $country['value'];
-            if(!in_array($value, $sepaCountriesAllowed)) {
+            if (!in_array($value, $sepaCountriesAllowed)) {
                 unset($countryList[$key]);
             }
         }
         return $countryList;
     }
 
-    public function getShopperCountryId() {
+
+    public function getShopperCountryId()
+    {
         $country = "";
-        if(Mage::app()->getStore()->isAdmin())
-        {
+        if (Mage::app()->getStore()->isAdmin()) {
             $quote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
         } else {
             $quote = Mage::helper('checkout/cart')->getQuote();
         }
-
-        if($quote) {
+        if ($quote) {
             $billingAddress = $quote->getBillingAddress();
-            if($billingAddress) {
+            if ($billingAddress) {
                 $country = $billingAddress->getCountryId();
             }
         }
         return $country;
     }
 
+
+    public function getBillingAgreements()
+    {
+        return $this->getMethod()->getBillingAgreementCollection();
+    }
 }
