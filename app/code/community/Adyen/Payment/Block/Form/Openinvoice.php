@@ -38,6 +38,9 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
 
     protected function _construct()
     {
+        parent::_construct();
+        $this->setTemplate('adyen/form/openinvoice.phtml');
+
         if (Mage::getStoreConfig('payment/adyen_abstract/title_renderer')
             == Adyen_Payment_Model_Source_Rendermode::MODE_TITLE_IMAGE) {
             $this->setMethodTitle('');
@@ -53,9 +56,6 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
             $this->setDate($customer->getDob());
             $this->setGender($customer->getGender());
         }
-
-
-        parent::_construct();
     }
 
     public function getMethodLabelAfterHtml()
