@@ -65,7 +65,9 @@
             <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
-            <block type="core/text" name="adyen.diners.validation">
+        </reference>
+        <reference name="after_body_start">
+            <block type="core/text" name="adyen.diners.validation" after="-">
                 <action method="setText">
                     <text>
                         <![CDATA[<script type="text/javascript">
@@ -83,7 +85,9 @@
             <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
-            <block type="core/text" name="adyen.diners.validation">
+        </reference>
+        <reference name="after_body_start">
+            <block type="core/text" name="adyen.diners.validation" after="-">
                 <action method="setText">
                     <text>
                         <![CDATA[<script type="text/javascript">
