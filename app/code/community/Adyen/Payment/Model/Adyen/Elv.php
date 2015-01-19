@@ -36,11 +36,11 @@ class Adyen_Payment_Model_Adyen_Elv extends Adyen_Payment_Model_Adyen_Abstract {
 
     public function __construct()
     {
-        $visable = Mage::getStoreConfig("payment/adyen_elv/visable_type");
-        if($visable == "backend") {
+        $visible = Mage::getStoreConfig("payment/adyen_elv/visible_type");
+        if($visible == "backend") {
             $this->_canUseCheckout = false;
             $this->_canUseInternal = true;
-        } else if($visable == "frontend") {
+        } else if($visible == "frontend") {
             $this->_canUseCheckout = true;
             $this->_canUseInternal = false;
         } else {

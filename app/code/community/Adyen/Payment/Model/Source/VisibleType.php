@@ -25,7 +25,7 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Source_VisableType {
+class Adyen_Payment_Model_Source_VisibleType {
 
     public function toOptionArray() {
         return array(
