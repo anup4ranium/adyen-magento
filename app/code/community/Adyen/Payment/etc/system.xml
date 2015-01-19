@@ -841,7 +841,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </installments_MO>
-                        <installments_JC translate="label">
+                        <installments_JCB translate="label">
                             <label>Installments For JCB</label>
                             <frontend_model>adyen/adminhtml_form_field_installments</frontend_model>
                             <backend_model>adyen/system_config_backend_installments</backend_model>
@@ -849,7 +849,25 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </installments_JC>
+                        </installments_JCB>
+                        <installments_ELO translate="label">
+                            <label>Installments For Elo</label>
+                            <frontend_model>adyen/adminhtml_form_field_installments</frontend_model>
+                            <backend_model>adyen/system_config_backend_installments</backend_model>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </installments_ELO>
+                        <installments_hipercard translate="label">
+                            <label>Installments For Hipercard</label>
+                            <frontend_model>adyen/adminhtml_form_field_installments</frontend_model>
+                            <backend_model>adyen/system_config_backend_installments</backend_model>
+                            <sort_order>210</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </installments_hipercard>
                     </fields>
                 </adyen_cc>
                 <adyen_oneclick>
