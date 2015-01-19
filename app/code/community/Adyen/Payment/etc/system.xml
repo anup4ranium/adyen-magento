@@ -748,6 +748,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>101</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                         <enable_moto>
                             <label>Enable MOTO for backend orders</label>
                             <frontend_type>select</frontend_type>
@@ -923,6 +933,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_elv>
                 <!-- @boleto only -->
@@ -1016,6 +1036,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_boleto>
                 <!-- @SEPA only -->
@@ -1091,6 +1121,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_sepa>
             </groups>

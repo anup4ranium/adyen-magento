@@ -31,6 +31,24 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract 
     protected $_formBlockType = 'adyen/form_sepa';
     protected $_infoBlockType = 'adyen/info_sepa';
     protected $_paymentMethod = 'sepa';
+    protected $_canUseCheckout = true;
+    protected $_canUseInternal = true;
+
+    public function __construct()
+    {
+        $visable = Mage::getStoreConfig("payment/adyen_sepa/visable_type");
+        if($visable == "backend") {
+            $this->_canUseCheckout = false;
+            $this->_canUseInternal = true;
+        } else if($visable == "frontend") {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = false;
+        } else {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = true;
+        }
+        parent::__construct();
+    }
 
     /**
      * 1)Called everytime the adyen_sepa is called or used in checkout

@@ -300,6 +300,7 @@
                 <enable_installments>0</enable_installments>
                 <cse_enabled>0</cse_enabled>
                 <cse_public_key></cse_public_key>
+                <visable_type>both</visable_type>
                 <enable_moto>0</enable_moto>
                 <account_id>99999</account_id>
                 <trxuser_id>99999</trxuser_id>
@@ -321,6 +322,7 @@
                 <model>adyen/adyen_elv</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visable_type>both</visable_type>
                 <title>Adyen ELV</title>
                 <sort_order>50</sort_order>
             </adyen_elv>
@@ -329,6 +331,7 @@
                 <model>adyen/adyen_boleto</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visable_type>both</visable_type>
                 <title>Adyen Boleto</title>
                 <delivery_days>5</delivery_days>
                 <sort_order>70</sort_order>
@@ -338,6 +341,7 @@
                 <model>adyen/adyen_sepa</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visable_type>both</visable_type>
                 <title>Adyen SEPA</title>
                 <sort_order>60</sort_order>
                 <validate_iban>0</validate_iban>

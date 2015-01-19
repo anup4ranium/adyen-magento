@@ -31,6 +31,24 @@ class Adyen_Payment_Model_Adyen_Boleto extends Adyen_Payment_Model_Adyen_Abstrac
     protected $_formBlockType = 'adyen/form_boleto';
     protected $_infoBlockType = 'adyen/info_boleto';
     protected $_paymentMethod = 'boleto';
+    protected $_canUseCheckout = true;
+    protected $_canUseInternal = true;
+
+    public function __construct()
+    {
+        $visable = Mage::getStoreConfig("payment/adyen_boleto/visable_type");
+        if($visable == "backend") {
+            $this->_canUseCheckout = false;
+            $this->_canUseInternal = true;
+        } else if($visable == "frontend") {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = false;
+        } else {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = true;
+        }
+        parent::__construct();
+    }
 
 	/**
      * 1)Called everytime the adyen_boleto is called or used in checkout
