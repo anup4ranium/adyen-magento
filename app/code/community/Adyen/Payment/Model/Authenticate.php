@@ -70,7 +70,11 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         }else{
         	$secretWord = $this->_getConfigData('secret_wordp', 'adyen_hpp');
         }
-        $sign = $response->getData('authResult') . $response->getData('pspReference') . $response->getData('merchantReference') . $response->getData('skinCode');
+
+        $sign = $response->getData('authResult') . $response->getData('pspReference') .
+                $response->getData('merchantReference') . $response->getData('skinCode') .
+                $response->getData('merchantReturnData');
+
         $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
         $localStringToHash = base64_encode(pack('H*', $signMac));
         if (strcmp($localStringToHash, $response->getData('merchantSig')) === 0) {
@@ -89,7 +93,7 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         $this->fixCgiHttpAuthentication(); //add cgi support
         $internalMerchantAccount = $this->_getConfigData('merchantAccount');
         $username = $this->_getConfigData('notification_username');
-        $password = $this->_getConfigData('notification_password');
+        $password = Mage::helper('core')->decrypt($this->_getConfigData('notification_password'));
         $submitedMerchantAccount = $response->getData('merchantAccountCode');
         
         if (empty($submitedMerchantAccount) && empty($internalMerchantAccount)) {

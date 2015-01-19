@@ -54,7 +54,7 @@
                         </version>
                         <merchantAccount translate="label">
                             <label>Merchant Account</label>
-                            <comment>You can find this in the Adyen backoffice.</comment>
+                            <comment><![CDATA[You can find this in the Adyen back-office. The Adyen back-office can be found on <a target="_blank" href="https://ca-test.adyen.com">https://ca-test.adyen.com</a> for test or <a target="_blank" href="https://ca-live.adyen.com">https://ca-live.adyen.com</a> for live.]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
@@ -143,7 +143,8 @@
                         <notification_password translate="label">
                             <label>Notification Password</label>
                             <comment>Should match your "notifications settings" in your Adyen account.</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>76</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -180,7 +181,8 @@
                         <ws_password_test translate="label">
                             <label>Adyen ws password for Test</label>
                             <comment>The password of the ws user for Test</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>90</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -198,7 +200,8 @@
                         <ws_password_live translate="label">
                             <label>Adyen ws password for Live</label>
                             <comment>The password of the ws user for Live</comment>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>110</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -799,6 +802,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>101</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                         <enable_moto>
                             <label>Enable MOTO for backend orders</label>
                             <frontend_type>select</frontend_type>
@@ -974,6 +987,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_elv>
                 <!-- @boleto only -->
@@ -1067,6 +1090,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_boleto>
                 <!-- @SEPA only -->
@@ -1142,6 +1175,16 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <visable_type>
+                            <label>Visable in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisableType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visable_type>
                     </fields>
                 </adyen_sepa>
             </groups>

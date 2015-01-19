@@ -219,6 +219,14 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         //blocked methods
         $adyFields['blockedMethods'] = "";
+
+        /*
+         * This feld will be appended as-is to the return URL when the shopper completes, or abandons, the payment and
+         * returns to your shop; it is typically used to transmit a session ID. This feld has a maximum of 128 characters
+         * This is an optional field and not necessary by default
+         */
+        $adyFields['merchantReturnData'] = "";
+
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
         if ($this->_code == "adyen_openinvoice" || $this->getInfoInstance()->getCcType() == "klarna"
             || $this->getInfoInstance()->getCcType() == "afterpay_default"
@@ -243,6 +251,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $adyFields['shopperReference'] .
             $adyFields['recurringContract'] .
             $adyFields['blockedMethods'] .
+            $adyFields['merchantReturnData'] .
             $adyFields['billingAddressType'] .
             $adyFields['deliveryAddressType'] .
             $adyFields['shopperType'];
@@ -265,9 +274,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         // if option to put Return Url in request from magento is enabled add this in the request
         $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp');
         if ($returnUrlInRequest) {
-            $url
-                                 =
-                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
+            $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
             $adyFields['resURL'] = $url;
         }
         // pos over hpp
@@ -324,10 +331,8 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                     $url = 'https://live.adyen.com/hpp/pay.shtml';
                 } else {
                     $url = (empty($brandCode))
-                        ?
-                        'https://live.adyen.com/hpp/select.shtml'
-                        :
-                        "https://live.adyen.com/hpp/details.shtml?brandCode=$brandCode";
+                        ? 'https://live.adyen.com/hpp/select.shtml'
+                        : "https://live.adyen.com/hpp/details.shtml?brandCode=$brandCode";
                 }
                 break;
         }
@@ -336,10 +341,8 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $bankData     = $this->getInfoInstance()->getPoNumber();
         if ($brandCode == 'ideal' && !empty($bankData)) {
             $idealBankUrl = ($isConfigDemoMode == true)
-                ?
-                'https://test.adyen.com/hpp/redirectIdeal.shtml'
-                :
-                'https://live.adyen.com/hpp/redirectIdeal.shtml';
+                ? 'https://test.adyen.com/hpp/redirectIdeal.shtml'
+                : 'https://live.adyen.com/hpp/redirectIdeal.shtml';
         }
         return (!empty($idealBankUrl)) ? $idealBankUrl : $url;
     }

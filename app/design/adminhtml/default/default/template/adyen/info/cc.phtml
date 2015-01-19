@@ -67,5 +67,8 @@ echo ($cseEnabled ? " (with Client-Side Encryption)" : "");
     <?php if($this->htmlEscape($this->getInfo()->getAdyenCvcResult()) != ""): ?>
         <?php echo Mage::helper('adyen')->__('Cvc result: %s', $this->htmlEscape($this->getInfo()->getAdyenCvcResult())) ?><br/>
     <?php endif; ?>
+    <?php if($this->htmlEscape($this->getInfo()->getAdyenTotalFraudScore()) != ""): ?>
+        <?php echo Mage::helper('adyen')->__('Total fraud score: %s', $this->htmlEscape($this->getInfo()->getAdyenTotalFraudScore())) ?><br/>
+    <?php endif; ?>
 
 <?php endif;?>

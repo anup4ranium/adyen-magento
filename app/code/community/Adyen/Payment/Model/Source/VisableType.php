@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Adyen Payment Module
  *
@@ -24,16 +25,14 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-$installer = $this;
-/* @var $installer Adyen_Payment_Model_Mysql4_Setup */
+class Adyen_Payment_Model_Source_VisableType {
 
-$installer->startSetup();
-$installer->run("ALTER TABLE `{$this->getTable('adyen/event')}` ADD INDEX `adyen_event_result`
-(`increment_id`, `adyen_event_result`(32));");
+    public function toOptionArray() {
+        return array(
+            array('value' => 'both', 'label' => 'Backend and Frontend'),
+            array('value' => 'backend', 'label' => 'Backend Only'),
+            array('value' => 'frontend', 'label' => 'Frontend Only')
+        );
+    }
 
-$installer->run("ALTER TABLE `{$this->getTable('adyen/event')}` CHANGE `adyen_event_result` `adyen_event_result` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Adyen Event Result';");
-
-$installer->endSetup();
-
-
-
+}

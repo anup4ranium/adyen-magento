@@ -227,6 +227,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         }
                     }
                 }
+            } else {
+                $incrementId = $varienObj->getData('originalCustomMerchantReference');
+                Mage::log("Checksum failed for :".$incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
             }
         }
         // close the window
@@ -407,6 +410,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $avsResult = $response->getData('additionalData_avsResult');
         $cvcResult = $response->getData('additionalData_cvcResult');
         $boletoPaidAmount = $response->getData('additionalData_boletobancario_paidAmount');
+        $totalFraudScore = $response->getData('additionalData_totalFraudScore');
         $pspReference = $response->getData('pspReference');
         $eventCode = $response->getData('eventCode');
         $authResult = $response->getData('authResult');
@@ -466,6 +470,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             }
             if($boletoPaidAmount != "") {
                 $paymentObj->setAdyenBoletoPaidAmount($boletoPaidAmount);
+            }
+            if($totalFraudScore != "") {
+                $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
             }
         }
 
