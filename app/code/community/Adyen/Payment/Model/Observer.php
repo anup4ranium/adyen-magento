@@ -115,23 +115,11 @@ class Adyen_Payment_Model_Observer {
             $paymentMethodCode = $paymentMethod['brandCode'];
 
             //Skip open invoice methods if they are enabled
-            if (Mage::getStoreConfigFlag('payment/adyen_openinvoice/active')
-                && Mage::getStoreConfig('payment/adyen_openinvoice/openinvoicetypes') == $paymentMethodCode) {
+            if (Mage::getStoreConfig('payment/adyen_openinvoice/openinvoicetypes') == $paymentMethodCode) {
                 continue;
             }
 
-            if (Mage::getStoreConfigFlag('payment/adyen_cc/active')
-                && in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro'))) {
-                continue;
-            }
-
-            if (Mage::getStoreConfigFlag('payment/adyen_elv/active')
-                && $paymentMethodCode == 'elv') {
-                continue;
-            }
-
-            if (Mage::getStoreConfigFlag('payment/adyen_sepa/active')
-                && $paymentMethodCode == 'sepadirectdebit') {
+            if (in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro', 'elv', 'sepadirectdebit'))) {
                 continue;
             }
 
@@ -168,7 +156,11 @@ class Adyen_Payment_Model_Observer {
             return $country;
         }
 
-        return Mage::getStoreConfig('payemnt/account/merchant_country');
+        if (Mage::getStoreConfig('payment/account/merchant_country')) {
+            return Mage::getStoreConfig('payment/account/merchant_country');
+        }
+
+        return null;
     }
 
     protected function _getCurrentPaymentAmount()
@@ -188,6 +180,12 @@ class Adyen_Payment_Model_Observer {
      */
     protected function _getResponse($requestParams, Mage_Core_Model_Store $store)
     {
+        $cacheKey = $this->_getCacheKeyForRequest($requestParams, $store);
+        if ($responseData = Mage::app()->getCache()->load($cacheKey)) {
+            Mage::log('loadcache');
+            return unserialize($responseData);
+        }
+
         $this->_signRequestParams($requestParams, $store);
         $ch = curl_init();
 
@@ -223,7 +221,41 @@ class Adyen_Payment_Model_Observer {
             );
         }
 
+        Mage::app()->getCache()->save(serialize($responseData), $cacheKey, array(Mage_Core_Model_Config::CACHE_TAG));
+
         return $responseData;
+    }
+
+    protected $_requestFields = array(
+
+    );
+
+    protected $_cacheParams = array(
+        'currencyCode',
+        'merchantReference',
+        'skinCode',
+        'merchantAccount',
+        'countryCode',
+        'shopperLocale',
+    );
+
+
+    /**
+     * @param                       $requestParams
+     * @param Mage_Core_Model_Store $store
+     * @return string
+     */
+    protected function _getCacheKeyForRequest($requestParams, Mage_Core_Model_Store $store)
+    {
+        $cacheParams = array();
+        $cacheParams['store'] = $store->getId();
+        foreach ($this->_cacheParams as $paramKey) {
+            if (isset($requestParams[$paramKey])) {
+                $cacheParams[$paramKey] = $requestParams[$paramKey];
+            }
+        }
+
+        return md5(implode('|', $cacheParams));
     }
 
     protected $_requiredHmacFields = array(
