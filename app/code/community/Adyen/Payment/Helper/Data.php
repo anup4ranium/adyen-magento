@@ -174,12 +174,14 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     public function getMagentoCreditCartType($ccType) {
 
         $ccTypesMapper = array("amex" => "AE",
-                                "visa" => "VI",
-                                "mastercard" => "MC",
-                                "discover" => "DI",
-                                "diners" => "DC",
-                                "maestro" => "SM",
-                                "jcb" => "JCB"
+            "visa" => "VI",
+            "mastercard" => "MC",
+            "discover" => "DI",
+            "diners" => "DC",
+            "maestro" => "SM",
+            "jcb" => "JCB",
+            "elo" => "ELO",
+            "hipercard" => "hipercard"
         );
 
         if(isset($ccTypesMapper[$ccType])) {

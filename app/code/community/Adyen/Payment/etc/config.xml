@@ -393,6 +393,18 @@
                         <order>70</order>
                         <is_cvv_required>0</is_cvv_required>
                     </JCB>
+                    <ELO>
+                        <code>ELO</code>
+                        <name>Elo</name>
+                        <order>80</order>
+                        <is_cvv_required>0</is_cvv_required>
+                    </ELO>
+                    <hipercard>
+                        <code>hipercard</code>
+                        <name>Hipercard</name>
+                        <order>90</order>
+                        <is_cvv_required>0</is_cvv_required>
+                    </hipercard>
                 </cctypes>
                 <boletotypes>
                     <boletobancario_hsbc>
