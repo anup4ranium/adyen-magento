@@ -33,7 +33,7 @@
 <ul class="form-list"  id="payment_form_<?php echo $_code ?>" style="display:none">
     <li>
         <label for="payment[adyen_ideal_type]">
-            <?php echo $this->__('You will be redirected to your bank when you place an order.') ?>
+            <?php echo $this->__('Choose Your Bank') ?>
         </label>
         <?php if($this->getShowIdealLogos()): ?>
             <?php foreach ($this->getIssuers() as $_issueId => $_issuerData): ?>
