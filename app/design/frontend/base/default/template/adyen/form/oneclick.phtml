@@ -359,6 +359,20 @@
                     originalSaveMethod();
                 });
             }
+
+            // Fix for the onestepcheckout plugins
+            if($('onestepcheckout-place-order')) {
+                $('onestepcheckout-place-order').observe('click', function(e) {
+                    cseOneClick.call(this);
+                });
+            }
+
+            // fix for the IWD One Page Checkout
+            if($('checkout-review-submit')) {
+                $('checkout-review-submit').observe('click', function(e) {
+                    cse.call(this);
+                });
+            }
         }
 
         if (document.readyState === "complete") {
