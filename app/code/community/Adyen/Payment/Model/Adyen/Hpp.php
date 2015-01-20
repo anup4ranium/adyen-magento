@@ -350,7 +350,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             } else {
                 $countryCode = ""; // don't set countryCode so you get all the payment methods
                 // You could do ip lookup but availability and performace is not guaranteed
-//         		$ip = $this->getClientIp();
+//         		$ip =  Mage::helper('adyen')->getClientIp();
 //         		$countryCode = file_get_contents('http://api.hostip.info/country.php?ip='.$ip);
             }
         }
@@ -471,29 +471,4 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
     public function getShowIdealLogos() {
         return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
     }
-
-    // Function to get the client ip address
-    public function getClientIp() {
-
-        $ipaddress = '';
-
-        if (isset($_SERVER['HTTP_CLIENT_IP']))
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        else if(isset($_SERVER['REMOTE_ADDR']))
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        else
-            $ipaddress = '';
-
-        return $ipaddress;
-    }
-
-
 }

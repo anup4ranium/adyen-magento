@@ -360,4 +360,38 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
         return Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId);
     }
 
+    // Function to get the client ip address
+    public function getClientIp() {
+        $ipaddress = '';
+
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if(isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        }else if(isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if(isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if(isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = '';
+        }
+
+        return $ipaddress;
+    }
+
+    public function ipInRange($ip, $from, $to) {
+        $ip = ip2long($ip);
+        $lowIp = ip2long($from);
+        $highIp = ip2long($to);
+
+        if ($ip <= $highIp && $lowIp <= $ip) {
+            return true;
+        }
+        return false;
+    }
+
 }

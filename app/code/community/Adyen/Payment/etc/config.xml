@@ -274,6 +274,7 @@
                 <cash_drawer>0</cash_drawer>
                 <cash_drawer_printer_ip></cash_drawer_printer_ip>
                 <cash_drawer_code>27,112,48,55,121</cash_drawer_code>
+                <ip_filter>0</ip_filter>
                 <allowspecific>0</allowspecific>
                 <sort_order>80</sort_order>
             </adyen_pos>
