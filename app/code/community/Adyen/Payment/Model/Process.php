@@ -97,6 +97,10 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             }
         }catch(Exception $e){
             // do nothing
+            // log error
+            Mage::logException($e);
+            Mage::log('NOTIFICATION RESPONSE failure!', print_r($e, true), "adyen_notification.log", true);
+
         }
 
         return $status;
@@ -615,6 +619,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $paymentMethod = trim($response->getData('paymentMethod'));
             $_paymentCode = $this->_paymentMethodCode($order);
             switch ($eventCode) {
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND_FAILED:
+                    // do nothing only inform the merchant with order comment history
+                    break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND:
 
                     $this->refundOrder($order, $response);
@@ -636,6 +643,12 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     if($_paymentCode != "adyen_pos") {
                         $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
+                    break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_REJECT:
+                    // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
+                    break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
+                    // don't do anything it will send a CAPTURE notification when this payment is captured
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
                     if($_paymentCode != "adyen_pos") {
