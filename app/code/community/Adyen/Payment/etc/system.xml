@@ -318,16 +318,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secret_wordp>
-                        <payment_routines translate="label">
-                            <label>Payment Flow Selection</label>
-                            <comment>Adyen provide you with 2 types of payment routines. Multi-page and Single Page</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adyen/source_PaymentRoutines</source_model>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </payment_routines>
                         <delivery_days translate="label">
                             <label>Days for Delivery</label>
                             <validate>validate-digits</validate>
@@ -348,6 +338,17 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </disable_hpptypes>
+                        <payment_routines translate="label">
+                            <label>Payment Flow Selection</label>
+                            <comment>Adyen provide you with 2 types of payment routines. Multi-page and Single Page</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_PaymentRoutines</source_model>
+                            <sort_order>95</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><disable_hpptypes>1</disable_hpptypes></depends>
+                        </payment_routines>
                         <cache_directory_lookup>
                             <label>Cache payment method call</label>
                             <comment>Enable this if you having trouble with performance and you don't have any amount rules setup in your skin in the Adyen backoffice.</comment>
