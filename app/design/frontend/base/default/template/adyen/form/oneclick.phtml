@@ -369,9 +369,11 @@
 
             // fix for the IWD One Page Checkout
             if($('checkout-review-submit')) {
-                $('checkout-review-submit').observe('click', function(e) {
-                    cse.call(this);
-                });
+                $$('.opc-btn-checkout').each(function(element) {
+                    element.observe('click', function(e) {
+                        cse.call(this);
+                    });
+                })
             }
         }
 
