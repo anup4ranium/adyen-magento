@@ -93,4 +93,7 @@ class Adyen_Payment_Model_Adyen_Boleto extends Adyen_Payment_Model_Adyen_Abstrac
         parent::prepareSave();
     }
 
+    public function getUseTaxvat() {
+        return $this->_getConfigData('use_taxvat', 'adyen_boleto');
+    }
 }

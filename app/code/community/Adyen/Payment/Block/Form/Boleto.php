@@ -85,4 +85,24 @@ class Adyen_Payment_Block_Form_Boleto extends Mage_Payment_Block_Form {
         return $lastname;
     }
 
+    public function getUseTaxvat() {
+        return $this->getMethod()->getUseTaxvat();
+    }
+
+    public function getTaxvat() {
+        $taxvat = "";
+
+        // check if user is logged in
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+            /* Get the customer data */
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            $taxvat = $customer->getTaxvat();
+
+        } else {
+            //getCustomerTaxvat
+            $taxvat = Mage::getSingleton('checkout/session')->getQuote()->getCustomerTaxvat();
+        }
+        return $taxvat;
+    }
+
 }
