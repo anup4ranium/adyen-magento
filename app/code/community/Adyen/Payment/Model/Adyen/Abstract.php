@@ -261,6 +261,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         switch ($request) {
             case "authorise":
             case "authorise3d":
+                $fraudResult = $response->paymentResult->fraudResult->accountScore;
+                $payment->setAdyenTotalFraudScore($fraudResult);
                 $responseCode = $response->paymentResult->resultCode;
                 $pspReference = $response->paymentResult->pspReference;
                 break;
