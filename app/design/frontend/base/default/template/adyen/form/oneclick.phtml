@@ -375,6 +375,13 @@
                     });
                 })
             }
+
+            //Fix for Inovarti One Step Checkout Brasil
+            if($('onestepcheckout-place-order-button')) {
+                $('onestepcheckout-place-order-button').observe('click', function(e) {
+                    cse.call(this);
+                });
+            }
         }
 
         if (document.readyState === "complete") {
