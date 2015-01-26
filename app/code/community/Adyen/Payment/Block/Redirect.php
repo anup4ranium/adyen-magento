@@ -43,9 +43,20 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
 
     protected function _toHtml() {
 
+        $paymentObject = $this->_getOrder()->getPayment();
         $payment = $this->_getOrder()->getPayment()->getMethodInstance();
 
-        $html = '<html><head><link rel="stylesheet" type="text/css" href="'.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'/frontend/base/default/css/adyenstyle.css"><script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script></head><body class="redirect-body-adyen">';
+        $html = '<html><head><link rel="stylesheet" type="text/css" href="'.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'/frontend/base/default/css/adyenstyle.css"><script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>';
+
+        // for cash add epson libary to open the cash drawer
+        $cashDrawer = Mage::helper('adyen')->_getConfigData("cash_drawer", "adyen_pos", null);
+        if($payment->getCode() == "adyen_hpp" && $paymentObject->getCcType() == "c_cash" && $cashDrawer) {
+            $jsPath = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);
+            $html .= '<script src="'.$jsPath.'adyen/payment/epos-device-2.6.0.js"></script>';
+        }
+        $html .= '</head><body class="redirect-body-adyen">';
+
+
         // if pos payment redirect to app
         if($payment->getCode() == "adyen_pos") {
 
@@ -130,7 +141,46 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
 
             $html.= $this->__(' ');
             $html.= $form->toHtml();
-            $html.= '<script type="text/javascript">document.getElementById("'.$payment->getCode().'").submit();</script>';
+
+            if($payment->getCode() == "adyen_hpp" && $paymentObject->getCcType() == "c_cash" && $cashDrawer) {
+                $cashDrawerIp = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_ip", "adyen_pos", null);
+                $cashDrawerPort = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_port", "adyen_pos", null);
+                $cashDrawerDeviceId = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_device_id", "adyen_pos", null);
+
+                if($cashDrawerIp != '' && $cashDrawerPort != '' && $cashDrawerDeviceId != '') {
+                    $html.= '
+                            <script type="text/javascript">
+                                var ipAddress = "'.$cashDrawerIp.'";
+                                var port = "'.$cashDrawerPort.'";
+                                var deviceID = "'.$cashDrawerDeviceId.'";
+                                var ePosDev = new epson.ePOSDevice();
+                                ePosDev.connect(ipAddress, port, Callback_connect);
+
+                                function Callback_connect(data) {
+                                    if (data == "OK" || data == "SSL_CONNECT_OK") {
+                                        var options = "{}";
+                                        ePosDev.createDevice(deviceID, ePosDev.DEVICE_TYPE_PRINTER, options, callbackCreateDevice_printer);
+                                    } else {
+                                        alert("connected to ePOS Device Service Interface is failed. [" + data + "]");
+                                    }
+                                }
+
+                                function callbackCreateDevice_printer(data, code) {
+                                    var print = data;
+                                    var drawer = "{}";
+                                    var time = print.PULSE_100
+                                    print.addPulse();
+                                    print.send();
+                                    document.getElementById("'.$payment->getCode().'").submit();
+                                }
+                            </script>
+                    ';
+                } else {
+                    Mage::log("You did not fill in all the fields (ip,port,device id) to use Cash Drawer support:", Zend_Log::DEBUG, "adyen_notification.log", true);
+                }
+            } else {
+                $html.= '<script type="text/javascript">document.getElementById("'.$payment->getCode().'").submit();</script>';
+            }
         }
         $html.= '</body></html>';
         return $html;
