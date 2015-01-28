@@ -99,7 +99,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             // do nothing
             // log error
             Mage::logException($e);
-            Mage::log('NOTIFICATION RESPONSE failure!', print_r($e, true), "adyen_notification.log", true);
+            Mage::log('NOTIFICATION RESPONSE failure!' . print_r($e, true), Zend_Log::DEBUG, "adyen_notification.log", true);
 
         }
 
