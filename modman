@@ -9,3 +9,7 @@ app/etc/modules/Adyen_Payment.xml   app/etc/modules/Adyen_Payment.xml
 skin/frontend/base/default/css/adyenstyle.css   skin/frontend/base/default/css/adyenstyle.css
 skin/frontend/base/default/images/adyen/    skin/frontend/base/default/images/adyen/
 js/adyen/payment/   js/adyen/payment/
+app/locale/de_DE/*  app/locale/de_DE/
+app/locale/es_ES/*  app/locale/es_ES/
+app/locale/fr_FR/*  app/locale/fr_FR/
+app/locale/nl_NL/*  app/locale/nl_NL/
