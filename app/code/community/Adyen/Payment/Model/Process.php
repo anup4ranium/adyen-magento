@@ -97,6 +97,10 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             }
         }catch(Exception $e){
             // do nothing
+            // log error
+            Mage::logException($e);
+            Mage::log('NOTIFICATION RESPONSE failure!' . print_r($e, true), Zend_Log::DEBUG, "adyen_notification.log", true);
+
         }
 
         return $status;
@@ -108,6 +112,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $helper = Mage::helper('adyen');
         $response = $_REQUEST;
 
+        Mage::log("PosResonse:".print_r($response, true), Zend_Log::DEBUG, "adyen_notification.log", true);
 
         $varienObj = new Varien_Object();
         foreach ($response as $code => $value) {
@@ -169,7 +174,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $session_id_checksum = 0;
             for($i=0;$i<strlen($session_id);$i++)
             {
-                $checksum_calc = ord($session_id[$i]) - 48;
+                $checksum_calc = $this->getAscii2Int($session_id[$i]);
                 $session_id_checksum += $checksum_calc;
             }
 
@@ -226,6 +231,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         }
                     }
                 }
+            } else {
+                $incrementId = $varienObj->getData('originalCustomMerchantReference');
+                Mage::log("Checksum failed for :".$incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
             }
         }
         // close the window
@@ -240,6 +248,15 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 		    		</body></html>";
 
         return $html;
+    }
+
+    public function getAscii2Int($ascii){
+        if (is_numeric($ascii)){
+            $int = ord($ascii) - 48;
+        } else {
+            $int = ord($ascii) - 64;
+        }
+        return $int;
     }
 
     public function processCashResponse()
@@ -394,10 +411,10 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      */
     protected function _addAdyenAttributes(Varien_Object $order, $response, $updateAdyenStatus = true) {
         $klarnaReservationNumber = $response->getData('additionalData_additionalData_acquirerReference');
-        $ccLast4 = $response->getData('additionalData_cardSummary');
         $avsResult = $response->getData('additionalData_avsResult');
         $cvcResult = $response->getData('additionalData_cvcResult');
         $boletoPaidAmount = $response->getData('additionalData_boletobancario_paidAmount');
+        $totalFraudScore = $response->getData('additionalData_totalFraudScore');
         $pspReference = $response->getData('pspReference');
         $eventCode = $response->getData('eventCode');
         $authResult = $response->getData('authResult');
@@ -407,6 +424,20 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $eventData = (!empty($eventCode)) ? $eventCode : $authResult;
         $paymentObj = $order->getPayment();
         $_paymentCode = $this->_paymentMethodCode($order);
+
+        $ccLast4 = $response->getData('additionalData_cardSummary');
+        // if there is no server communication setup try to get last4 digits from reason field
+        if($ccLast4 == "") {
+            $reason = trim($response->getData('reason'));
+            if($reason != "") {
+                $reasonArray = explode(":", $reason);
+                if($reasonArray != null && is_array($reasonArray)) {
+                    if(isset($reasonArray[1])) {
+                        $ccLast4 = $reasonArray[1];
+                    }
+                }
+            }
+        }
 
         $paymentObj->setLastTransId($incrementId)
             ->setAdyenPaymentMethod($paymentMethod)
@@ -443,6 +474,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             }
             if($boletoPaidAmount != "") {
                 $paymentObj->setAdyenBoletoPaidAmount($boletoPaidAmount);
+            }
+            if($totalFraudScore != "") {
+                $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
             }
         }
 
@@ -582,9 +616,12 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $eventCode = trim($response->getData('eventCode'));
 
             $success = (bool) trim($response->getData('success'));
-            $payment_method = trim($response->getData('paymentMethod'));
+            $paymentMethod = trim($response->getData('paymentMethod'));
             $_paymentCode = $this->_paymentMethodCode($order);
             switch ($eventCode) {
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND_FAILED:
+                    // do nothing only inform the merchant with order comment history
+                    break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND:
 
                     $this->refundOrder($order, $response);
@@ -592,21 +629,33 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     $this->setRefundAuthorized($order, $success);
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING:
-                    //add comment to the order
+                    if($this->_getConfigData('send_email_bank_sepa_on_pending', 'adyen_abstract')) {
+                        // Check if payment is banktransfer or sepa if true then send out order confirmation email
+                        $isBankTransfer = $this->isBankTransfer($paymentMethod);
+                        if($isBankTransfer || $paymentMethod == 'sepadirectdebit') {
+                            $order->sendNewOrderEmail(); // send order email
+                        }
+                    }
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY:
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION:
                     // for POS don't do anything on the AUTHORIZATION
                     if($_paymentCode != "adyen_pos") {
-                        $this->authorizePayment($order, $success, $payment_method, $response);
+                        $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
+                    break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_REJECT:
+                    // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
+                    break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
+                    // don't do anything it will send a CAPTURE notification when this payment is captured
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
                     if($_paymentCode != "adyen_pos") {
                         $this->setPaymentAuthorized($order, $success, $response);
                     } else {
                         // FOR POS authorize the payment on the CAPTURE notification
-                        $this->authorizePayment($order, $success, $payment_method, $response);
+                        $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE_FAILED:
@@ -662,7 +711,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $this->createInvoice($order, $response);
 
         $_paymentCode = $this->_paymentMethodCode($order);
-        if($payment_method == "c_cash" || ($this->_getConfigData('cash_drawer', 'adyen_pos') && $_paymentCode = "adyen_pos"))
+        if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos') && $_paymentCode == "adyen_pos"))
         {
             $this->createShipment($order);
         }
@@ -677,6 +726,13 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if ($success && !empty($order)) {
 
             $status = $this->_getConfigData('payment_authorized');
+            // virtual order can have different status
+            if($order->getIsVirtual()) {
+                $virtual_status = $this->_getConfigData('payment_authorized_virtual');
+                if($virtual_status != "") {
+                    $status = $virtual_status;
+                }
+            }
 
             // check for boleto if payment is totally paid
             if($order->getPayment()->getMethod() == "adyen_boleto") {
@@ -776,7 +832,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             return false;
         }
         //online capture after delivery, use Magento backend to online invoice
-        if (strcmp($paymentMethod, 'openinvoice') === 0) {
+        if (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0) {
             return false;
         }
         return true;
@@ -788,6 +844,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         } else {
             $isBankTransfer = false;
         }
+        return $isBankTransfer;
     }
 
     /**
@@ -860,7 +917,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $eventCode = trim($response->getData('eventCode'));
         $reason = trim($response->getData('reason'));
         $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail');
-        $_status = $this->_getConfigData('order_status');
         $_mail = (bool) $this->_getConfigData('send_update_mail');
         $value = trim($response->getData('value'));
 
@@ -883,7 +939,10 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if ($order->canInvoice()) {
             $invoice = $order->prepareInvoice();
             $invoice->getOrder()->setIsInProcess(true);
-            $invoice->register()->capture();
+            // set transaction id so you can do a online refund this is used instead of online capture
+            // because it is already auto capture in Adyen Backoffice
+            $invoice->setTransactionId(1);
+            $invoice->register()->pay();
             try {
                 Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
@@ -1103,13 +1162,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      * @param string $code
      */
     protected function _getConfigData($code, $paymentMethodCode = null, $storeId = null) {
-        if (null === $storeId) {
-            $storeId = Mage::app()->getStore()->getId();
-        }
-        if (empty($paymentMethodCode)) {
-            return Mage::getStoreConfig("payment/adyen_abstract/$code", $storeId);
-        }
-        return Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId);
+        return Mage::helper('adyen')->_getConfigData($code, $paymentMethodCode, $storeId);
     }
 
     public function getConfigData($code, $paymentMethodCode = null, $storeId = null) {

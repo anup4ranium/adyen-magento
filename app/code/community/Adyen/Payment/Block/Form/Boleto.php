@@ -28,8 +28,21 @@
 class Adyen_Payment_Block_Form_Boleto extends Mage_Payment_Block_Form {
 
     protected function _construct() {
+        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
+        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_boleto");
+
+        $mark = Mage::getConfig()->getBlockClassName('core/template');
+        $mark = new $mark;
+        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
+            ->setPaymentMethodIcon($paymentMethodIcon)
+            ->setPaymentMethodLabel($label)
+            ->setPaymentMethodClass("adyen_boleto");
+
+        $this->setTemplate('adyen/form/boleto.phtml')
+            ->setMethodTitle('')
+            ->setMethodLabelAfterHtml($mark->toHtml());
+
         parent::_construct();
-        $this->setTemplate('adyen/form/boleto.phtml');
     }
 
     /**
@@ -70,6 +83,26 @@ class Adyen_Payment_Block_Form_Boleto extends Mage_Payment_Block_Form {
             $lastname = Mage::getSingleton('checkout/session')->getQuote()->getBillingAddress()->getLastname();
         }
         return $lastname;
+    }
+
+    public function getUseTaxvat() {
+        return $this->getMethod()->getUseTaxvat();
+    }
+
+    public function getTaxvat() {
+        $taxvat = "";
+
+        // check if user is logged in
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+            /* Get the customer data */
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            $taxvat = $customer->getTaxvat();
+
+        } else {
+            //getCustomerTaxvat
+            $taxvat = Mage::getSingleton('checkout/session')->getQuote()->getCustomerTaxvat();
+        }
+        return $taxvat;
     }
 
 }

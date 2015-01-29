@@ -31,6 +31,24 @@ class Adyen_Payment_Model_Adyen_Elv extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_formBlockType = 'adyen/form_elv';
     protected $_infoBlockType = 'adyen/info_elv';
     protected $_paymentMethod = 'elv';
+    protected $_canUseCheckout = true;
+    protected $_canUseInternal = true;
+
+    public function __construct()
+    {
+        $visible = Mage::getStoreConfig("payment/adyen_elv/visible_type");
+        if($visible == "backend") {
+            $this->_canUseCheckout = false;
+            $this->_canUseInternal = true;
+        } else if($visible == "frontend") {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = false;
+        } else {
+            $this->_canUseCheckout = true;
+            $this->_canUseInternal = true;
+        }
+        parent::__construct();
+    }
 
     /**
      * 1)Called everytime the adyen_elv is called or used in checkout

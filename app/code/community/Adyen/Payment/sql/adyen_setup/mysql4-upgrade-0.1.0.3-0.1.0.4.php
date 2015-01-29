@@ -41,7 +41,7 @@ CREATE TABLE `{$this->getTable('adyen/event')}` (
 `created_at` datetime NULL DEFAULT NULL COMMENT 'Created At',
 PRIMARY KEY (`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+ALTER TABLE `{$this->getTable('adyen/event')}` ADD INDEX(adyen_event_code, psp_reference);
 ");
 
 $installer->endSetup();

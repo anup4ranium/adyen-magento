@@ -92,7 +92,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $grandTotal = $order->getGrandTotal();
 
         if($grandTotal == $amount) {
-            $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, null, $pspReference);
+            $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
         } else {
             $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $pspReference);
         }
@@ -124,6 +124,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $payment->setStatus(self::STATUS_APPROVED)
                 ->setTransactionId($this->getTransactionId())
                 ->setIsTransactionClosed(0);
+
+        // do capture request to adyen
+        $order = $payment->getOrder();
+        $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
+        $order->getPayment()->getMethodInstance()->sendCaptureRequest($payment, $amount, $pspReference);
+
         return $this;
     }
 	
@@ -151,7 +157,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         return $this->_processRequest($payment, $amount, "refund", $pspReference);
     }
 
-    public function SendCancelOrRefund(Varien_Object $payment, $amount, $pspReference) {
+    public function SendCancelOrRefund(Varien_Object $payment, $pspReference) {
         if (empty($pspReference)) {
             $this->writeLog('oops empty pspReference');
             return $this;
@@ -255,6 +261,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         switch ($request) {
             case "authorise":
             case "authorise3d":
+                $fraudResult = $response->paymentResult->fraudResult->accountScore;
+                $payment->setAdyenTotalFraudScore($fraudResult);
                 $responseCode = $response->paymentResult->resultCode;
                 $pspReference = $response->paymentResult->pspReference;
                 break;
@@ -610,36 +618,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
     public function getConfigPaymentAction() {
         return Mage_Payment_Model_Method_Abstract::ACTION_AUTHORIZE;
-    }
-
-    /**
-     * @todo deprecates these use $this->_getConfigData($code,'paymentCode')
-     * @desc No reason of doing this!!!
-     */
-    public function getConfigDataMerchantAccount() {
-        return $this->_getConfigData('merchantAccount');
-    }
-
-    public function getConfigDataPaymentAuthorizedStatus() {
-        return $this->_getConfigData('payment_authorized');
-    }
-
-    public function getConfigDataMailAuthorizedUpdate() {
-        return $this->_getConfigData('mail_authorized');
-    }
-
-    public function getConfigDataCancelPendingCron() {
-        return $this->_getConfigData('cancel_pending_cron');
-    }
-
-    public function getConfigDataHppSecretTest() {
-        die("getConfigDataHppSecretTest in Adyen_Payment_Model_Adyen_Abstract");
-        return $this->_getConfigData('secret_wordt');
-    }
-
-    public function getConfigDataHppSecretLive() {
-        die("getConfigDataHppSecretLive in Adyen_Payment_Model_Adyen_Abstract");
-        return $this->_getConfigData('secret_wordp');
     }
 
 }

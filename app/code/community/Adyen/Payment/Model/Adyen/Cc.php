@@ -31,6 +31,27 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_formBlockType = 'adyen/form_cc';
     protected $_infoBlockType = 'adyen/info_cc';
     protected $_paymentMethod = 'cc';
+    protected $_canUseCheckout = true;
+    protected $_canUseInternal = true;
+
+    public function __construct()
+    {
+        // check if this is adyen_cc payment method because this function is as well used for oneclick payments
+        if($this->getCode() == "adyen_cc") {
+            $visible = Mage::getStoreConfig("payment/adyen_cc/visible_type");
+            if($visible == "backend") {
+                $this->_canUseCheckout = false;
+                $this->_canUseInternal = true;
+            } else if($visible == "frontend") {
+                $this->_canUseCheckout = true;
+                $this->_canUseInternal = false;
+            } else {
+                $this->_canUseCheckout = true;
+                $this->_canUseInternal = true;
+            }
+        }
+        parent::__construct();
+    }
 
     /**
      * 1)Called everytime the adyen_cc is called or used in checkout
@@ -115,6 +136,17 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
     }
 
     public function getCsePublicKey() {
+
+        if (Mage::app()->getStore()->isAdmin()) {
+            $quote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
+            $storeId = $quote->getStoreId();
+        } else {
+            $storeId = null;
+        }
+
+        if (Mage::helper('adyen')->getConfigDataDemoMode($storeId)) {
+            return trim(Mage::getStoreConfig("payment/adyen_cc/cse_publickey_test"));
+        }
         return trim(Mage::getStoreConfig("payment/adyen_cc/cse_publickey"));
     }
 
@@ -161,5 +193,5 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
 		
         return $adyFields;
 	}
-	
+
 }

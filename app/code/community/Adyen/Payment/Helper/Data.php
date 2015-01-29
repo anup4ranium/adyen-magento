@@ -75,7 +75,10 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     }
 
     public function hasEnableScanner() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/enable_scanner');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/enable_scanner');
+        }
+        return false;
     }
 
     public function hasAutoSubmitScanner() {
@@ -83,11 +86,17 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     }
 
     public function hasExpressCheckout() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/express_checkout');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/express_checkout');
+        }
+        return false;
     }
 
     public function hasCashExpressCheckout() {
-        return (int) Mage::getStoreConfig('payment/adyen_pos/cash_express_checkout');
+        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_pos/cash_express_checkout');
+        }
+        return false;
     }
 
     public function getOrderStatus() {
@@ -165,13 +174,14 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     public function getMagentoCreditCartType($ccType) {
 
         $ccTypesMapper = array("amex" => "AE",
-                                "visa" => "VI",
-                                "mastercard" => "MC",
-                                "discover" => "DI",
-                                "diners" => "DC",
-                                "maestro" => "SM",
-                                "jcb" => "JCB",
-//                                "" => "CB" cart blue is just visa
+            "visa" => "VI",
+            "mastercard" => "MC",
+            "discover" => "DI",
+            "diners" => "DC",
+            "maestro" => "SM",
+            "jcb" => "JCB",
+            "elo" => "ELO",
+            "hipercard" => "hipercard"
         );
 
         if(isset($ccTypesMapper[$ccType])) {
@@ -235,8 +245,6 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
                 $result = utf8_encode(urldecode($result));
                 // convert to array
                 parse_str($result,$result);
-
-                Mage::log("List recurring result is: " . curl_error($ch), self::DEBUG_LEVEL, 'http-request.log',true);
 
                 foreach($result as $key => $value) {
                     // strip the key
@@ -331,9 +339,9 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
 
     public function getConfigDataWsPassword($storeId = null) {
         if ($this->getConfigDataDemoMode($storeId)) {
-            return $this->_getConfigData('ws_password_test', null, $storeId);
+            return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_test', null, $storeId));
         }
-        return $this->_getConfigData('ws_password_live', null, $storeId);
+        return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_live', null, $storeId));
     }
 
     /**
@@ -350,6 +358,40 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
             return Mage::getStoreConfig("payment/adyen_abstract/$code", $storeId);
         }
         return Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId);
+    }
+
+    // Function to get the client ip address
+    public function getClientIp() {
+        $ipaddress = '';
+
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if(isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        }else if(isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if(isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if(isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = '';
+        }
+
+        return $ipaddress;
+    }
+
+    public function ipInRange($ip, $from, $to) {
+        $ip = ip2long($ip);
+        $lowIp = ip2long($from);
+        $highIp = ip2long($to);
+
+        if ($ip <= $highIp && $lowIp <= $ip) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -42,7 +42,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_paymentMethod = 'hpp';
     protected $_testModificationUrl = 'https://pal-test.adyen.com/pal/adapter/httppost';
     protected $_liveModificationUrl = 'https://pal-live.adyen.com/pal/adapter/httppost';
-
+    protected $_isInitializeNeeded = true;
     /**
      * @desc Get checkout session namespace
      *
@@ -71,6 +71,22 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             Mage::throwException(Mage::helper('adyen')->__('Payment Method is complusory in order to process your payment'));
         }
         return $this;
+    }
+
+    public function validate()
+    {
+        parent::validate();
+
+        $info = $this->getInfoInstance();
+        $hppType = $info->getCcType();
+
+        // validate if the ideal bank is chosen
+        if($hppType == "ideal") {
+            if($info->getPoNumber() == "") {
+                // hpp type is empty throw error
+                Mage::throwException(Mage::helper('adyen')->__('You chose an invalid bank'));
+            }
+        }
     }
 
     /**
@@ -125,7 +141,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
 
         $adyFields = array();
         $deliveryDays = (int) $this->_getConfigData('delivery_days', 'adyen_hpp');
-        $deliveryDays = (!empty($deliveryDays)) ? $deliveryDays : 55;
+        $deliveryDays = (!empty($deliveryDays)) ? $deliveryDays : 5;
         $adyFields['merchantAccount'] = $merchantAccount;
         $adyFields['merchantReference'] = $realOrderId;
         $adyFields['paymentAmount'] = (int)$amount;
@@ -155,13 +171,20 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         $adyFields['sessionValidity'] = date(DATE_ATOM, mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y")));
         $adyFields['shopperEmail'] = $shopperEmail;
 
-        // recurring    	
+        // recurring
         $recurringType = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference'] = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
 
         //blocked methods
         $adyFields['blockedMethods'] = "";
+
+        /*
+         * This feld will be appended as-is to the return URL when the shopper completes, or abandons, the payment and
+         * returns to your shop; it is typically used to transmit a session ID. This feld has a maximum of 128 characters
+         * This is an optional field and not necessary by default
+         */
+        $adyFields['merchantReturnData'] = "";
 
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
 
@@ -175,7 +198,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             $adyFields['shopperType'] = "";
         }
 
-        //the data that needs to be signed is a concatenated string of the form data 
+        //the data that needs to be signed is a concatenated string of the form data
         $sign = $adyFields['paymentAmount'] .
             $adyFields['currencyCode'] .
             $adyFields['shipBeforeDate'] .
@@ -187,6 +210,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             $adyFields['shopperReference'] .
             $adyFields['recurringContract'] .
             $adyFields['blockedMethods'] .
+            $adyFields['merchantReturnData'] .
             $adyFields['billingAddressType'] .
             $adyFields['deliveryAddressType'] .
             $adyFields['shopperType'];
@@ -300,20 +324,11 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         return $this->_redirectBlockType;
     }
 
-    public function isInitializeNeeded() {
-        return true;
-    }
-
     public function initialize($paymentAction, $stateObject) {
         $state = Mage_Sales_Model_Order::STATE_NEW;
         $stateObject->setState($state);
         $stateObject->setStatus($this->_getConfigData('order_status'));
     }
-
-    public function getConfigPaymentAction() {
-        return true;
-    }
-
 
     public function getAvailableHPPTypes() {
 
@@ -335,7 +350,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
             } else {
                 $countryCode = ""; // don't set countryCode so you get all the payment methods
                 // You could do ip lookup but availability and performace is not guaranteed
-//         		$ip = $this->getClientIp();
+//         		$ip =  Mage::helper('adyen')->getClientIp();
 //         		$countryCode = file_get_contents('http://api.hostip.info/country.php?ip='.$ip);
             }
         }
@@ -409,8 +424,9 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
 
             if($results_json == null) {
                 // no valid json so show the error
-                Mage::log("Payment methods are empty on this merchantaccount\skin. results_json is incorrect result is:" . $results, self::DEBUG_LEVEL, 'http-request.log',true);
-                Mage::throwException(Mage::helper('adyen')->__('Payment methods are empty on this merchantaccount\skin' . $results));
+                Mage::log("Payment methods are empty on this merchantaccount with the selected skin,hmac,amount,country check if these settings are correct results_json result is:" . $results, self::DEBUG_LEVEL, 'http-request.log',true);
+                // return empty array
+                return array();
             }
 
             $payment_methods = $results_json->paymentMethods;
@@ -452,28 +468,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         return Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
     }
 
-    // Function to get the client ip address
-    public function getClientIp() {
-
-        $ipaddress = '';
-
-        if (isset($_SERVER['HTTP_CLIENT_IP']))
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        else if(isset($_SERVER['REMOTE_ADDR']))
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        else
-            $ipaddress = '';
-
-        return $ipaddress;
+    public function getShowIdealLogos() {
+        return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
     }
-
-
 }

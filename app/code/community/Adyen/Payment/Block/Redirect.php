@@ -25,7 +25,7 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
- class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
+class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
 
     protected function _getCheckout() {
         return Mage::getSingleton('checkout/session');
@@ -42,20 +42,31 @@
     }
 
     protected function _toHtml() {
-    	
-    	$payment = $this->_getOrder()->getPayment()->getMethodInstance();
-    	
-    	$html = '<html><head><link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css"><link rel="stylesheet" type="text/css" href="'.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'/frontend/base/default/css/adyenstyle.css"><script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script></head><body class="redirect-body-adyen">';
-    	// if pos payment redirect to app
-    	if($payment->getCode() == "adyen_pos") {
-    		
-    		$adyFields = $payment->getFormFields();
-    		// use the secure url (if not secure this will be filled in with http://
-    		$url = urlencode(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true)."adyen/process/successPos");
-    		
-    		// detect ios or android
-    		$ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-    		$android = stripos($ua,'android');
+
+        $paymentObject = $this->_getOrder()->getPayment();
+        $payment = $this->_getOrder()->getPayment()->getMethodInstance();
+
+        $html = '<html><head><link rel="stylesheet" type="text/css" href="'.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'/frontend/base/default/css/adyenstyle.css"><script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>';
+
+        // for cash add epson libary to open the cash drawer
+        $cashDrawer = Mage::helper('adyen')->_getConfigData("cash_drawer", "adyen_pos", null);
+        if($payment->getCode() == "adyen_hpp" && $paymentObject->getCcType() == "c_cash" && $cashDrawer) {
+            $jsPath = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);
+            $html .= '<script src="'.$jsPath.'adyen/payment/epos-device-2.6.0.js"></script>';
+        }
+        $html .= '</head><body class="redirect-body-adyen">';
+
+
+        // if pos payment redirect to app
+        if($payment->getCode() == "adyen_pos") {
+
+            $adyFields = $payment->getFormFields();
+            // use the secure url (if not secure this will be filled in with http://
+            $url = urlencode(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true)."adyen/process/successPos");
+
+            // detect ios or android
+            $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+            $android = stripos($ua,'android');
 
             // extra parameters so that you alway's return these paramters from the application
             $extra_paramaters = urlencode("/?originalCustomCurrency=".$adyFields['currencyCode']."&originalCustomAmount=".$adyFields['paymentAmount']. "&originalCustomMerchantReference=".$adyFields['merchantReference'] . "&originalCustomSessionId=".session_id());
@@ -79,18 +90,18 @@
             // log the launchlink
             Mage::log("Launchlink:".$launchlink, Zend_Log::DEBUG, "adyen_notification.log", true);
 
-    		// call app directly without HPP
-    		$html .= "<div id=\"pos-redirect-page\">
+            // call app directly without HPP
+            $html .= "<div id=\"pos-redirect-page\">
     					<div class=\"logo\"></div>
     					<div class=\"grey-header\">
     						<h1>POS Payment</h1>
     					</div>
     					<div class=\"amount-box\">".
-    					$adyFields['paymentAmountGrandTotal'] .
-    					"<a id=\"launchlink\" href=\"".$launchlink ."\" >Payment</a> ".
-    					"</div>";
+                $adyFields['paymentAmountGrandTotal'] .
+                "<a id=\"launchlink\" href=\"".$launchlink ."\" >Payment</a> ".
+                "</div>";
 
-    		$html .= '<script type="text/javascript">
+            $html .= '<script type="text/javascript">
     				
     				function checkStatus() {
 	    				$.ajax({
@@ -107,32 +118,71 @@
 						    }
 						});
 					}';
-						    		
-    				if($android !== false) {
-    					$html .= 'url = document.getElementById(\'launchlink\').href;';
-    					$html .= 'window.location.assign(url);';
-    					$html .= 'window.onfocus = function(){setTimeout("checkStatus()", 500);};';
-    				} else {
-    					$html .= 'document.getElementById(\'launchlink\').click();';
+
+            if($android !== false) {
+                $html .= 'url = document.getElementById(\'launchlink\').href;';
+                $html .= 'window.location.assign(url);';
+                $html .= 'window.onfocus = function(){setTimeout("checkStatus()", 500);};';
+            } else {
+                $html .= 'document.getElementById(\'launchlink\').click();';
     					$html .= 'setTimeout("checkStatus()", 5000);';
-    				}
-    				$html .= '</script></div>';
-    	} else {
-	        $form = new Varien_Data_Form();
-	        $form->setAction($payment->getFormUrl())
-	                ->setId($payment->getCode())
-	                ->setName($payment->getFormName())
-	                ->setMethod('POST')
-	                ->setUseContainer(true);
-	        foreach ($payment->getFormFields() as $field => $value) {
-	            $form->addField($field, 'hidden', array('name' => $field, 'value' => $value));
-	        }
-	        
-	        $html.= $this->__(' ');
-	        $html.= $form->toHtml();
-	        $html.= '<script type="text/javascript">document.getElementById("'.$payment->getCode().'").submit();</script>';
-    	}
-    	$html.= '</body></html>';
+            }
+            $html .= '</script></div>';
+        } else {
+            $form = new Varien_Data_Form();
+            $form->setAction($payment->getFormUrl())
+                ->setId($payment->getCode())
+                ->setName($payment->getFormName())
+                ->setMethod('POST')
+                ->setUseContainer(true);
+            foreach ($payment->getFormFields() as $field => $value) {
+                $form->addField($field, 'hidden', array('name' => $field, 'value' => $value));
+            }
+
+            $html.= $this->__(' ');
+            $html.= $form->toHtml();
+
+            if($payment->getCode() == "adyen_hpp" && $paymentObject->getCcType() == "c_cash" && $cashDrawer) {
+                $cashDrawerIp = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_ip", "adyen_pos", null);
+                $cashDrawerPort = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_port", "adyen_pos", null);
+                $cashDrawerDeviceId = Mage::helper('adyen')->_getConfigData("cash_drawer_printer_device_id", "adyen_pos", null);
+
+                if($cashDrawerIp != '' && $cashDrawerPort != '' && $cashDrawerDeviceId != '') {
+                    $html.= '
+                            <script type="text/javascript">
+                                var ipAddress = "'.$cashDrawerIp.'";
+                                var port = "'.$cashDrawerPort.'";
+                                var deviceID = "'.$cashDrawerDeviceId.'";
+                                var ePosDev = new epson.ePOSDevice();
+                                ePosDev.connect(ipAddress, port, Callback_connect);
+
+                                function Callback_connect(data) {
+                                    if (data == "OK" || data == "SSL_CONNECT_OK") {
+                                        var options = "{}";
+                                        ePosDev.createDevice(deviceID, ePosDev.DEVICE_TYPE_PRINTER, options, callbackCreateDevice_printer);
+                                    } else {
+                                        alert("connected to ePOS Device Service Interface is failed. [" + data + "]");
+                                    }
+                                }
+
+                                function callbackCreateDevice_printer(data, code) {
+                                    var print = data;
+                                    var drawer = "{}";
+                                    var time = print.PULSE_100
+                                    print.addPulse();
+                                    print.send();
+                                    document.getElementById("'.$payment->getCode().'").submit();
+                                }
+                            </script>
+                    ';
+                } else {
+                    Mage::log("You did not fill in all the fields (ip,port,device id) to use Cash Drawer support:", Zend_Log::DEBUG, "adyen_notification.log", true);
+                }
+            } else {
+                $html.= '<script type="text/javascript">document.getElementById("'.$payment->getCode().'").submit();</script>';
+            }
+        }
+        $html.= '</body></html>';
         return $html;
     }
 

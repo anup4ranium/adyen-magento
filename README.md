@@ -8,7 +8,8 @@ But you can also request or suggest new features or code changes yourself!
 
 <h2>Setup Module</h2>
 <a href="http://vimeo.com/94005128">Click here to see the video how to setup your Adyen Magento module and the Adyen backoffice</a><br />
-<a href="http://vimeo.com/94005128">Click here to download the manual how to setup your Adyen Magento module and the Adyen backoffice</a>
+<a href="https://www.adyen.com/dam/jcr:80ea0213-02cd-43aa-8136-459a471d2a0d/MagentoQuickIntegrationManual.pdf">Click here to download the Magento Quick Integration Guide how to setup the basics for the Adyen Magento module and the Adyen backoffice</a><br />
+<a href="https://www.adyen.com/dam/jcr:d0fd4c42-831b-4c4a-b5e5-864cc1410145/AdyenMagentoExtension">For a more advanced manual click here</a>
 
 <h2>Support</h2>
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
