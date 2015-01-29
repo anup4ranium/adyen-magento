@@ -245,7 +245,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
         if (empty($incrementId)) {
             $session->addError($this->__('Your payment failed, Please try again later'));
-            $this->_redirect('checkout/cart');
+            $this->_redirectCheckoutCart();
             return;
         }
 
@@ -265,8 +265,14 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         }
 
         $session->addError($this->__('Your payment failed. Please try again later'));
-        $this->_redirect('checkout/cart');
+        $this->_redirectCheckoutCart();
     }
+
+    protected function _redirectCheckoutCart()
+    {
+        $this->_redirect(Mage::getStoreConfig('payment/adyen_abstract/payment_cancelled_redirect'));
+    }
+
 
     public function insAction() {
         try {

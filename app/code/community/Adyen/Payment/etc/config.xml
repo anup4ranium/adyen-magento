@@ -252,6 +252,7 @@
                 <order_status>processing</order_status>
                 <payment_authorized>processing</payment_authorized>
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
+                <payment_cancelled_redirect>checkout/cart</payment_cancelled_redirect>
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
