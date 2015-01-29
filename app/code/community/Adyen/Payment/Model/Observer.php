@@ -182,9 +182,9 @@ class Adyen_Payment_Model_Observer {
      */
     protected function _getCurrentPaymentAmount()
     {
-        if ($grandTotal = $this->_getQuote()->getGrandTotal() > 0) {
-            return $grandTotal;
-        }
+//        if (($grandTotal = $this->_getQuote()->getGrandTotal()) > 0) {
+//            return $grandTotal;
+//        }
         return 10;
     }
 
