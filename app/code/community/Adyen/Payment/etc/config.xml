@@ -29,7 +29,7 @@
 <config>
     <modules>
         <Adyen_Payment>
-            <version>2.1.1</version>
+            <version>2.2.0</version>
         </Adyen_Payment>
     </modules>
     <global>
@@ -136,9 +136,12 @@
                 <totals>
                     <payment_fee>
                         <class>adyen/total_paymentFee_invoice</class>
+                        <after>subtotal,discount</after>
+                        <before>grand_total,tax</before>
                     </payment_fee>
                     <payment_installment_fee>
                         <class>adyen/total_paymentInstallmentFee_invoice</class>
+                        <after>grand_total</after>
                     </payment_installment_fee>
                 </totals>
             </order_invoice>
@@ -146,9 +149,12 @@
                 <totals>
                     <payment_fee>
                         <class>adyen/total_paymentFee_creditmemo</class>
+                        <after>subtotal,discount</after>
+                        <before>grand_total,tax</before>
                     </payment_fee>
                     <payment_installment_fee>
                         <class>adyen/total_paymentInstallmentFee_creditmemo</class>
+                        <after>grand_total</after>
                     </payment_installment_fee>
                 </totals>
             </order_creditmemo>
@@ -204,14 +210,6 @@
             </modules>
         </translate>
         <events>
-            <sales_order_invoice_pay>
-                <observers>
-                    <adyen_manual_online_capture>
-                        <class>adyen/observer</class>
-                        <method>capture</method>
-                    </adyen_manual_online_capture>
-                </observers>
-            </sales_order_invoice_pay>
             <sales_order_payment_cancel>
                 <observers>
                     <adyen_payment>
@@ -237,10 +235,11 @@
                 <ws_password_live></ws_password_live>
                 <demoMode>N</demoMode>
                 <order_status>processing</order_status>
-                <payment_pending>pending</payment_pending>
                 <payment_authorized>processing</payment_authorized>
+                <payment_authorized_virtual>complete</payment_authorized_virtual>
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
+                <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">
                 <customer_id backend_model="adminhtml/system_config_backend_encrypted"/>
@@ -255,13 +254,12 @@
                 <ws_username_live></ws_username_live>
                 <ws_password_live></ws_password_live>
                 <order_status>processing</order_status>
-                <payment_pending>pending</payment_pending>
-                <payment_authorized>processing</payment_authorized>
                 <allowspecific>0</allowspecific>
                 <disable_hpptypes>0</disable_hpptypes>
                 <sort_order>30</sort_order>
                 <cache_directory_lookup>0</cache_directory_lookup>
                 <return_url_in_request>0</return_url_in_request>
+                <show_ideal_logos>0</show_ideal_logos>
             </adyen_hpp>
             <adyen_pos translate="title" module="adyen">
                 <active>0</active>
@@ -275,7 +273,9 @@
                 <cash_express_checkout>0</cash_express_checkout>
                 <cash_drawer>0</cash_drawer>
                 <cash_drawer_printer_ip></cash_drawer_printer_ip>
-                <cash_drawer_code>27,112,48,55,121</cash_drawer_code>
+                <cash_drawer_printer_port>8008</cash_drawer_printer_port>
+                <cash_drawer_printer_device_id>local_printer</cash_drawer_printer_device_id>
+                <ip_filter>0</ip_filter>
                 <allowspecific>0</allowspecific>
                 <sort_order>80</sort_order>
             </adyen_pos>
@@ -288,6 +288,7 @@
                 <openinvoicetypes>openinvoice</openinvoicetypes>
                 <gender_show>0</gender_show>
                 <dob_show>0</dob_show>
+                <telephone_show>0</telephone_show>
                 <different_address_disable>0</different_address_disable>
                 <sort_order>40</sort_order>
             </adyen_openinvoice>
@@ -301,6 +302,7 @@
                 <enable_installments>0</enable_installments>
                 <cse_enabled>0</cse_enabled>
                 <cse_public_key></cse_public_key>
+                <visible_type>both</visible_type>
                 <enable_moto>0</enable_moto>
                 <account_id>99999</account_id>
                 <trxuser_id>99999</trxuser_id>
@@ -322,6 +324,7 @@
                 <model>adyen/adyen_elv</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visible_type>both</visible_type>
                 <title>Adyen ELV</title>
                 <sort_order>50</sort_order>
             </adyen_elv>
@@ -330,8 +333,10 @@
                 <model>adyen/adyen_boleto</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visible_type>both</visible_type>
                 <title>Adyen Boleto</title>
                 <delivery_days>5</delivery_days>
+                <use_taxvat>0</use_taxvat>
                 <sort_order>70</sort_order>
             </adyen_boleto>
             <adyen_sepa translate="title" module="adyen">
@@ -339,6 +344,7 @@
                 <model>adyen/adyen_sepa</model>
                 <group>adyen</group>
                 <order_status>processing</order_status>
+                <visible_type>both</visible_type>
                 <title>Adyen SEPA</title>
                 <sort_order>60</sort_order>
                 <validate_iban>0</validate_iban>
@@ -390,12 +396,18 @@
                         <order>70</order>
                         <is_cvv_required>0</is_cvv_required>
                     </JCB>
-                    <CB>
-                        <code>CB</code>
-                        <name>CarteBleue</name>
+                    <ELO>
+                        <code>ELO</code>
+                        <name>Elo</name>
                         <order>80</order>
                         <is_cvv_required>0</is_cvv_required>
-                    </CB>
+                    </ELO>
+                    <hipercard>
+                        <code>hipercard</code>
+                        <name>Hipercard</name>
+                        <order>90</order>
+                        <is_cvv_required>0</is_cvv_required>
+                    </hipercard>
                 </cctypes>
                 <boletotypes>
                     <boletobancario_hsbc>
@@ -426,8 +438,8 @@
                 </boletotypes>
                 <openinvoicetypes>
                     <afterpay>
-                        <code>openinvoice</code>
-                        <name>AfterPay</name>
+                        <code>afterpay_default</code>
+                        <name>AfterPay Netherlands</name>
                         <order>10</order>
                     </afterpay>
                     <klarna>

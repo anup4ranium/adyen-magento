@@ -48,4 +48,8 @@ class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
     public function getHppOptionsDisabled() {
         return $this->getMethod()->getHppOptionsDisabled();
     }
+
+    public function getShowIdealLogos() {
+        return $this->getMethod()->getShowIdealLogos();
+    }
 }

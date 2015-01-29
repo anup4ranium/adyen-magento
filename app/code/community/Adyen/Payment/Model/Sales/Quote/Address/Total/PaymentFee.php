@@ -63,8 +63,23 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sale
                     'title'=> Mage::helper('adyen')->__('Payment Fee'),
                     'value'=> $amt
             ));
+        } else {
+            $this->removeTotal($address, $this->getCode());
         }
-
         return $this;
+    }
+
+    /**
+     * @param Mage_Sales_Model_Quote_Address $address
+     * @param string $code
+     */
+    protected function removeTotal(Mage_Sales_Model_Quote_Address $address, $code)
+    {
+        $reflectedClass = new ReflectionClass($address);
+        $propertyTotals = $reflectedClass->getProperty('_totals');
+        $propertyTotals->setAccessible(true);
+        $totals = $propertyTotals->getValue($address);
+        unset($totals[$code]);
+        $propertyTotals->setValue($address, $totals);
     }
 }

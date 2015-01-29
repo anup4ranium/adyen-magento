@@ -117,9 +117,6 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             //redirect to adyen
             if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) === 0 ||
                 (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_NEW) === 0)) {
-                $_status = $this->_getConfigData('order_status');
-                // FIXME this status won't be added because order is not saved $order->save() missing
-                $order->addStatusHistoryComment(Mage::helper('adyen')->__('Customer was redirected to Adyen.'), $_status);
                 $this->getResponse()->setBody(
                     $this->getLayout()
                         ->createBlock($this->_redirectBlockType)
@@ -313,8 +310,10 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             // get the order
             $order = Mage::getModel('sales/order')->loadByIncrementId($_POST['merchantReference']);
             // if order is not cancelled then order is success
-            if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED) {
+            if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED || substr($order->getAdyenEventCode(), 0, 13)  == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
                 echo 'true';
+            } else {
+                Mage::log("NO MATCH! order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
             }
         }
         return;

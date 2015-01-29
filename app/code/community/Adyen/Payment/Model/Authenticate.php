@@ -70,7 +70,11 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         }else{
         	$secretWord = $this->_getConfigData('secret_wordp', 'adyen_hpp');
         }
-        $sign = $response->getData('authResult') . $response->getData('pspReference') . $response->getData('merchantReference') . $response->getData('skinCode');
+
+        $sign = $response->getData('authResult') . $response->getData('pspReference') .
+                $response->getData('merchantReference') . $response->getData('skinCode') .
+                $response->getData('merchantReturnData');
+
         $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
         $localStringToHash = base64_encode(pack('H*', $signMac));
         if (strcmp($localStringToHash, $response->getData('merchantSig')) === 0) {
@@ -89,18 +93,20 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         $this->fixCgiHttpAuthentication(); //add cgi support
         $internalMerchantAccount = $this->_getConfigData('merchantAccount');
         $username = $this->_getConfigData('notification_username');
-        $password = $this->_getConfigData('notification_password');
+        $password = Mage::helper('core')->decrypt($this->_getConfigData('notification_password'));
         $submitedMerchantAccount = $response->getData('merchantAccountCode');
         
         if (empty($submitedMerchantAccount) && empty($internalMerchantAccount)) {
-        	if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_") {
-        		echo 'merchantAccountCode is empty in magento settings'; exit();
+        	if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_" || strtolower(substr($response->getData('pspReference'),0,5)) == "test_") {
+                Mage::log('Notification test failed: merchantAccountCode is empty in magento settings', Zend_Log::DEBUG, "adyen_notification.log", true);
+                echo 'merchantAccountCode is empty in magento settings'; exit();
         	}
             return false;
         }
         if (!isset($_SERVER['PHP_AUTH_USER']) && !isset($_SERVER['PHP_AUTH_PW'])) {
-        	if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_") {
-        		echo 'Authentication failed: PHP_AUTH_USER and PHP_AUTH_PW are empt	y. See Adyen Magento manual CGI mode'; exit();
+        	if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_" || strtolower(substr($response->getData('pspReference'),0,5)) == "test_") {
+                Mage::log('Authentication failed: PHP_AUTH_USER and PHP_AUTH_PW are empty. See Adyen Magento manual CGI mode', Zend_Log::DEBUG, "adyen_notification.log", true);
+                echo 'Authentication failed: PHP_AUTH_USER and PHP_AUTH_PW are empty. See Adyen Magento manual CGI mode'; exit();
         	}
             return false;
         }
@@ -112,11 +118,13 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         }
         
         // If notification is test check if fields are correct if not return error
-        if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_") {
+        if(strtolower(substr($response->getData('pspReference'),0,17)) == "testnotification_" || strtolower(substr($response->getData('pspReference'),0,5)) == "test_") {
         	if($accountCmp != 0) {
-        		echo 'MerchantAccount in notification is not the same as in Magento settings'; exit();
+                Mage::log('MerchantAccount in notification is not the same as in Magento settings', Zend_Log::DEBUG, "adyen_notification.log", true);
+                echo 'MerchantAccount in notification is not the same as in Magento settings'; exit();
         	} elseif($usernameCmp != 0 || $passwordCmp != 0) {
-        		echo 'PHP_AUTH_USER and\or PHP_AUTH_PW are not the same as Magento settings'; exit();
+                Mage::log('username (PHP_AUTH_USER) and\or password (PHP_AUTH_PW) are not the same as Magento settings', Zend_Log::DEBUG, "adyen_notification.log", true);
+                echo 'username (PHP_AUTH_USER) and\or password (PHP_AUTH_PW) are not the same as Magento settings'; exit();
         	}
         }
 
@@ -127,14 +135,10 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
      * Fix these global variables for the CGI
      */
     public function fixCgiHttpAuthentication() { // unsupported is $_SERVER['REMOTE_AUTHORIZATION']: as stated in manual :p
-    	//Mage::log(print_r($_SERVER,true));
-    	 
-        if (isset($_SERVER['REDIRECT_REMOTE_AUTHORIZATION']) && $_SERVER['REDIRECT_REMOTE_AUTHORIZATION'] != '') { //pcd note: no idea who sets this
+    	if (isset($_SERVER['REDIRECT_REMOTE_AUTHORIZATION']) && $_SERVER['REDIRECT_REMOTE_AUTHORIZATION'] != '') { //pcd note: no idea who sets this
             list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode($_SERVER['REDIRECT_REMOTE_AUTHORIZATION']));
-/* TODO: added pcd */
         } elseif(!empty($_SERVER['HTTP_AUTHORIZATION'])){ //pcd note: standard in magento?
             list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
-/* end added pcd */
         } elseif (!empty($_SERVER['REMOTE_USER'])) { //pcd note: when cgi and .htaccess modrewrite patch is executed
             list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['REMOTE_USER'], 6)));
         } elseif (!empty($_SERVER['REDIRECT_REMOTE_USER'])) { //pcd note: no idea who sets this
@@ -149,13 +153,7 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
      * @param string $code
      */
     protected function _getConfigData($code, $paymentMethodCode = null, $storeId = null) {
-        if (null === $storeId) {
-            $storeId = Mage::app()->getStore()->getId();
-        }
-        if (empty($paymentMethodCode)) {
-            return Mage::getStoreConfig("payment/adyen_abstract/$code", $storeId);
-        }
-        return Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId);
+        return Mage::helper('adyen')->_getConfigData($code, $paymentMethodCode, $storeId);
     }    
 
 }

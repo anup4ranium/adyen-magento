@@ -29,7 +29,20 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc {
 
     protected function _construct() {
         parent::_construct();
-        $this->setTemplate('adyen/form/cc.phtml');
+
+        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
+        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_cc");
+
+        $mark = Mage::getConfig()->getBlockClassName('core/template');
+        $mark = new $mark;
+        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
+            ->setPaymentMethodIcon($paymentMethodIcon)
+            ->setPaymentMethodLabel($label)
+            ->setPaymentMethodClass("adyen_cc");
+
+        $this->setTemplate('adyen/form/cc.phtml')
+            ->setMethodTitle('')
+            ->setMethodLabelAfterHtml($mark->toHtml());
     }
 	
     /**

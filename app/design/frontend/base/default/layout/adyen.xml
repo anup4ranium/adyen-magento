@@ -43,7 +43,7 @@
             <action method="setTemplate"><template>page/2columns-left.phtml</template></action>
         </reference>
         <reference name="my.account.wrapper">
-            <block type="adyen/savedCards" name="adyen.savedCards" template="adyen/savedCards.phtml"/>
+            <block type="adyen/savedCards" name="adyen.savedCards" template="adyen/saved_cards.phtml"/>
         </reference>
     </adyen_savedcard_index>
 
@@ -53,23 +53,26 @@
 
     <checkout_cart_index>
         <reference name="top.container">
-            <block type="adyen/scanProduct" name="adyen.scanProduct" template="adyen/scanProduct.phtml"/>
+            <block type="adyen/scanProduct" name="adyen.scanProduct" template="adyen/scan_product.phtml"/>
         </reference>
         <reference name="checkout.cart.methods">
-            <block type="adyen/posExpressCheckout" before="-" name="adyen.pos.express.checkout" template="adyen/posExpressCheckout.phtml"/>
+            <block type="adyen/posExpressCheckout" before="-" name="adyen.pos.express.checkout" template="adyen/pos_express_checkout.phtml"/>
         </reference>
     </checkout_cart_index>
 
     <checkout_onepage_index>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
-            <block type="core/text" name="newmodule.diners.validation">
+            <block type="core/text" name="adyen.diners.validation">
                 <action method="setText">
                     <text>
                         <![CDATA[<script type="text/javascript">
                             Validation.creditCartTypes.set('DC', [new RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'), new RegExp('^[0-9]{3}$'), true]);
                             Validation.creditCartTypes.set('CB', [new RegExp('^4[0-9]{12}([0-9]{3})?$'), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('ELO', [new RegExp(/^((((636368)|(438935)|(504175)|(451416)|(636297)|(506699))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('hipercard', [new RegExp(/^(606282\d{10}(\d{3})?)|(3841\d{15})$/), new RegExp('^[0-9]{3}$'), true]);
                         </script>]]>
                     </text>
                 </action>
@@ -85,19 +88,33 @@
 
     <onestepcheckout_index_index>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
+            <block type="core/text" name="adyen.diners.validation">
+                <action method="setText">
+                    <text>
+                        <![CDATA[<script type="text/javascript">
+                            Validation.creditCartTypes.set('DC', [new RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('CB', [new RegExp('^4[0-9]{12}([0-9]{3})?$'), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('ELO', [new RegExp(/^((((636368)|(438935)|(504175)|(451416)|(636297)|(506699))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('hipercard', [new RegExp(/^(606282\d{10}(\d{3})?)|(3841\d{15})$/), new RegExp('^[0-9]{3}$'), true]);
+                        </script>]]>
+                    </text>
+                </action>
+            </block>
         </reference>
     </onestepcheckout_index_index>
 
     <checkout_multishipping_billing>
         <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
             <action method="addJs"><script>adyen/payment/elv.js</script></action>
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
         </reference>
     </checkout_multishipping_billing>
     <checkout_onepage_success>
-    	 <reference name="content">
+        <reference name="content">
             <block type="adyen/checkout_success" name="adyen.checkout.success" template="adyen/checkout/success.phtml"/>
         </reference>
     </checkout_onepage_success>
