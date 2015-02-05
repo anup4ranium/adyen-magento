@@ -282,13 +282,14 @@
                 js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt.js";
                 document.body.appendChild(js);
             }
-            if (typeof payment.save !== 'undefined') {
+
+            if (typeof payment !== 'undefined' && typeof payment.save !== 'undefined') {
                 payment.save = payment.save.wrap(function(originalSaveMethod) {
                     cse.call(this);
                     originalSaveMethod();
                 });
             }
-            if (typeof checkout.save !== 'undefined') {
+            if (typeof checkout !== 'undefined' && typeof checkout.save !== 'undefined') {
                 checkout.save = checkout.save.wrap(function(originalSaveMethod) {
                     cse.call(this);
                     originalSaveMethod();
