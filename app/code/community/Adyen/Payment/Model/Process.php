@@ -73,13 +73,19 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 
         try{
 
+            // skip notification if merchantReference is no integer (can be the case for example Report_Available notification)
+            if(!is_numeric($incrementId)) {
+                Mage::log('merchantReference is no integer so do nothing with this notification, incrementId is:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                return false;
+            }
+
             //get order && payment objects
             $order = Mage::getModel('sales/order');
 
             //error
             $orderExist = $this->_incrementIdExist($incrementId);
             if (empty($orderExist)) {
-                $this->_writeLog("unknown order : $incrementId");
+                Mage::log('Order does not exist with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
                 return false;
             }
             $order->loadByIncrementId($incrementId);
@@ -208,6 +214,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $order->addStatusHistoryComment($comment, false);
 
                         try {
+                            Mage::log("processPosResponse Adyen Event Status is:".$order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification.log", true);
                             $order->save();
                         } catch (Exception $e) {
                             Mage::logException($e);
