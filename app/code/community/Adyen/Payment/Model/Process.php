@@ -73,9 +73,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 
         try{
 
-            // skip notification if merchantReference is no integer (can be the case for example Report_Available notification)
-            if(!is_numeric($incrementId)) {
-                Mage::log('merchantReference is no integer so do nothing with this notification, incrementId is:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+            // skip notification if notification is REPORT_AVAILABLE
+            $eventCode = trim($varienObj->getData('eventCode'));
+            if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_REPORT_AVAILABLE) {
                 return false;
             }
 
