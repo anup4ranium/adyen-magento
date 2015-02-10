@@ -28,7 +28,7 @@
 class Adyen_Payment_Block_Form_Boleto extends Mage_Payment_Block_Form {
 
     protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
+        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
         $label = Mage::helper('adyen')->_getConfigData("title", "adyen_boleto");
 
         $mark = Mage::getConfig()->getBlockClassName('core/template');
