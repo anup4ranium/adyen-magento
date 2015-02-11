@@ -837,7 +837,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             return true;
         }
         // if auto capture mode for openinvoice is turned on then use auto capture
-        if($captureModeOpenInvoice == true) {
+        if ($captureModeOpenInvoice == true && (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0)) {
             return true;
         }
         if (strcmp($captureMode, 'manual') === 0) {
