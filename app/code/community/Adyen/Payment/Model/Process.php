@@ -827,6 +827,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $captureMode = trim($this->_getConfigData('capture_mode'));
         $sepaFlow = trim($this->_getConfigData('capture_mode', 'adyen_sepa'));
         $_paymentCode = $this->_paymentMethodCode($order);
+        $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract');
 
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->isBankTransfer($paymentMethod);
@@ -835,10 +836,14 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if (strcmp($paymentMethod, 'ideal') === 0 || strcmp($paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap")) {
             return true;
         }
+        // if auto capture mode for openinvoice is turned on then use auto capture
+        if($captureModeOpenInvoice == true) {
+            return true;
+        }
         if (strcmp($captureMode, 'manual') === 0) {
             return false;
         }
-        //online capture after delivery, use Magento backend to online invoice
+        //online capture after delivery, use Magento backend to online invoice (if the option auto capture mode for openinvoice is not set)
         if (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0) {
             return false;
         }

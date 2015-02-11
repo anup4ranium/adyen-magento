@@ -239,6 +239,7 @@
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
+                <auto_capture_openinvoice>0</auto_capture_openinvoice>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">
