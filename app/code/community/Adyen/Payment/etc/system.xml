@@ -217,6 +217,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </auto_capture_openinvoice>
+                        <paypal_capture_mode>
+                            <label>Capture Mode for PayPal</label>
+                            <comment>If you are using a different capture mode for PayPal setup in your Adyen account select here this capture modus</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_PayPalCaptureModes</source_model>
+                            <sort_order>118</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </paypal_capture_mode>
                         <send_email_bank_sepa_on_pending>
                             <label>Send confirmation email for Banktransfer/SEPA</label>
                             <comment>Send a confirmation mail after banktranfer/SEPA is placed (not yet paid). Make sure that you have BankTransfer Pending Notification enabled in Adyen backoffice to do this contact magento@adyen.com</comment>

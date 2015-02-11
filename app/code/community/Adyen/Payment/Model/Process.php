@@ -828,6 +828,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $sepaFlow = trim($this->_getConfigData('capture_mode', 'adyen_sepa'));
         $_paymentCode = $this->_paymentMethodCode($order);
         $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract');
+        $captureModePayPal = trim($this->_getConfigData('paypal_capture_mode', 'adyen_abstract'));
 
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->isBankTransfer($paymentMethod);
@@ -839,6 +840,14 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         // if auto capture mode for openinvoice is turned on then use auto capture
         if ($captureModeOpenInvoice == true && (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0)) {
             return true;
+        }
+        // if PayPal capture modues is different from the default use this one
+        if(strcmp($paymentMethod, 'paypal' ) === 0 && $captureModePayPal != "") {
+            if(strcmp($captureModePayPal, 'auto') === 0 ) {
+                return true;
+            } elseif(strcmp($captureModePayPal, 'manual') === 0 ) {
+                return false;
+            }
         }
         if (strcmp($captureMode, 'manual') === 0) {
             return false;
