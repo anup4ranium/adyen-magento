@@ -282,6 +282,25 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         exit();
     }
 
+    public function jsonAction() {
+
+        try {
+            $notificationItems = json_decode(file_get_contents('php://input'), true);
+
+            foreach($notificationItems['notificationItems'] as $notificationItem)
+            {
+                $status = $this->processResponse($notificationItem['NotificationRequestItem']);
+                if($status == "401"){
+                    $this->_return401();
+                }
+            }
+            echo "[accepted]";
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
+        exit();
+    }
+
     public function cashAction() {
 
         $status = $this->processCashResponse();
