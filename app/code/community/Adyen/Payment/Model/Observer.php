@@ -32,7 +32,9 @@ class Adyen_Payment_Model_Observer {
     public function addHppMethodsToConfig(Varien_Event_Observer $observer)
     {
         $store = Mage::app()->getStore();
-        $this->_addHppMethodsToConfig($store);
+        if (Mage::getStoreConfigFlag('payment/adyen_hpp/active', $store)) {
+            $this->_addHppMethodsToConfig($store);
+        }
     }
 
 
