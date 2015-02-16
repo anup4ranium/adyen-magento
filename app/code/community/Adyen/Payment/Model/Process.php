@@ -83,7 +83,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $order = Mage::getModel('sales/order');
 
             //error
-            $orderExist = $this->_incrementIdExist($incrementId);
+            $orderExist = $this->_incrementIdExist($varienObj, $incrementId);
             if (empty($orderExist)) {
                 Mage::log('Order does not exist with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
                 return false;
@@ -407,8 +407,31 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      * @param type $incrementId
      * @return type
      */
-    protected function _incrementIdExist($incrementId) {
-        return Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+    protected function _incrementIdExist($varienObj, $incrementId) {
+
+        $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+
+        if (empty($orderExist)) {
+            // on authorization it could be that the order is not yet created
+            $eventCode = trim($varienObj->getData('eventCode'));
+            if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
+                // pspreference is numeric otherwise it is a test notification
+                $pspReference = $varienObj->getData('pspReference');
+                if(is_numeric($pspReference)) {
+                    // try to get the order now
+                    sleep(1);
+                    $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+                    if (empty($orderExist)) {
+                        sleep(2);
+                        $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+                        return $orderExist;
+                    } else {
+                        return $orderExist;
+                    }
+                }
+            }
+        }
+        return $orderExist;
     }
 
     /**
