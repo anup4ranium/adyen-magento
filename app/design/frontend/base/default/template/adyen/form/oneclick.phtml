@@ -382,6 +382,13 @@
                     cse.call(this);
                 });
             }
+
+            // Fix for GoMage LightCheckout
+            if($('submit-btn')) {
+                $('submit-btn').observe('click', function(e) {
+                    cse.call(this);
+                });
+            }
         }
 
         if (document.readyState === "complete") {
