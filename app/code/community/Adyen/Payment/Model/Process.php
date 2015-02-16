@@ -195,7 +195,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                 $incrementId = $varienObj->getData('originalCustomMerchantReference');
 
                 //error
-                $orderExist = $this->_incrementIdExist($incrementId);
+                $orderExist = $this->_incrementIdExist($varienObj, $incrementId);
 
                 if (empty($orderExist)) {
                     $this->_writeLog("unknown order : $incrementId");
@@ -307,7 +307,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $order = Mage::getModel('sales/order');
 
             //error
-            $orderExist = $this->_incrementIdExist($merchantReference);
+            $orderExist = $this->_incrementIdExist($varienObj, $merchantReference);
 
             if (empty($orderExist)) {
                 $this->_writeLog("unknown order : $merchantReference");
