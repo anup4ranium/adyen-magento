@@ -114,11 +114,23 @@ class Adyen_Payment_Model_Observer {
             $paymentMethodCode = $paymentMethod['brandCode'];
 
             //Skip open invoice methods if they are enabled
-            if (Mage::getStoreConfig('payment/adyen_openinvoice/openinvoicetypes') == $paymentMethodCode) {
+            if (Mage::getStoreConfigFlag('payment/adyen_openinvoice/active')
+                && Mage::getStoreConfig('payment/adyen_openinvoice/openinvoicetypes') == $paymentMethodCode) {
                 continue;
             }
 
-            if (in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro', 'elv', 'sepadirectdebit'))) {
+            if (Mage::getStoreConfigFlag('payment/adyen_cc/active')
+                && in_array($paymentMethodCode, array('diners','discover','amex','mc','visa','maestro'))) {
+                continue;
+            }
+
+            if (Mage::getStoreConfigFlag('payment/adyen_sepa/active')
+                && in_array($paymentMethodCode, array('sepadirectdebit'))) {
+                continue;
+            }
+
+            if (Mage::getStoreConfigFlag('payment/adyen_elv/active')
+                && in_array($paymentMethodCode, array('elv'))) {
                 continue;
             }
 
