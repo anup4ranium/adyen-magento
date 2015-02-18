@@ -15,6 +15,20 @@ But you can also request or suggest new features or code changes yourself!
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
 
 <h2>Current Release</h2>
+<h3>2.2.1</h3>
+<h4>Features</h4>
+* #206 Add CSE support for GoMage LightCheckout
+* #207 Add JSON support for Notifications
+* #204 Make OpenInvoice gender translatable
+* #203 Add option for OpenInvoice (Afterpay/Klarna) to select a capture mode different from the default enhancement
+* #196 Add option for PayPal to select a capture mode different from the default
+<h4>Fixes</h4>
+* #200 do not process REPORT_AVAILABLE notifications just give back [accepted]
+* #205 Magento CreditCard API order not always update the status
+* #201 getSkinUrl method accept path with slashes only
+* #197 Failed OneClick payment will casue CreditCard to use OneClick
+
+<h2>Previous Releases</h2>
 <h3>2.2.0</h3>
 <h4>Features</h4>
 * #156 CreditCard logos are shown and automatically detected instead of selecting your cart type
@@ -28,12 +42,12 @@ You can create issues on our Magento Repository or if you have some specific pro
 * #149 Pre fill country for Payment Method SEPA based on billing information
 * #157 Added option to use IPFilter for the payment method Adyen POS
 * #150 Create a new  configuration field for Client-Side Encryption Public Key for test
-* #114 Added extra setting so you can can define a different status for Downloadable products 
+* #114 Added extra setting so you can can define a different status for Downloadable products
 * #165 Option to send out confirmation mail for Banktransfer/SEPA before payment is received
 * #176 Added CSE support for IWD One Page Checkout
 * #154 Added Filter on N.A in Adyen Status column of sales order grid
-* #127 #180 Added translation for Dutch,German,Spanish and French 
-* #181 Cash Drawer support for epson ePOS-Device  
+* #127 #180 Added translation for Dutch,German,Spanish and French
+* #181 Cash Drawer support for epson ePOS-Device
 
 <h4>Fixes</h4>
 * #152 IOS CheckSum Fix For POS payments
@@ -49,7 +63,6 @@ You can create issues on our Magento Repository or if you have some specific pro
 * #183 Openinvoice (Afterpay/Klarna) are always manual captured
 * #116 Removed specific OneStepCheckout changes from the module, this will be added on GitHub as an external asset
 
-<h2>Previous Releases</h2>
 <h3>2.1.1</h3>
 <h4>Features</h4>
 * Make installments possible for the OneClick Payments
