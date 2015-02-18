@@ -23,6 +23,7 @@ You can create issues on our Magento Repository or if you have some specific pro
 * #206 Add CSE support for GoMage LightCheckout
 * #207 Add JSON support for Notifications
 * #209 Show in the admin a page where you can see the notifications that did not been processed yet
+* #211 Add option in configuration to export Adyen Settings
 
 <h4>Fixes</h4>
 * #197 Failed OneClick payment will cause CreditCard to use OneClick
