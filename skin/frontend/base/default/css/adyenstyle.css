@@ -33,7 +33,7 @@
 #co-payment-form .sp-methods dt label {background:none; padding:0 0 0 6px; }
 #co-payment-form .sp-methods dt label span { display:block; padding-top:9px;}
 
-.sp-methods #payment_form_adyen_cc .v-fix label { float:none; vertical-align: middle;}
+#co-payment-form .sp-methods #payment_form_adyen_cc .v-fix label { float:none; vertical-align: middle;}
 
 .sp-methods img.adyen-payment-method-icon { margin-right: 14px; margin-left:2px; border:none !important; width:66px; height:43px; background:url(../images/adyen/pm_gloss.png) left top no-repeat; }
 .sp-methods img.adyen-payment-method-icon.adyen_cc { background-position: 0px -272px; }
@@ -45,8 +45,8 @@
 .sp-methods img.adyen-payment-method-icon.adyen_sepa { background-position: 0px -1910px; }
 
 .sp-methods .adyen-payment-method-icon .no-mc { background-position: left top;  }
-.sp-methods dd { clear:both; }
-.sp-methods dd li { margin:5px 0 -10px 0px;}
+#co-payment-form .sp-methods dd { clear:both; }
+#co-payment-form .sp-methods dd li { margin:5px 0 -10px 0px;}
 
 .sp-methods .form-list li.adyen_payment_creditcard_labels { margin-top:15px; }
 .adyen_payment_creditcard_labels img.grey {
