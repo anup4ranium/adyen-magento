@@ -86,6 +86,18 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $orderExist = $this->_incrementIdExist($varienObj, $incrementId);
             if (empty($orderExist)) {
                 Mage::log('Order does not exist with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                // on authorization it could be that the order is not yet created
+                $eventCode = trim($varienObj->getData('eventCode'));
+                if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
+                    // pspreference is always numeric otherwise it is a test notification
+                    $pspReference = $varienObj->getData('pspReference');
+                    if(is_numeric($pspReference)) {
+                        $this->updateNotProcessedEvents($varienObj);
+                        return false;
+                    }
+                }
+                // it is a test notification but update the events that are in the queue
+                $this->updateNotProcessedEvents(null);
                 return false;
             }
             $order->loadByIncrementId($incrementId);
@@ -99,6 +111,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     break;
                 default:
                     $status = $this->_processNotifications($order, $varienObj);
+                    $this->updateNotProcessedEvents(null);
                     break;
             }
         }catch(Exception $e){
@@ -112,6 +125,81 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         return $status;
     }
 
+    public function updateNotProcessedEvents($varienObj) {
+
+        if($varienObj) {
+            $incrementId = $varienObj->getData('merchantReference');
+            $pspReference = $varienObj->getData('pspReference');
+            $eventCode = $varienObj->getData('eventCode');
+
+            // check if already exists in the queue (sometimes Adyen Platform can send the same notification twice)
+            $eventResults = Mage::getModel('adyen/event_queue')->getCollection()
+                ->addFieldToFilter('increment_id', $incrementId);
+
+            $eventQueue = null;
+            if(count($eventResults) > 0) {
+                $eventQueue = $eventResults->getFirstItem();
+            }
+
+            if($eventQueue) {
+                $attempt = (int)$eventQueue->getAttempt();
+                try{
+                    $eventQueue->setAttempt(++$attempt);
+                    $eventQueue->save();
+                } catch(Exception $e) {
+                    Mage::logException($e);
+                }
+                Mage::log('Notification could still not processed this was attempt:'.$attempt .' for notification with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+            } else {
+                try {
+                    // add current request to the queue
+                    $eventQueue = Mage::getModel('adyen/event_queue');
+                    $eventQueue->setPspReference($pspReference);
+                    $eventQueue->setAdyenEventCode($eventCode);
+                    $eventQueue->setIncrementId($incrementId);
+                    $eventQueue->setAttempt(1);
+                    $eventQueue->setResponse(serialize($varienObj));
+                    $eventQueue->setCreatedAt(now());
+                    $eventQueue->save();
+                    Mage::log('Notification is added to the queue it will process when the next notification is received for incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                } catch(Exception $e) {
+                    Mage::logException($e);
+                }
+            }
+        }
+
+        // try to update old notifications that did not processed yet
+        $collection = Mage::getModel('adyen/event_queue')->getCollection()
+            ->addFieldToFilter('attempt', array('lteq' => '3'));
+
+        foreach($collection as $event){
+
+            if($event->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
+
+                $incrementId = $event->getIncrementId();
+                $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+                if (!empty($orderExist)) {
+                    // try to process it now
+                    $varienObj = unserialize($event->getResponse());
+                    $order = Mage::getModel('sales/order');
+                    $order->loadByIncrementId($incrementId);
+
+                    //log
+                    Mage::log('Notification from queue is trying to processing it again incrementId is:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                    $order->getPayment()->getMethodInstance()->writeLog($varienObj->debug());
+                    $this->_processNotifications($order, $varienObj);
+
+                    // update event that it is processed
+                    try{
+                        Mage::log('Notification from queue is processed with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                        $event->delete();
+                    } catch(Exception $e) {
+                        Mage::logException($e);
+                    }
+                }
+            }
+        }
+    }
 
     public function processPosResponse() {
 
@@ -410,27 +498,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
     protected function _incrementIdExist($varienObj, $incrementId) {
 
         $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
-
-        if (empty($orderExist)) {
-            // on authorization it could be that the order is not yet created
-            $eventCode = trim($varienObj->getData('eventCode'));
-            if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
-                // pspreference is numeric otherwise it is a test notification
-                $pspReference = $varienObj->getData('pspReference');
-                if(is_numeric($pspReference)) {
-                    // try to get the order now
-                    sleep(1);
-                    $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
-                    if (empty($orderExist)) {
-                        sleep(2);
-                        $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
-                        return $orderExist;
-                    } else {
-                        return $orderExist;
-                    }
-                }
-            }
-        }
         return $orderExist;
     }
 
@@ -962,7 +1029,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $reason = trim($response->getData('reason'));
         $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail');
         $_mail = (bool) $this->_getConfigData('send_update_mail');
-        $value = trim($response->getData('value'));
 
         //create invoice
         if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW) == 0) {
