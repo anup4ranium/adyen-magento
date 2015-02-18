@@ -702,7 +702,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      * @param type $order
      * @param type $response
      */
-    protected function _processNotifications($order, $response) {
+    public function _processNotifications($order, $response) {
         $valid = $this->notificationHandler($order, $response); //hmt: added $valid
 
         if ($valid) {

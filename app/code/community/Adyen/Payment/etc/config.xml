@@ -194,6 +194,17 @@
             </updates>
         </layout>
     </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <adyen before="Mage_Adminhtml">Adyen_Payment_Adminhtml</adyen>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 
     <adminhtml>
         <layout>
