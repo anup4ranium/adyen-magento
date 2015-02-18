@@ -17,16 +17,19 @@ You can create issues on our Magento Repository or if you have some specific pro
 <h2>Current Release</h2>
 <h3>2.2.1</h3>
 <h4>Features</h4>
+* #196 Add option for PayPal to select a capture mode different from the default
+* #203 Add option for OpenInvoice (Afterpay/Klarna) to select a capture mode different from the default
+* #204 Make OpenInvoice gender translatable
 * #206 Add CSE support for GoMage LightCheckout
 * #207 Add JSON support for Notifications
-* #204 Make OpenInvoice gender translatable
-* #203 Add option for OpenInvoice (Afterpay/Klarna) to select a capture mode different from the default enhancement
-* #196 Add option for PayPal to select a capture mode different from the default
+* #209 Show in the admin a page where you can see the notifications that did not been processed yet
+
 <h4>Fixes</h4>
+* #197 Failed OneClick payment will cause CreditCard to use OneClick
 * #200 do not process REPORT_AVAILABLE notifications just give back [accepted]
-* #205 Magento CreditCard API order not always update the status
 * #201 getSkinUrl method accept path with slashes only
-* #197 Failed OneClick payment will casue CreditCard to use OneClick
+* #205 Magento CreditCard API order not always update the status
+* #210 prefix some css classes so it won't change style of the shipping list
 
 <h2>Previous Releases</h2>
 <h3>2.2.0</h3>
