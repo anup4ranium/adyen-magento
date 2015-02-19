@@ -38,7 +38,7 @@ CREATE TABLE `{$this->getTable('adyen/event_queue')}` (
 `increment_id` varchar(50) DEFAULT NULL COMMENT 'Increment Id',
 `attempt` tinyint(1) DEFAULT NULL COMMENT 'attempt',
 `response` text DEFAULT NULL COMMENT 'response',
-`created_at` datetime NULL DEFAULT NULL COMMENT 'Created At',
+`created_at` datetime NULL DEFAULT NOW() COMMENT 'Created At',
 PRIMARY KEY (`event_queue_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ALTER TABLE `{$this->getTable('adyen/event_queue')}` ADD INDEX(`attempt`);
