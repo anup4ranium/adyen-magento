@@ -30,7 +30,7 @@
     <menu>
         <sales>
             <children>
-                <adyen_payment module="adyen_recurring" translate="title">
+                <adyen_payment module="adyen" translate="title">
                     <title>Adyen Notification Queue</title>
                     <sort_order>600</sort_order>
                     <action>adminhtml/adyen_event_queue</action>
