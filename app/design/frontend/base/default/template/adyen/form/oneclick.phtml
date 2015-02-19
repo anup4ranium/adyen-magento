@@ -58,7 +58,7 @@
 
                         ?>
                         <?php if (file_exists($_filename)){ ?>
-                            <img src="<?php echo $this->getSkinUrl('images'.DS.'adyen'.DS. $_bankFile . "_small.png") ?>" alt="<?php echo $_bankFile ?>" label="<?php echo $_bankFile ?>" />
+                            <img src="<?php echo $this->getSkinUrl('images/adyen/' . $_bankFile . "_small.png") ?>" alt="<?php echo $_bankFile ?>" label="<?php echo $_bankFile ?>" />
                         <?php } ?>
 
 
@@ -347,13 +347,13 @@
                 js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt.js";
                 document.body.appendChild(js);
             }
-            if (typeof payment.save !== 'undefined') {
+            if (typeof payment !== 'undefined' && typeof payment.save !== 'undefined') {
                 payment.save = payment.save.wrap(function(originalSaveMethod) {
                     cseOneClick.call(this);
                     originalSaveMethod();
                 });
             }
-            if (typeof checkout.save !== 'undefined') {
+            if (typeof checkout !== 'undefined' && typeof checkout.save !== 'undefined') {
                 checkout.save = checkout.save.wrap(function(originalSaveMethod) {
                     cseOneClick.call(this);
                     originalSaveMethod();
@@ -379,6 +379,13 @@
             //Fix for Inovarti One Step Checkout Brasil
             if($('onestepcheckout-place-order-button')) {
                 $('onestepcheckout-place-order-button').observe('click', function(e) {
+                    cse.call(this);
+                });
+            }
+
+            // Fix for GoMage LightCheckout
+            if($('submit-btn')) {
+                $('submit-btn').observe('click', function(e) {
                     cse.call(this);
                 });
             }

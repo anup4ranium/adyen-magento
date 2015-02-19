@@ -30,7 +30,7 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc {
     protected function _construct() {
         parent::_construct();
 
-        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
+        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
         $label = Mage::helper('adyen')->_getConfigData("title", "adyen_cc");
 
         $mark = Mage::getConfig()->getBlockClassName('core/template');
@@ -44,7 +44,7 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc {
             ->setMethodTitle('')
             ->setMethodLabelAfterHtml($mark->toHtml());
     }
-	
+
     /**
      * Retrieve availables credit card types
      *
@@ -53,18 +53,18 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc {
     public function getCcAvailableTypes() {
         return $this->getMethod()->getAvailableCCTypes();
     }
-    
+
     public function isCseEnabled() {
         return $this->getMethod()->isCseEnabled();
     }
     public function getCsePublicKey() {
         return $this->getMethod()->getCsePublicKey();
     }
-	
+
     public function getPossibleInstallments(){
         return $this->getMethod()->getPossibleInstallments();
     }
-    
+
     public function hasInstallments(){
         return Mage::helper('adyen/installments')->isInstallmentsEnabled();
     }

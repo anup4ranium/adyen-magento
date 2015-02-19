@@ -29,7 +29,7 @@
 <config>
     <modules>
         <Adyen_Payment>
-            <version>2.2.0</version>
+            <version>2.2.1</version>
         </Adyen_Payment>
     </modules>
     <global>
@@ -47,6 +47,9 @@
                     <event>
                         <table>adyen_event_data</table>
                     </event>
+                    <event_queue>
+                        <table>adyen_event_data_queue</table>
+                    </event_queue>
                 </entities>
             </adyen_mysql4>
         </models>
@@ -191,6 +194,17 @@
             </updates>
         </layout>
     </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <adyen before="Mage_Adminhtml">Adyen_Payment_Adminhtml</adyen>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 
     <adminhtml>
         <layout>
@@ -239,6 +253,8 @@
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
+                <auto_capture_openinvoice>0</auto_capture_openinvoice>
+                <paypal_capture_mode>0</paypal_capture_mode>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">

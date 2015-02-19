@@ -37,7 +37,7 @@ class Adyen_Payment_Block_Form_Openinvoice extends Mage_Payment_Block_Form {
     protected $_address;
 
     protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif");
+        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
         $label = Mage::helper('adyen')->_getConfigData("title", "adyen_openinvoice");
         // check if klarna or afterpay is selected for showing correct logo
         $openinvoiceType = Mage::helper('adyen')->_getConfigData("openinvoicetypes", "adyen_openinvoice");
