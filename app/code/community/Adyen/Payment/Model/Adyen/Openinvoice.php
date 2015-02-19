@@ -305,7 +305,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = Mage::helper('adyen')->formatAmount($item->getPrice(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? Mage::helper('adyen')->formatAmount($item->getPriceInclTax(), $currency) - Mage::helper('adyen')->formatAmount($item->getPrice(), $currency):Mage::helper('adyen')->formatAmount($item->getTaxAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
-            $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+
+            if(($this->_code == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($this->getInfoInstance()->getCcType() == "afterpay_default")) {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+            } else {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            }
+
+
         }
 
         //discount cost
@@ -317,7 +324,12 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = Mage::helper('adyen')->formatAmount($order->getDiscountAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-            $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            if(($this->_code == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($this->getInfoInstance()->getCcType() == "afterpay_default")) {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+            } else {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            }
+
         }
 
         //shipping cost
@@ -329,7 +341,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = Mage::helper('adyen')->formatAmount($order->getShippingAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = Mage::helper('adyen')->formatAmount($order->getShippingTaxAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-            $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            if(($this->_code == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($this->getInfoInstance()->getCcType() == "afterpay_default")) {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+            } else {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            }
         }
 
         if($order->getPaymentFeeAmount() > 0) {
@@ -339,7 +355,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = Mage::helper('adyen')->formatAmount($order->getPaymentFeeAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-            $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            if(($this->_code == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($this->getInfoInstance()->getCcType() == "afterpay_default")) {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+            } else {
+                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+            }
         }
 
         // Klarna wants tax cost provided in the lines of the products so overal tax cost is not needed anymore
