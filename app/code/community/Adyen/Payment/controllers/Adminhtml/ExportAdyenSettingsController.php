@@ -67,7 +67,7 @@ class Adyen_Payment_Adminhtml_ExportAdyenSettingsController extends Mage_Adminht
 
         // export to xml
         $contentType = "application/xml";
-        $fileName = "test.xml";
+        $fileName = "AdyenSettings.xml";
 
         $this->getResponse()
             ->setHttpResponseCode(200)
