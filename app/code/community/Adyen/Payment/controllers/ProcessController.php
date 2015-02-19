@@ -261,7 +261,13 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             Mage::logException($e);
         }
 
-        $session->addError($this->__('Your payment failed. Please try again later'));
+        $params = $this->getRequest()->getParams();
+        if(isset($params['authResult']) && $params['authResult'] == Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED) {
+            $session->addError($this->__('You have cancelled the order. Please try again'));
+        } else {
+            $session->addError($this->__('Your payment failed. Please try again later'));
+        }
+
         $this->_redirect('checkout/cart');
     }
 
@@ -331,9 +337,14 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             // if order is not cancelled then order is success
             if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED || substr($order->getAdyenEventCode(), 0, 13)  == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
                 echo 'true';
+            } elseif($order->getStatus() == 'pending' &&  $order->getAdyenEventCode() == "") {
+                echo 'wait';
+                Mage::log("NO MATCH! JUST WAIT order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
             } else {
                 Mage::log("NO MATCH! order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
             }
+
+            // extra check cancelled
         }
         return;
     }
