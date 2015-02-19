@@ -25,23 +25,32 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Pos extends Mage_Payment_Block_Form {
 
-    protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
-        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_pos");
+/**
+ * Adminhtml sales orders block
+ */
 
-        $mark = Mage::getConfig()->getBlockClassName('core/template');
-        $mark = new $mark;
-        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
-            ->setPaymentMethodIcon($paymentMethodIcon)
-            ->setPaymentMethodLabel($label)
-            ->setPaymentMethodClass("adyen_pos");
+class Adyen_Payment_Block_Adminhtml_Adyen_Event_Queue extends Mage_Adminhtml_Block_Widget_Grid_Container {
 
-        $this->setTemplate('adyen/form/pos.phtml')
-            ->setMethodTitle('')
-            ->setMethodLabelAfterHtml($mark->toHtml());
+    /**
+     * Instructions to create child grid
+     *
+     * @var string
+     */
+    protected $_blockGroup = 'adyen';
+    protected $_controller = 'adminhtml_adyen_event_queue';
 
-        parent::_construct();
+
+    /**
+     * Set header text and remove "add" btn
+     */
+    public function __construct()
+    {
+        $this->_headerText = Mage::helper('adyen')->__('Adyen Notification Queue');
+        parent::__construct();
+        $this->_removeButton('add');
     }
+
+
+
 }

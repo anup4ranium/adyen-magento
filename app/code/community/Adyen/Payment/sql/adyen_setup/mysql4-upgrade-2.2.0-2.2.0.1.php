@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -25,23 +24,23 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Pos extends Mage_Payment_Block_Form {
+$installer = $this;
+/* @var $installer Adyen_Payment_Model_Mysql4_Setup */
 
-    protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
-        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_pos");
+$installer->startSetup();
 
-        $mark = Mage::getConfig()->getBlockClassName('core/template');
-        $mark = new $mark;
-        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
-            ->setPaymentMethodIcon($paymentMethodIcon)
-            ->setPaymentMethodLabel($label)
-            ->setPaymentMethodClass("adyen_pos");
-
-        $this->setTemplate('adyen/form/pos.phtml')
-            ->setMethodTitle('')
-            ->setMethodLabelAfterHtml($mark->toHtml());
-
-        parent::_construct();
-    }
-}
+$installer->run("
+DROP TABLE IF EXISTS `{$this->getTable('adyen/event_queue')}`;
+CREATE TABLE `{$this->getTable('adyen/event_queue')}` (
+`event_queue_id` int(11) NOT NULL AUTO_INCREMENT,
+`psp_reference` varchar(55) DEFAULT NULL COMMENT 'pspReference',
+`adyen_event_code` varchar(55) DEFAULT NULL COMMENT 'Adyen Event Code',
+`increment_id` varchar(50) DEFAULT NULL COMMENT 'Increment Id',
+`attempt` tinyint(1) DEFAULT NULL COMMENT 'attempt',
+`response` text DEFAULT NULL COMMENT 'response',
+`created_at` datetime NULL DEFAULT NULL COMMENT 'Created At',
+PRIMARY KEY (`event_queue_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ALTER TABLE `{$this->getTable('adyen/event_queue')}` ADD INDEX(`attempt`);
+");
+$installer->endSetup();

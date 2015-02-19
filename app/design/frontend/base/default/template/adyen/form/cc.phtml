@@ -30,7 +30,7 @@
 <li class="adyen_payment_creditcard_labels">
     <?php $count = 0;
     foreach ($this->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
-        <?php $_filename = $this->getSkinUrl('images'.DS.'adyen'.DS. strtolower($_typeCode) . "_small.png"); ?>
+        <?php $_filename = $this->getSkinUrl('images/adyen/' . strtolower($_typeCode) . "_small.png"); ?>
         <img id="cc_type_<?php echo $count; ?>" width="40" height="22" src="<?php echo $_filename; ?>" alt="" class="mid" />
         <?php ++$count;
     endforeach; ?>
@@ -282,13 +282,14 @@
                 js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt.js";
                 document.body.appendChild(js);
             }
-            if (typeof payment.save !== 'undefined') {
+
+            if (typeof payment !== 'undefined' && typeof payment.save !== 'undefined') {
                 payment.save = payment.save.wrap(function(originalSaveMethod) {
                     cse.call(this);
                     originalSaveMethod();
                 });
             }
-            if (typeof checkout.save !== 'undefined') {
+            if (typeof checkout !== 'undefined' && typeof checkout.save !== 'undefined') {
                 checkout.save = checkout.save.wrap(function(originalSaveMethod) {
                     cse.call(this);
                     originalSaveMethod();
@@ -314,6 +315,13 @@
             //Fix for Inovarti One Step Checkout Brasil
             if($('onestepcheckout-place-order-button')) {
                 $('onestepcheckout-place-order-button').observe('click', function(e) {
+                    cse.call(this);
+                });
+            }
+
+            // Fix for GoMage LightCheckout
+            if($('submit-btn')) {
+                $('submit-btn').observe('click', function(e) {
                     cse.call(this);
                 });
             }

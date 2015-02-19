@@ -1,6 +1,6 @@
-<!-- Original:  Simon Tneoh (tneohcb@pc.jaring.my) -->
+/* Original:  Simon Tneoh (tneohcb@pc.jaring.my) */
 
-/*Cardtype format: name, starting numbers ( , separated, (is not a range)), number of digits ( , separated)  */
+/* Cardtype format: name, starting numbers ( , separated, (is not a range)), number of digits ( , separated)  */
 var Cards = new makeArray(22);
 //Cards[0] = new CardType("mc", "51,52,53,54,55", "16");
 Cards[0] = new CardType("MC", "51,52,53,54,55", "16");

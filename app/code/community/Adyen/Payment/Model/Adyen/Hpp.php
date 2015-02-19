@@ -412,7 +412,6 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract {
         $results = curl_exec($ch);
 
         if($results === false) {
-            echo "Error: " . curl_error($ch);
             Mage::log("Payment methods are not available on this merchantaccount\skin result is: " . curl_error($ch), self::DEBUG_LEVEL, 'http-request.log',true);
             Mage::throwException(Mage::helper('adyen')->__('Payment methods are not available on this merchantaccount\skin'));
         } else{

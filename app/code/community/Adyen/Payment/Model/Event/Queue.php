@@ -25,23 +25,14 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Form_Pos extends Mage_Payment_Block_Form {
+class Adyen_Payment_Model_Event_Queue extends Mage_Core_Model_Abstract {
 
+    /**
+     * Initialize resources
+     */
     protected function _construct() {
-        $paymentMethodIcon = $this->getSkinUrl('images/adyen/img_trans.gif');
-        $label = Mage::helper('adyen')->_getConfigData("title", "adyen_pos");
-
-        $mark = Mage::getConfig()->getBlockClassName('core/template');
-        $mark = new $mark;
-        $mark->setTemplate('adyen/payment/payment_method_label.phtml')
-            ->setPaymentMethodIcon($paymentMethodIcon)
-            ->setPaymentMethodLabel($label)
-            ->setPaymentMethodClass("adyen_pos");
-
-        $this->setTemplate('adyen/form/pos.phtml')
-            ->setMethodTitle('')
-            ->setMethodLabelAfterHtml($mark->toHtml());
-
-        parent::_construct();
+        $this->_init('adyen/adyen_event_queue');
     }
+
+
 }
