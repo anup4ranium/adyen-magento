@@ -264,7 +264,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             Mage::logException($e);
         }
 
-        $session->addError($this->__('Your payment failed. Please try again later'));
+        $session->addError($this->__('Your payment failed, Please try again later'));
         $this->_redirectCheckoutCart();
     }
 
