@@ -371,7 +371,7 @@
             if($('checkout-review-submit')) {
                 $$('.opc-btn-checkout').each(function(element) {
                     element.observe('click', function(e) {
-                        cse.call(this);
+                        cseOneClick.call(this);
                     });
                 })
             }
@@ -379,14 +379,14 @@
             //Fix for Inovarti One Step Checkout Brasil
             if($('onestepcheckout-place-order-button')) {
                 $('onestepcheckout-place-order-button').observe('click', function(e) {
-                    cse.call(this);
+                    cseOneClick.call(this);
                 });
             }
 
             // Fix for GoMage LightCheckout
             if($('submit-btn')) {
                 $('submit-btn').observe('click', function(e) {
-                    cse.call(this);
+                    cseOneClick.call(this);
                 });
             }
         }
