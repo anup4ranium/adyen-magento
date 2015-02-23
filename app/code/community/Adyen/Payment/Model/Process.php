@@ -196,6 +196,11 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     } catch(Exception $e) {
                         Mage::logException($e);
                     }
+                } else {
+                    // order still not exists save this attempt
+                    $currentAttempt = $event->getAttempt();
+                    $event->setAttempt(++$currentAttempt);
+                    $event->save();
                 }
             }
         }
