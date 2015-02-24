@@ -172,7 +172,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 
         // try to update old notifications that did not processed yet
         $collection = Mage::getModel('adyen/event_queue')->getCollection()
-            ->addFieldToFilter('attempt', array('lteq' => '3'));
+            ->addFieldToFilter('attempt', array('lteq' => '4'));
 
         foreach($collection as $event){
 
