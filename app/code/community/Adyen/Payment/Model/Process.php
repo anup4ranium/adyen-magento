@@ -88,7 +88,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                 Mage::log('Order does not exist with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
                 // on authorization it could be that the order is not yet created
                 $eventCode = trim($varienObj->getData('eventCode'));
-                if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
+                $success = (trim($varienObj->getData('success')) == "true") ? true : false;
+                // only log the AUTHORISATION with Sucess true because with false the order will never be created in magento
+                if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $success == true) {
                     // pspreference is always numeric otherwise it is a test notification
                     $pspReference = $varienObj->getData('pspReference');
                     if(is_numeric($pspReference)) {
@@ -170,7 +172,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 
         // try to update old notifications that did not processed yet
         $collection = Mage::getModel('adyen/event_queue')->getCollection()
-            ->addFieldToFilter('attempt', array('lteq' => '3'));
+            ->addFieldToFilter('attempt', array('lteq' => '4'));
 
         foreach($collection as $event){
 
@@ -196,6 +198,11 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     } catch(Exception $e) {
                         Mage::logException($e);
                     }
+                } else {
+                    // order still not exists save this attempt
+                    $currentAttempt = $event->getAttempt();
+                    $event->setAttempt(++$currentAttempt);
+                    $event->save();
                 }
             }
         }

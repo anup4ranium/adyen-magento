@@ -15,6 +15,17 @@ But you can also request or suggest new features or code changes yourself!
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
 
 <h2>Current Release</h2>
+<h3>2.2.2</h3>
+<h4>Features</h4>
+* #220 Add only Authorization with success true to the notification queue
+* #221 Added support for HMAC key in Notification
+
+<h4>Fixes</h4>
+* #217 Afterpay send in vatCategory = High instead of None
+* #219 Notification Queue does not update attempts if second attempt failed
+
+
+<h2>Previous Releases</h2>
 <h3>2.2.1</h3>
 <h4>Features</h4>
 * #196 Add option for PayPal to select a capture mode different from the default
@@ -32,8 +43,6 @@ You can create issues on our Magento Repository or if you have some specific pro
 * #201 getSkinUrl method accept path with slashes only
 * #205 Magento CreditCard API order not always update the status
 * #210 prefix some css classes so it won't change style of the shipping list
-
-<h2>Previous Releases</h2>
 <h3>2.2.0</h3>
 <h4>Features</h4>
 * #156 CreditCard logos are shown and automatically detected instead of selecting your cart type
