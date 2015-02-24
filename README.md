@@ -18,6 +18,7 @@ You can create issues on our Magento Repository or if you have some specific pro
 <h3>2.2.2</h3>
 <h4>Features</h4>
 * #220 Add only Authorization with success true to the notification queue
+* #221 Added support for HMAC key in Notification
 
 <h4>Fixes</h4>
 * #217 Afterpay send in vatCategory = High instead of None
