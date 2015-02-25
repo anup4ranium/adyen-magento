@@ -139,10 +139,15 @@
                                     // set the adyen_hpp payment method
                                     $('p_method_adyen_hpp').checked = true;
                                     payment.switchMethod("adyen_hpp");
-                                    if (method.value == 'ideal') {
-                                        $('payment_form_ideal').show();
-                                    } else {
-                                        $('payment_form_ideal').hide();
+
+                                    var paymentFormIdeal =  $('payment_form_ideal');
+
+                                    if(paymentFormIdeal != undefined) {
+                                        if (method.value == 'ideal') {
+                                            paymentFormIdeal.show();
+                                        } else {
+                                            paymentFormIdeal.hide();
+                                        }
                                     }
                                 };
                                 Event.observe($('hpp_type_<?php echo $_typeCode?>'), 'change', IdealChecked);
