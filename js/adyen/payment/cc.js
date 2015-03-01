@@ -1,6 +1,6 @@
-<!-- Original:  Simon Tneoh (tneohcb@pc.jaring.my) -->
+/* Original:  Simon Tneoh (tneohcb@pc.jaring.my) */
 
-/*Cardtype format: name, starting numbers ( , separated, (is not a range)), number of digits ( , separated)  */
+/* Cardtype format: name, starting numbers ( , separated, (is not a range)), number of digits ( , separated)  */
 var Cards = new makeArray(22);
 //Cards[0] = new CardType("mc", "51,52,53,54,55", "16");
 Cards[0] = new CardType("MC", "51,52,53,54,55", "16");
@@ -41,7 +41,7 @@ var Hipercard = Cards[14];
 //Cards[15] = new CardType("maestro", "50,56,57,58,6", "16");
 Cards[15] = new CardType("SM", "50,56,57,58,6", "16");
 var MaestroCard = Cards[15];
-Cards[16] = new CardType("elo", "506699,50670,50671,50672,50673,50674,50675,50676,506770,506771,506772,506773,506774,506775,506776,506777,506778,401178,438935,451416,457631,457632,504175,627780,636297,636368", "16");
+Cards[16] = new CardType("ELO", "506699,50670,50671,50672,50673,50674,50675,50676,506770,506771,506772,506773,506774,506775,506776,506777,506778,401178,438935,451416,457631,457632,504175,627780,636297,636368", "16");
 var Elo = Cards[16];
 Cards[17] = new CardType("uatp", "1", "15");
 var Uatp = Cards[17];

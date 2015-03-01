@@ -321,10 +321,8 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                     $url = 'https://test.adyen.com/hpp/pay.shtml';
                 } else {
                     $url = (empty($brandCode))
-                        ?
-                        'https://test.adyen.com/hpp/select.shtml'
-                        :
-                        "https://test.adyen.com/hpp/details.shtml?brandCode=$brandCode";
+                        ? 'https://test.adyen.com/hpp/select.shtml'
+                        : "https://test.adyen.com/hpp/details.shtml?brandCode=$brandCode";
                 }
                 break;
             default:
@@ -371,5 +369,13 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $state = Mage_Sales_Model_Order::STATE_NEW;
         $stateObject->setState($state);
         $stateObject->setStatus($this->_getConfigData('order_status'));
+    }
+
+    public function getHppOptionsDisabled() {
+        return Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
+    }
+
+    public function getShowIdealLogos() {
+        return $this->_getConfigData('show_ideal_logos', 'adyen_hpp');
     }
 }

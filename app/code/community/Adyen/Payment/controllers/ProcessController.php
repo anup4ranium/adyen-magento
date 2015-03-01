@@ -117,9 +117,6 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             //redirect to adyen
             if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) === 0 ||
                 (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_NEW) === 0)) {
-                $_status = $this->_getConfigData('order_status');
-                // FIXME this status won't be added because order is not saved $order->save() missing
-                $order->addStatusHistoryComment(Mage::helper('adyen')->__('Customer was redirected to Adyen.'), $_status);
                 $this->getResponse()->setBody(
                     $this->getLayout()
                         ->createBlock($this->_redirectBlockType)
@@ -263,9 +260,15 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         } catch (Mage_Core_Exception $e) {
             Mage::logException($e);
         }
+        
+        $params = $this->getRequest()->getParams();
+        if(isset($params['authResult']) && $params['authResult'] == Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED) {
+            $session->addError($this->__('You have cancelled the order. Please try again'));
+        } else {
+            $session->addError($this->__('Your payment failed. Please try again later'));
+        }
 
-        $session->addError($this->__('Your payment failed, Please try again later'));
-        $this->_redirectCheckoutCart();
+        $this->_redirect('checkout/cart');
     }
 
     protected function _redirectCheckoutCart()
@@ -288,6 +291,25 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             Mage::logException($e);
         }
 
+        exit();
+    }
+
+    public function jsonAction() {
+
+        try {
+            $notificationItems = json_decode(file_get_contents('php://input'), true);
+
+            foreach($notificationItems['notificationItems'] as $notificationItem)
+            {
+                $status = $this->processResponse($notificationItem['NotificationRequestItem']);
+                if($status == "401"){
+                    $this->_return401();
+                }
+            }
+            echo "[accepted]";
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
         exit();
     }
 
@@ -319,9 +341,16 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             // get the order
             $order = Mage::getModel('sales/order')->loadByIncrementId($_POST['merchantReference']);
             // if order is not cancelled then order is success
-            if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED) {
+            if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED || substr($order->getAdyenEventCode(), 0, 13)  == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
                 echo 'true';
+            } elseif($order->getStatus() == 'pending' &&  $order->getAdyenEventCode() == "") {
+                echo 'wait';
+                Mage::log("NO MATCH! JUST WAIT order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
+            } else {
+                Mage::log("NO MATCH! order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
             }
+
+            // extra check cancelled
         }
         return;
     }

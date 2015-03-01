@@ -124,7 +124,11 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
             	$this->elv = null;
                 $this->bankAccount = null;
 
-                $recurringDetailReference = $payment->getAdditionalInformation("recurring_detail_reference");
+                if($paymentMethod == "oneclick") {
+                    $recurringDetailReference = $payment->getAdditionalInformation("recurring_detail_reference");
+                } else {
+                    $recurringDetailReference = null;
+                }
 
                 // set shopperInteraction
                 if($recurringType == "RECURRING") {

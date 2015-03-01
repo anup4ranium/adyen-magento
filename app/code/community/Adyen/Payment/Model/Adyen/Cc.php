@@ -38,11 +38,11 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
     {
         // check if this is adyen_cc payment method because this function is as well used for oneclick payments
         if($this->getCode() == "adyen_cc") {
-            $visable = Mage::getStoreConfig("payment/adyen_cc/visable_type");
-            if($visable == "backend") {
+            $visible = Mage::getStoreConfig("payment/adyen_cc/visible_type");
+            if($visible == "backend") {
                 $this->_canUseCheckout = false;
                 $this->_canUseInternal = true;
-            } else if($visable == "frontend") {
+            } else if($visible == "frontend") {
                 $this->_canUseCheckout = true;
                 $this->_canUseInternal = false;
             } else {

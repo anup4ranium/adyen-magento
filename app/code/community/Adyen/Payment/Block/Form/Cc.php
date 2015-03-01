@@ -59,7 +59,7 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 
         return $this->getData('_method_label_html');
     }
-	
+
     /**
      * Retrieve availables credit card types
      *
@@ -68,18 +68,18 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     public function getCcAvailableTypes() {
         return $this->getMethod()->getAvailableCCTypes();
     }
-    
+
     public function isCseEnabled() {
         return $this->getMethod()->isCseEnabled();
     }
     public function getCsePublicKey() {
         return $this->getMethod()->getCsePublicKey();
     }
-	
+
     public function getPossibleInstallments(){
         return $this->getMethod()->getPossibleInstallments();
     }
-    
+
     public function hasInstallments(){
         return Mage::helper('adyen/installments')->isInstallmentsEnabled();
     }

@@ -1,4 +1,4 @@
-magento
+Magento
 =======
 
 This is the Adyen Payment plugin for Magento. The plugin supports the Magento Community and Enterprise edition.
@@ -15,6 +15,68 @@ But you can also request or suggest new features or code changes yourself!
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
 
 <h2>Current Release</h2>
+<h3>2.2.2</h3>
+<h4>Features</h4>
+* #220 Add only Authorization with success true to the notification queue
+* #221 Added support for HMAC key in Notification
+
+<h4>Fixes</h4>
+* #217 Afterpay send in vatCategory = High instead of None
+* #219 Notification Queue does not update attempts if second attempt failed
+
+
+<h2>Previous Releases</h2>
+<h3>2.2.1</h3>
+<h4>Features</h4>
+* #196 Add option for PayPal to select a capture mode different from the default
+* #203 Add option for OpenInvoice (Afterpay/Klarna) to select a capture mode different from the default
+* #204 Make OpenInvoice gender translatable
+* #206 Add CSE support for GoMage LightCheckout
+* #207 Add JSON support for Notifications
+* #209 Show in the admin a page where you can see the notifications that did not been processed yet
+* #211 Add option in configuration to export Adyen Settings
+* #212 Add different message when shopper cancel the order on the HPP
+
+<h4>Fixes</h4>
+* #197 Failed OneClick payment will cause CreditCard to use OneClick
+* #200 do not process REPORT_AVAILABLE notifications just give back [accepted]
+* #201 getSkinUrl method accept path with slashes only
+* #205 Magento CreditCard API order not always update the status
+* #210 prefix some css classes so it won't change style of the shipping list
+<h3>2.2.0</h3>
+<h4>Features</h4>
+* #156 CreditCard logos are shown and automatically detected instead of selecting your cart type
+* #174 Added Elo and Hipercard to CreditCard types
+* #175 Show number of installments in payment details of the order
+* #170 Encrypt password fields in configuration settings
+* #168 Option to add phonenumber field only for the OpenInvoice payment method
+* #113 Show fraudscore in Magento (if you have this setup for your account or if you have Adyen CC payment method enabled)
+* #144 Show by default Ideal payment method as a list instead of logos (can be changed in the configurations)
+* #140 Added payment logos for all payment methods
+* #149 Pre fill country for Payment Method SEPA based on billing information
+* #157 Added option to use IPFilter for the payment method Adyen POS
+* #150 Create a new  configuration field for Client-Side Encryption Public Key for test
+* #114 Added extra setting so you can can define a different status for Downloadable products
+* #165 Option to send out confirmation mail for Banktransfer/SEPA before payment is received
+* #176 Added CSE support for IWD One Page Checkout
+* #154 Added Filter on N.A in Adyen Status column of sales order grid
+* #127 #180 Added translation for Dutch,German,Spanish and French
+* #181 Cash Drawer support for epson ePOS-Device
+
+<h4>Fixes</h4>
+* #152 IOS CheckSum Fix For POS payments
+* #172 Update scripts now support tables that have prefixes
+* #169 Admin Order is now showing Total Due and Total Refunded
+* #126 Change logic for Capture so it will shoot in an api call to Adyen when you use the magento API capture
+* #158 Orders not using Adyen Payments can now be cancelled without errors
+* #151 #155 Database Optimization for better performance
+* #130 Adyen PSP Reference link in order details goes directly to the payment instead of the list with filtering on this PSP Reference.
+* #121 Don’t throw exception when there are no payment methods available for the Adyen HPP payment method
+* #117 Use for Afterpay afterpay_default payment method instead of old open invoice integration
+* #115 Fix validation for Diners cards
+* #183 Openinvoice (Afterpay/Klarna) are always manual captured
+* #116 Removed specific OneStepCheckout changes from the module, this will be added on GitHub as an external asset
+
 <h3>2.1.1</h3>
 <h4>Features</h4>
 * Make installments possible for the OneClick Payments
@@ -46,7 +108,6 @@ You can create issues on our Magento Repository or if you have some specific pro
 * Fixed that DeliveryDate For Boleto is now correctly send to Adyen platform
 * Fixed that Ajax calls now support the HTTPS protocol
 
-<h2>Previous Releases</h2>
 <h3>2.1.0</h3>
 <h4>Features & Fixes</h4>
  * Show OneClick payments in Magento checkout

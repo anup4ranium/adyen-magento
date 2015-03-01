@@ -73,13 +73,33 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
 
         try{
 
+            // skip notification if notification is REPORT_AVAILABLE
+            $eventCode = trim($varienObj->getData('eventCode'));
+            if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_REPORT_AVAILABLE) {
+                return false;
+            }
+
             //get order && payment objects
             $order = Mage::getModel('sales/order');
 
             //error
-            $orderExist = $this->_incrementIdExist($incrementId);
+            $orderExist = $this->_incrementIdExist($varienObj, $incrementId);
             if (empty($orderExist)) {
-                $this->_writeLog("unknown order : $incrementId");
+                Mage::log('Order does not exist with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                // on authorization it could be that the order is not yet created
+                $eventCode = trim($varienObj->getData('eventCode'));
+                $success = (trim($varienObj->getData('success')) == "true") ? true : false;
+                // only log the AUTHORISATION with Sucess true because with false the order will never be created in magento
+                if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $success == true) {
+                    // pspreference is always numeric otherwise it is a test notification
+                    $pspReference = $varienObj->getData('pspReference');
+                    if(is_numeric($pspReference)) {
+                        $this->updateNotProcessedEvents($varienObj);
+                        return false;
+                    }
+                }
+                // it is a test notification but update the events that are in the queue
+                $this->updateNotProcessedEvents(null);
                 return false;
             }
             $order->loadByIncrementId($incrementId);
@@ -93,15 +113,100 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     break;
                 default:
                     $status = $this->_processNotifications($order, $varienObj);
+                    $this->updateNotProcessedEvents(null);
                     break;
             }
         }catch(Exception $e){
             // do nothing
+            // log error
+            Mage::logException($e);
+            Mage::log('NOTIFICATION RESPONSE failure!' . print_r($e, true), Zend_Log::DEBUG, "adyen_notification.log", true);
+
         }
 
         return $status;
     }
 
+    public function updateNotProcessedEvents($varienObj) {
+
+        if($varienObj) {
+            $incrementId = $varienObj->getData('merchantReference');
+            $pspReference = $varienObj->getData('pspReference');
+            $eventCode = $varienObj->getData('eventCode');
+
+            // check if already exists in the queue (sometimes Adyen Platform can send the same notification twice)
+            $eventResults = Mage::getModel('adyen/event_queue')->getCollection()
+                ->addFieldToFilter('increment_id', $incrementId);
+
+            $eventQueue = null;
+            if(count($eventResults) > 0) {
+                $eventQueue = $eventResults->getFirstItem();
+            }
+
+            if($eventQueue) {
+                $attempt = (int)$eventQueue->getAttempt();
+                try{
+                    $eventQueue->setAttempt(++$attempt);
+                    $eventQueue->save();
+                } catch(Exception $e) {
+                    Mage::logException($e);
+                }
+                Mage::log('Notification could still not processed this was attempt:'.$attempt .' for notification with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+            } else {
+                try {
+                    // add current request to the queue
+                    $eventQueue = Mage::getModel('adyen/event_queue');
+                    $eventQueue->setPspReference($pspReference);
+                    $eventQueue->setAdyenEventCode($eventCode);
+                    $eventQueue->setIncrementId($incrementId);
+                    $eventQueue->setAttempt(1);
+                    $eventQueue->setResponse(serialize($varienObj));
+                    $eventQueue->setCreatedAt(now());
+                    $eventQueue->save();
+                    Mage::log('Notification is added to the queue it will process when the next notification is received for incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                } catch(Exception $e) {
+                    Mage::logException($e);
+                }
+            }
+        }
+
+        // try to update old notifications that did not processed yet
+        $collection = Mage::getModel('adyen/event_queue')->getCollection()
+            ->addFieldToFilter('attempt', array('lteq' => '4'));
+
+        foreach($collection as $event){
+
+            if($event->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
+
+                $incrementId = $event->getIncrementId();
+                $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+                if (!empty($orderExist)) {
+                    // try to process it now
+                    $varienObj = unserialize($event->getResponse());
+                    $order = Mage::getModel('sales/order');
+                    $order->loadByIncrementId($incrementId);
+
+                    //log
+                    Mage::log('Notification from queue is trying to processing it again incrementId is:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                    $order->getPayment()->getMethodInstance()->writeLog($varienObj->debug());
+                    $this->_processNotifications($order, $varienObj);
+
+                    // update event that it is processed
+                    try{
+                        Mage::log('Notification from queue is processed with incrementId:' . $incrementId, Zend_Log::DEBUG, "adyen_notification.log", true);
+                        $event->delete();
+                    } catch(Exception $e) {
+                        Mage::logException($e);
+                    }
+                } else {
+                    // order still not exists save this attempt
+                    $currentAttempt = $event->getAttempt();
+                    $event->setAttempt(++$currentAttempt);
+                    $event->save();
+                }
+            }
+        }
+    }
 
     public function processPosResponse() {
 
@@ -185,7 +290,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                 $incrementId = $varienObj->getData('originalCustomMerchantReference');
 
                 //error
-                $orderExist = $this->_incrementIdExist($incrementId);
+                $orderExist = $this->_incrementIdExist($varienObj, $incrementId);
 
                 if (empty($orderExist)) {
                     $this->_writeLog("unknown order : $incrementId");
@@ -204,6 +309,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $order->addStatusHistoryComment($comment, false);
 
                         try {
+                            Mage::log("processPosResponse Adyen Event Status is:".$order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification.log", true);
                             $order->save();
                         } catch (Exception $e) {
                             Mage::logException($e);
@@ -296,7 +402,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $order = Mage::getModel('sales/order');
 
             //error
-            $orderExist = $this->_incrementIdExist($merchantReference);
+            $orderExist = $this->_incrementIdExist($varienObj, $merchantReference);
 
             if (empty($orderExist)) {
                 $this->_writeLog("unknown order : $merchantReference");
@@ -314,54 +420,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     ->setEntityName("order")
                     ->setOrder($order);
                 $history->save();
-
-
-                if($this->_getConfigData('cash_drawer', 'adyen_pos')) {
-
-                    $printerIp = trim($this->_getConfigData('cash_drawer_printer_ip', 'adyen_pos'));
-
-                    if($printerIp != "") {
-
-                        $drawCodeConfig = trim($this->_getConfigData('cash_drawer_code', 'adyen_pos'));
-
-                        if($drawCodeConfig != "") {
-
-                            // split comm based
-                            $drawCodes = explode(",", $drawCodeConfig);
-
-                            // open the cash drawer
-                            try {
-                                $esc = "\x1b";
-                                $fp = fsockopen($printerIp, 9100);
-                                fwrite($fp, $esc . "@");
-                                $write = "";
-                                $count = 0;
-                                foreach($drawCodes as $drawCode) {
-                                    // first code 27 must be special character to let it work
-                                    if($count == 0 && $drawCode == "27") {
-                                        $write .= $esc;
-                                    } else {
-                                        $write .= chr($drawCode);
-                                    }
-                                    ++$count;
-                                }
-                                // example: fwrite($fp, $esc . chr(112) . chr(48) . chr(55) . chr(121));
-                                fwrite($fp, $write);
-                                // close connection
-                                fclose($fp);
-                            } catch(Exception $e) {
-                                Mage::logException($e);
-                                Mage::throwException($e->getMessage());
-                            }
-                        } else {
-                            Mage::log("Cash drawer Code not filled in check your Adyen POS settings", Zend_Log::DEBUG, "adyen_notification.log", true);
-                            Mage::throwException('Cash drawer Code not filled in check your Adyen POS settings');
-                        }
-                    } else {
-                        Mage::log("Cash drawer Code not filled in check your Adyen POS settings", Zend_Log::DEBUG, "adyen_notification.log", true);
-                        Mage::throwException('Cash drawer IP not filled in check your Adyen POS settings');
-                    }
-                }
                 return $status;
             }
         }
@@ -396,8 +454,10 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      * @param type $incrementId
      * @return type
      */
-    protected function _incrementIdExist($incrementId) {
-        return Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+    protected function _incrementIdExist($varienObj, $incrementId) {
+
+        $orderExist = Mage::getResourceModel('adyen/order')->orderExist($incrementId);
+        return $orderExist;
     }
 
     /**
@@ -601,7 +661,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
      * @param type $order
      * @param type $response
      */
-    protected function _processNotifications($order, $response) {
+    public function _processNotifications($order, $response) {
         $valid = $this->notificationHandler($order, $response); //hmt: added $valid
 
         if ($valid) {
@@ -615,6 +675,9 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
             $paymentMethod = trim($response->getData('paymentMethod'));
             $_paymentCode = $this->_paymentMethodCode($order);
             switch ($eventCode) {
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND_FAILED:
+                    // do nothing only inform the merchant with order comment history
+                    break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND:
 
                     $this->refundOrder($order, $response);
@@ -637,6 +700,12 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $this->authorizePayment($order, $success, $paymentMethod, $response);
                     }
                     break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_REJECT:
+                    // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
+                    break;
+                case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
+                    // don't do anything it will send a CAPTURE notification when this payment is captured
+                    break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
                     if($_paymentCode != "adyen_pos") {
                         $this->setPaymentAuthorized($order, $success, $response);
@@ -651,7 +720,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     $this->holdCancelOrder($order, $response);
                     break;
                 case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCEL_OR_REFUND:
-
                     $resultModification = trim($response->getData('additionalData_modification_action'));
                     if(isset($resultModification) && $resultModification != "") {
                         if($resultModification == "cancel") {
@@ -667,6 +735,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $order->addStatusHistoryComment($helper->__('Order is cancelled or refunded'));
                         $order->save();
                     }
+                    break;
                 default:
                     //@todo fix me cancel && error here
                     $order->getPayment()->getMethodInstance()->writeLog('notification event not supported!');
@@ -807,6 +876,8 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $captureMode = trim($this->_getConfigData('capture_mode'));
         $sepaFlow = trim($this->_getConfigData('capture_mode', 'adyen_sepa'));
         $_paymentCode = $this->_paymentMethodCode($order);
+        $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract');
+        $captureModePayPal = trim($this->_getConfigData('paypal_capture_mode', 'adyen_abstract'));
 
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->isBankTransfer($paymentMethod);
@@ -815,11 +886,23 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         if (strcmp($paymentMethod, 'ideal') === 0 || strcmp($paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap")) {
             return true;
         }
+        // if auto capture mode for openinvoice is turned on then use auto capture
+        if ($captureModeOpenInvoice == true && (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0)) {
+            return true;
+        }
+        // if PayPal capture modues is different from the default use this one
+        if(strcmp($paymentMethod, 'paypal' ) === 0 && $captureModePayPal != "") {
+            if(strcmp($captureModePayPal, 'auto') === 0 ) {
+                return true;
+            } elseif(strcmp($captureModePayPal, 'manual') === 0 ) {
+                return false;
+            }
+        }
         if (strcmp($captureMode, 'manual') === 0) {
             return false;
         }
-        //online capture after delivery, use Magento backend to online invoice
-        if (strcmp($paymentMethod, 'openinvoice') === 0) {
+        //online capture after delivery, use Magento backend to online invoice (if the option auto capture mode for openinvoice is not set)
+        if (strcmp($paymentMethod, 'openinvoice') === 0 || strcmp($paymentMethod, 'afterpay_default') === 0 || strcmp($paymentMethod, 'klarna') === 0) {
             return false;
         }
         return true;
@@ -905,7 +988,6 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
         $reason = trim($response->getData('reason'));
         $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail');
         $_mail = (bool) $this->_getConfigData('send_update_mail');
-        $value = trim($response->getData('value'));
 
         //create invoice
         if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW) == 0) {

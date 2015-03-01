@@ -36,11 +36,11 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract 
 
     public function __construct()
     {
-        $visable = Mage::getStoreConfig("payment/adyen_sepa/visable_type");
-        if($visable == "backend") {
+        $visible = Mage::getStoreConfig("payment/adyen_sepa/visible_type");
+        if($visible == "backend") {
             $this->_canUseCheckout = false;
             $this->_canUseInternal = true;
-        } else if($visable == "frontend") {
+        } else if($visible == "frontend") {
             $this->_canUseCheckout = true;
             $this->_canUseInternal = false;
         } else {

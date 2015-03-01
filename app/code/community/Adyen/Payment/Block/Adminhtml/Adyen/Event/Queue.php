@@ -25,14 +25,32 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Source_VisableType {
 
-    public function toOptionArray() {
-        return array(
-            array('value' => 'both', 'label' => 'Backend and Frontend'),
-            array('value' => 'backend', 'label' => 'Backend Only'),
-            array('value' => 'frontend', 'label' => 'Frontend Only')
-        );
+/**
+ * Adminhtml sales orders block
+ */
+
+class Adyen_Payment_Block_Adminhtml_Adyen_Event_Queue extends Mage_Adminhtml_Block_Widget_Grid_Container {
+
+    /**
+     * Instructions to create child grid
+     *
+     * @var string
+     */
+    protected $_blockGroup = 'adyen';
+    protected $_controller = 'adminhtml_adyen_event_queue';
+
+
+    /**
+     * Set header text and remove "add" btn
+     */
+    public function __construct()
+    {
+        $this->_headerText = Mage::helper('adyen')->__('Adyen Notification Queue');
+        parent::__construct();
+        $this->_removeButton('add');
     }
+
+
 
 }
