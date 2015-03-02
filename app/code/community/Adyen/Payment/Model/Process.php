@@ -599,6 +599,14 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                 }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_REFUSED:
+                $this->_addStatusHistoryComment($order, $params);
+                // if refused there will be a AUTHORIZATION : FALSE notification send only exception is ideal
+                $paymentMethod = trim($params->getData('paymentMethod'));
+                if(strcmp($paymentMethod, 'ideal') === 0) {
+                    //attempt to hold/cancel
+                    $this->holdCancelOrder($order, $params);
+                }
+                break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_ERROR:
                 $this->_addStatusHistoryComment($order, $params);
                 //attempt to hold/cancel
