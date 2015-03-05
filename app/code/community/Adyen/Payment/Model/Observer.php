@@ -96,6 +96,9 @@ class Adyen_Payment_Model_Observer {
 
         $skinCode          = $adyenHelper->_getConfigData('skinCode', 'adyen_hpp', $store);
         $merchantAccount   = $adyenHelper->_getConfigData('merchantAccount', null, $store);
+        if ($skinCode || $merchantAccount) {
+            return array();
+        }
 
         $adyFields = array(
             "paymentAmount"     => $this->_getCurrentPaymentAmount(),
