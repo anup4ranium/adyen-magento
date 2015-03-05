@@ -94,9 +94,9 @@ class Adyen_Payment_Model_Observer {
         $adyenHelper = Mage::helper('adyen');
 
 
-        $skinCode          = $adyenHelper->_getConfigData('skinCode', 'adyen_hpp', $store);
-        $merchantAccount   = $adyenHelper->_getConfigData('merchantAccount', null, $store);
-        if ($skinCode || $merchantAccount) {
+        $skinCode          = $adyenHelper->getConfigData('skinCode', 'adyen_hpp', $store);
+        $merchantAccount   = $adyenHelper->getConfigData('merchantAccount', null, $store);
+        if (!$skinCode && !$merchantAccount) {
             return array();
         }
 
@@ -370,10 +370,10 @@ class Adyen_Payment_Model_Observer {
         $adyenHelper = Mage::helper('adyen');
         switch ($adyenHelper->getConfigDataDemoMode()) {
             case true:
-                $secretWord = trim($adyenHelper->_getConfigData('secret_wordt', 'adyen_hpp'));
+                $secretWord = trim($adyenHelper->getConfigData('secret_wordt', 'adyen_hpp'));
                 break;
             default:
-                $secretWord = trim($adyenHelper->_getConfigData('secret_wordp', 'adyen_hpp'));
+                $secretWord = trim($adyenHelper->getConfigData('secret_wordp', 'adyen_hpp'));
                 break;
         }
         return $secretWord;
