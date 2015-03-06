@@ -96,12 +96,12 @@ class Adyen_Payment_Model_Observer {
 
         $skinCode          = $adyenHelper->getConfigData('skinCode', 'adyen_hpp', $store);
         $merchantAccount   = $adyenHelper->getConfigData('merchantAccount', null, $store);
-        if (!$skinCode && !$merchantAccount) {
+        if (!$skinCode || !$merchantAccount) {
             return array();
         }
 
         $adyFields = array(
-            "paymentAmount"     => $this->_getCurrentPaymentAmount(),
+            "paymentAmount"     => Mage::helper('adyen')->formatAmount($this->_getCurrentPaymentAmount(), $this->_getCurrentCurrencyCode()),
             "currencyCode"      => $this->_getCurrentCurrencyCode(),
             "merchantReference" => "Get Payment methods",
             "skinCode"          => $skinCode,
