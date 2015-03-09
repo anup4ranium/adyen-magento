@@ -265,10 +265,10 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         if(isset($params['authResult']) && $params['authResult'] == Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED) {
             $session->addError($this->__('You have cancelled the order. Please try again'));
         } else {
-            $session->addError($this->__('Your payment failed. Please try again later'));
+            $session->addError($this->__('Your payment failed, Please try again later'));
         }
 
-        $this->_redirect('checkout/cart');
+        $this->_redirectCheckoutCart();
     }
 
     protected function _redirectCheckoutCart()
