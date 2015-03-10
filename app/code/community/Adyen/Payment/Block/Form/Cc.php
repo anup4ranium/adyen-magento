@@ -47,9 +47,16 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         }
 
         if (! $this->hasData('_method_label_html')) {
+            $imgFileName = 'creditcard';
+            $result = Mage::getDesign()->getFilename("images/adyen/{$imgFileName}.png", array('_type' => 'skin'));
+
+            $imageUrl = file_exists($result)
+                ? $this->getSkinUrl("images/adyen/{$imgFileName}.png")
+                : $this->getSkinUrl("images/adyen/img_trans.gif");
+
             $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
                 'template' => 'adyen/payment/payment_method_label.phtml',
-                'payment_method_icon' =>  $this->getSkinUrl('images'.DS.'adyen'.DS."img_trans.gif"),
+                'payment_method_icon' =>  $imageUrl,
                 'payment_method_label' => Mage::helper('adyen')->getConfigData('title', $this->getMethod()->getCode()),
                 'payment_method_class' => $this->getMethod()->getCode()
             ));
