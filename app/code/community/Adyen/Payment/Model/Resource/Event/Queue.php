@@ -25,12 +25,12 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Event_Queue extends Mage_Core_Model_Mysql4_Abstract {
+class Adyen_Payment_Model_Resource_Event_Queue extends Mage_Core_Model_Resource_Db_Abstract {
 
     const COLLECTION_LIMIT = 1000;
 
-    protected function _construct() {
-        // set main table with primary key
+    protected function _construct()
+    {
         $this->_init('adyen/event_queue', 'event_queue_id');
     }
 }
