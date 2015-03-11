@@ -61,5 +61,3 @@ class Adyen_Payment_Block_Checkout_Success extends Mage_Checkout_Block_Onepage_S
 	}
 		
 }
-
-?>

@@ -25,11 +25,14 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Mysql4_Adyen_Event_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
-{
-    protected function _construct()
+class Adyen_Payment_Model_Source_CancelRedirect {
+
+    public function toOptionArray()
     {
-        $this->_init('adyen/adyen_event');
-        $this->setItemObjectClass('adyen/event');
+        return array(
+            array('value' => 'checkout/cart', 'label' => 'Cart'),
+            array('value' => 'checkout/onepage', 'label' => 'Checkout'),
+        );
     }
+
 }

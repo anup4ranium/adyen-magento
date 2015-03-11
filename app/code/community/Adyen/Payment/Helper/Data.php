@@ -323,34 +323,55 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
      * Used via Payment method.Notice via configuration ofcourse Y or N
      * @return boolean true on demo, else false
      */
-    public function getConfigDataDemoMode($storeId = null) {
-        if ($this->_getConfigData('demoMode', null, $storeId) == 'Y') {
+    public function getConfigDataDemoMode($storeId = null)
+    {
+        if ($this->getConfigData('demoMode', null, $storeId) == 'Y') {
             return true;
         }
         return false;
     }
 
-    public function getConfigDataWsUserName($storeId = null) {
+    public function getConfigDataWsUserName($storeId = null)
+    {
         if ($this->getConfigDataDemoMode($storeId)) {
-            return $this->_getConfigData('ws_username_test', null, $storeId);
+            return $this->getConfigData('ws_username_test', null, $storeId);
         }
-        return $this->_getConfigData('ws_username_live', null, $storeId);
+        return $this->getConfigData('ws_username_live', null, $storeId);
     }
 
-    public function getConfigDataWsPassword($storeId = null) {
+    public function getConfigDataWsPassword($storeId = null)
+    {
         if ($this->getConfigDataDemoMode($storeId)) {
             return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_test', null, $storeId));
         }
         return Mage::helper('core')->decrypt($this->_getConfigData('ws_password_live', null, $storeId));
     }
 
+
     /**
-     * @desc Give Default settings
-     * @example $this->_getConfigData('demoMode','adyen_abstract')
-     * @since 0.0.2
-     * @param string $code
+     * @param      $code
+     * @param null $paymentMethodCode
+     * @param null $storeId
+     * @deprecated please use getConfigData
+     * @return mixed
      */
-    public function _getConfigData($code, $paymentMethodCode = null, $storeId = null) {
+    public function _getConfigData($code, $paymentMethodCode = null, $storeId = null)
+    {
+        return $this->getConfigData($code, $paymentMethodCode, $storeId);
+    }
+
+
+    /**
+     * @desc    Give Default settings
+     * @example $this->_getConfigData('demoMode','adyen_abstract')
+     * @since   0.0.2
+     *
+     * @param string $code
+     *
+     * @todo    implement trim method for config value.
+     * @return mixed
+     */
+    public function getConfigData($code, $paymentMethodCode = null, $storeId = null) {
         if (null === $storeId) {
             $storeId = Mage::app()->getStore()->getStoreId();
         }

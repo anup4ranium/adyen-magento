@@ -25,21 +25,8 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Source_CcType {
-
-    public function toOptionArray() {
-        $options = array();
-        foreach (Mage::helper('adyen')->getCcTypes() as $code => $name) {
-            $options[] = array(
-                'value' => $code,
-                'label' => $name
-            );
-        }
-        return $options;
-    }
-
-    public function toOptionHash()
-    {
-        return Mage::helper('adyen')->getCcTypes();
-    }
+class Adyen_Payment_Model_Resource_Setup
+    extends Mage_Sales_Model_Resource_Setup
+{
+    
 }

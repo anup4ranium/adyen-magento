@@ -36,10 +36,10 @@
         <models>
             <adyen>
                 <class>Adyen_Payment_Model</class>
-                <resourceModel>adyen_mysql4</resourceModel>
+                <resourceModel>adyen_resource</resourceModel>
             </adyen>
-            <adyen_mysql4>
-                <class>Adyen_Payment_Model_Mysql4</class>
+            <adyen_resource>
+                <class>Adyen_Payment_Model_Resource</class>
                 <entities>
                     <api_debug>
                         <table>adyen_api_debug</table>
@@ -51,18 +51,23 @@
                         <table>adyen_event_data_queue</table>
                     </event_queue>
                 </entities>
-            </adyen_mysql4>
+            </adyen_resource>
         </models>
         <helpers>
             <adyen>
                 <class>Adyen_Payment_Helper</class>
             </adyen>
+            <payment>
+                <rewrite>
+                    <data>Adyen_Payment_Helper_Payment_Data</data>
+                </rewrite>
+            </payment>
         </helpers>
         <resources>
             <adyen_setup>
                 <setup>
                     <module>Adyen_Payment</module>
-                    <class>Adyen_Payment_Model_Mysql4_Setup</class>
+                    <class>Adyen_Payment_Model_Resource_Setup</class>
                 </setup>
                 <connection>
                     <use>core_setup</use>
@@ -162,6 +167,16 @@
                 </totals>
             </order_creditmemo>
         </sales>
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <adyen_payment>
+                        <class>adyen/observer</class>
+                        <method>addHppMethodsToConfig</method>
+                    </adyen_payment>
+                </observers>
+            </controller_action_predispatch>
+        </events>
     </global>
 
     <frontend>
@@ -251,11 +266,13 @@
                 <order_status>processing</order_status>
                 <payment_authorized>processing</payment_authorized>
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
+                <payment_cancelled_redirect>checkout/cart</payment_cancelled_redirect>
                 <capture_mode>auto</capture_mode>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <auto_capture_openinvoice>0</auto_capture_openinvoice>
                 <paypal_capture_mode>0</paypal_capture_mode>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
+                <title_renderer>title_image</title_renderer>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">
                 <customer_id backend_model="adminhtml/system_config_backend_encrypted"/>
@@ -275,8 +292,16 @@
                 <sort_order>30</sort_order>
                 <cache_directory_lookup>0</cache_directory_lookup>
                 <return_url_in_request>0</return_url_in_request>
-                <show_ideal_logos>0</show_ideal_logos>
             </adyen_hpp>
+            <adyen_ideal>
+                <active>0</active>
+                <model>adyen/adyen_ideal</model>
+                <title>Adyen iDEAL</title>
+                <show_ideal_logos>0</show_ideal_logos>
+                <sort_order>35</sort_order>
+                <allowspecific>1</allowspecific>
+                <specificcountry>NL</specificcountry>
+            </adyen_ideal>
             <adyen_pos translate="title" module="adyen">
                 <active>0</active>
                 <model>adyen/adyen_pos</model>

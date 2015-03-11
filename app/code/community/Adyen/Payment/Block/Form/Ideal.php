@@ -25,21 +25,33 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Source_CcType {
 
-    public function toOptionArray() {
-        $options = array();
-        foreach (Mage::helper('adyen')->getCcTypes() as $code => $name) {
-            $options[] = array(
-                'value' => $code,
-                'label' => $name
-            );
-        }
-        return $options;
+
+
+/**
+ * Class Adyen_Payment_Block_Form_Ideal
+ * @method Adyen_Payment_Model_Adyen_Ideal getMethod()
+ */
+class Adyen_Payment_Block_Form_Ideal extends Adyen_Payment_Block_Form_Hpp {
+
+    protected function _construct()
+    {
+        parent::_construct();
+        $this->setTemplate('adyen/form/ideal.phtml');
     }
 
-    public function toOptionHash()
+    public function getShowIdealLogos()
     {
-        return Mage::helper('adyen')->getCcTypes();
+        return $this->getMethod()->getShowIdealLogos();
+    }
+
+    public function getIssuers()
+    {
+        return $this->getMethod()->getIssuers();
+    }
+
+    public function getIssuerImageUrl($issuer) {
+        $_bankFile = strtoupper(str_replace(" ", '', $issuer['label']));
+        return $this->getSkinUrl('images'.DS.'adyen'.DS. $_bankFile . ".png");
     }
 }

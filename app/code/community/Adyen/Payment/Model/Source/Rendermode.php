@@ -13,11 +13,12 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category	Adyen
- * @package	Adyen_Payment
- * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category     Adyen
+ * @package      Adyen_Payment
+ * @copyright    Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 /**
  * @category   Payment Gateway
  * @package    Adyen_Payment
@@ -25,21 +26,18 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Model_Source_CcType {
+class Adyen_Payment_Model_Source_Rendermode
+{
 
-    public function toOptionArray() {
-        $options = array();
-        foreach (Mage::helper('adyen')->getCcTypes() as $code => $name) {
-            $options[] = array(
-                'value' => $code,
-                'label' => $name
-            );
-        }
-        return $options;
-    }
+    const MODE_TITLE = 'title';
+    const MODE_TITLE_IMAGE = 'title_image';
 
-    public function toOptionHash()
+
+    public function toOptionArray()
     {
-        return Mage::helper('adyen')->getCcTypes();
+        return array(
+            array('value' => self::MODE_TITLE, 'label' => Mage::helper('adyen')->__('Title')),
+            array('value' => self::MODE_TITLE_IMAGE, 'label' => Mage::helper('adyen')->__('Image + Title')),
+        );
     }
 }
