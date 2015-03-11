@@ -35,7 +35,7 @@
     <?php if(!empty($_listRecurringDetails)): ?>
 
         <h3><?php echo $this->__('Pay using previously stored details') ?></h3>
-        <ul id="oneclick_payment_form_<?php echo $_code ?>" class="recurring-creditcards">
+        <ul id="payment_form_<?php echo $_code ?>" class="recurring-creditcards">
             <?php
                 $count = 0;
                 foreach($_listRecurringDetails as $key => $value):?>
@@ -315,91 +315,49 @@
         </script>
     <?php endif; ?>
 
-<?php if ($this->isCseEnabled()): ?>
-    <input type="hidden" id="<?php echo $_code ?>_encrypted_form_expiry_generationtime" value="<?php echo date("c"); ?>" data-encrypted-name-oneclick="generationtime" />
+    <?php if ($this->isCseEnabled()): ?>
+    <input type="hidden" id="<?php echo $_code ?>_encrypted_form_expiry_generationtime" value="<?php echo date("c"); ?>" data-encrypted-name="generationtime" />
     <input type="hidden" id="adyen-cse-form" />
     <script type="text/javascript">
-        //<![CDATA[
-        var cse_form = document.getElementById('adyen-cse-form').form;
+        var cse_form = $('payment_form_<?php echo $_code ?>');
         var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
-        var cse_options_oneclick = {
+        var cse_options = {
             name:  'payment[encrypted_data_oneclick]',
-            force: true,
-            dataEncryptedName: "data-encrypted-name-oneclick"
+            force: true
         };
-        var cseOneClick = function() {
-            if (payment.currentMethod && payment.currentMethod == '<?php echo $_code ?>') {
-                try {
-                    adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options_oneclick);
-                } catch (e) {
-                    var encryptionFailed = true;
+
+        var cseUpdate = function() {
+            try {
+                if (payment.currentMethod && payment.currentMethod == '<?php echo $_code ?>') {
+                    adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options);
                 }
-                var encryptedForm = document.getElementById(cse_options_oneclick.name);
-                if (encryptionFailed || !encryptedForm || encryptedForm.value.length == 0) {
+            } catch (e) {
+                if (typeof console == "object") {
+                    console.error(e);
+                } else {
                     alert("Warning: Adyen Client Side Encryption cannot succeed.");
                 }
             }
-        }
-        var cse_oneclick_initialize = function() {
+
+        };
+
+        var cseInit = function() {
             if (typeof adyen === 'undefined') {
-                js = document.createElement("script");
-                js.type = "text/javascript";
-                js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt.js";
-                document.body.appendChild(js);
-            }
-            if (typeof payment !== 'undefined' && typeof payment.save !== 'undefined') {
-                payment.save = payment.save.wrap(function(originalSaveMethod) {
-                    cseOneClick.call(this);
-                    originalSaveMethod();
-                });
-            }
-            if (typeof checkout !== 'undefined' && typeof checkout.save !== 'undefined') {
-                checkout.save = checkout.save.wrap(function(originalSaveMethod) {
-                    cseOneClick.call(this);
-                    originalSaveMethod();
-                });
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt.js'); ?>";
+                document.body.appendChild(script);
             }
 
-            // Fix for the onestepcheckout plugins
-            if($('onestepcheckout-place-order')) {
-                $('onestepcheckout-place-order').observe('click', function(e) {
-                    cseOneClick.call(this);
-                });
-            }
+            var fields = $$('#payment_form_<?php echo $_code ?> input, #payment_form_<?php echo $_code ?> textarea, #payment_form_<?php echo $_code ?> select');
+            fields.forEach(function(field) {
+                field.observe('change', cseUpdate);
+            });
+        };
 
-            // fix for the IWD One Page Checkout
-            if($('checkout-review-submit')) {
-                $$('.opc-btn-checkout').each(function(element) {
-                    element.observe('click', function(e) {
-                        cseOneClick.call(this);
-                    });
-                })
-            }
-
-            //Fix for Inovarti One Step Checkout Brasil
-            if($('onestepcheckout-place-order-button')) {
-                $('onestepcheckout-place-order-button').observe('click', function(e) {
-                    cseOneClick.call(this);
-                });
-            }
-
-            // Fix for GoMage LightCheckout
-            if($('submit-btn')) {
-                $('submit-btn').observe('click', function(e) {
-                    cseOneClick.call(this);
-                });
-            }
-        }
-
-        if (document.readyState === "complete") {
-            cse_oneclick_initialize();
-        }
-        else {
-            Event.observe(window, 'load', cse_oneclick_initialize);
-        }
-        //]]>
+        cseInit();
     </script>
-<?php endif;?>
+    <?php endif;?>
 
 
 </div>
