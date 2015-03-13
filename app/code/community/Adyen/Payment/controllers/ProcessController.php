@@ -252,6 +252,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         $quoteId = $order->getQuoteId();
         $cart = Mage::getModel('sales/quote')->load($quoteId);
         $cart->setIsActive(true)->save();
+        $session->replaceQuote($cart);
 
         //handle the old order here
         try {
