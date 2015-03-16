@@ -256,7 +256,6 @@ $_code = $this->getMethodCode();
     <?php endif; ?>
     <?php if ($this->isCseEnabled()): ?>
     <input type="hidden" id="<?php echo $_code ?>_encrypted_form_expiry_generationtime" value="<?php echo date("c"); ?>" data-encrypted-name="generationtime" />
-    <input type="hidden" id="adyen-cse-form" />
     <script type="text/javascript">
         var cse_form = $('payment_form_<?php echo $_code ?>');
         var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
