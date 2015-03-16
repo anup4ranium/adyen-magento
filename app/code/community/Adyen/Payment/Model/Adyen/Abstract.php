@@ -123,6 +123,22 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
                 // set payment method to adyen_oneclick otherwise backend can not view the order
                 $payment->setMethod("adyen_oneclick");
+
+                $recurringDetailReference = $payment->getAdditionalInformation("recurring_detail_reference");
+
+                // load agreement based on reference_id (option to add an index on reference_id in database)
+                $agreement = Mage::getModel('sales/billing_agreement')->load($recurringDetailReference, 'reference_id');
+
+                // agreement could be a empty object
+                if ($agreement && $agreement->getAgreementId() > 0 && $agreement->isValid()) {
+                    $agreement->addOrderRelation($order);
+                    $agreement->setIsObjectChanged(true);
+                    $order->addRelatedObject($agreement);
+                    $message = Mage::helper('adyen')->__('Used existing billing agreement #%s.', $agreement->getReferenceId());
+
+                    $comment = $order->addStatusHistoryComment($message);
+                    $order->addRelatedObject($comment);
+                }
             }
             $_authorizeResponse = $this->_processRequest($payment, $amount, "authorise");
         }
