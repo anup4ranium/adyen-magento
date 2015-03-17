@@ -150,15 +150,18 @@ class Adyen_Payment_Model_Observer {
             $paymentMethods = array();
             foreach ($recurringCarts as $key => $paymentMethod) {
 
-                // check if recurringCart is a creditcard
-                if(isset($paymentMethod['recurringDetailReference']) &&
-                    isset($paymentMethod['card_number']) &&
-                    isset($paymentMethod['card_expiryMonth']) &&
-                    isset($paymentMethod['card_expiryYear']))
-                {
-                    $paymentMethodCode = $paymentMethod['recurringDetailReference'];
-                    $paymentMethods[$paymentMethodCode] = $paymentMethod;
+                $paymentMethodCode = $paymentMethod['recurringDetailReference'];
+                $paymentMethods[$paymentMethodCode] = $paymentMethod;
+
+                if($paymentMethod['variant'] == 'sepadirectdebit' || $paymentMethod['variant'] == 'ideal' || $paymentMethod['variant'] == 'openinvoice') {
+                    $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['bank_ownerName'] ;
+                } else if($paymentMethod['variant'] == 'elv') {
+                    $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['elv_accountHolderName'] ;
+                } else if(isset($paymentMethod["card_holderName"]) && isset($paymentMethod['card_number'])) {
                     $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod["card_holderName"] . " **** " . $paymentMethod['card_number'];
+                } else {
+                    // for now ignore PayPal and Klarna because we have no information on what account this is linked to. You will only get these back when you have recurring enabled
+//                    $paymentMethods[$paymentMethodCode]['title'] = Mage::helper('adyen')->__('Saved Card') . " " . $paymentMethod["variant"];
                 }
             }
         }

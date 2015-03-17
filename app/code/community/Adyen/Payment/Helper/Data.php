@@ -267,20 +267,16 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
                     $key2 = strstr($key, '_');
                     $keyNumber = str_replace($key2, "", $key);
                     $keyAttribute = substr($key2, 1);
+
+                    // set ideal to sepadirectdebit because it is and we want to show sepadirectdebit logo
+                    if($keyAttribute == "variant" && $value == "ideal") {
+                        $value = 'sepadirectdebit';
+                    }
+
                     $recurringCards[$keyNumber][$keyAttribute] = $value;
                 }
                 // unset the recurringDetailsResult because this is not a card
                 unset($recurringCards["recurringDetailsResult"]);
-
-                // filter out all non-creditcards
-                foreach($recurringCards as $key => $recurringCard) {
-
-                    if(!(isset($recurringCard["recurringDetailReference"]) && isset($recurringCard["variant"]) && isset($recurringCard["card_number"])
-                        && isset($recurringCard["card_expiryMonth"]) && isset($recurringCard["card_expiryYear"]))) {
-
-                        unset($recurringCards[$key]);
-                    }
-                }
             }
         }
 
