@@ -290,7 +290,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
         return $recurringCards;
     }
 
-    public function removeRecurringCart($merchantAccount, $shopperReference, $recurringDetailReference) {
+    public function removeRecurringCard($merchantAccount, $shopperReference, $recurringDetailReference) {
 
         // rest call to disable cart
         $request = array(

@@ -64,7 +64,7 @@ class Adyen_Payment_SavedCardController extends Mage_Core_Controller_Front_Actio
                 $customer = Mage::registry('current_customer');
                 $shopperReference = $customer->getId();
                 // do api call to delete this card
-                $success = Mage::helper('adyen')->removeRecurringCart($merchantAccount, $shopperReference, $recurringDetailReference);
+                $success = Mage::helper('adyen')->removeRecurringCard($merchantAccount, $shopperReference, $recurringDetailReference);
 
                 // show result message
                 if($success) {
