@@ -750,8 +750,8 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                     // get payment object
                     $payment = $order->getPayment();
 
-                    // only new creditcards save as new billing agreement
-                    if($_paymentCode == "adyen_cc") {
+                    // save recurring contract (not for oneclicks because billing agreement does already exists
+                    if($_paymentCode != "adyen_oneclick") {
 
                         // storedReferenceCode
                         $recurringDetailReference = trim($response->getData('pspReference'));
@@ -778,7 +778,7 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                             $agreement->setAgreementLabel($payment->getMethodInstance()->getTitle());
 
                             if ($agreement->isValid()) {
-                                $message = Mage::helper('adyen')->__('Created billing agreement (PROCESS) #%s.', $agreement->getReferenceId());
+                                $message = Mage::helper('adyen')->__('Created billing agreement #%s.', $agreement->getReferenceId());
 
                                 // save into sales_billing_agreement_order
                                 $agreement->addOrderRelation($order);
