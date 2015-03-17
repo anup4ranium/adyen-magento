@@ -792,6 +792,15 @@ class Adyen_Payment_Model_Process extends Mage_Core_Model_Abstract {
                         $comment = $order->addStatusHistoryComment($message);
                         $order->addRelatedObject($comment);
                         $order->save();
+
+                        /*
+                         * clear the cache for recurring payments so new card will be added
+                         */
+                        $merchantAccount = $this->_getConfigData('merchantAccount','adyen_abstract', $order->getStoreId());
+                        $recurringType = $this->_getConfigData('recurringtypes', 'adyen_abstract', $order->getStoreId());
+
+                        $cacheKey = $merchantAccount . "|" . $order->getCustomerId() . "|" . $recurringType;
+                        Mage::app()->getCache()->remove($cacheKey);
                     }
                     break;
                 default:
