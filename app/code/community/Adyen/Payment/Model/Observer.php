@@ -162,6 +162,7 @@ class Adyen_Payment_Model_Observer {
                 } else {
                     // for now ignore PayPal and Klarna because we have no information on what account this is linked to. You will only get these back when you have recurring enabled
 //                    $paymentMethods[$paymentMethodCode]['title'] = Mage::helper('adyen')->__('Saved Card') . " " . $paymentMethod["variant"];
+                    unset($paymentMethods[$paymentMethodCode]);
                 }
             }
         }
