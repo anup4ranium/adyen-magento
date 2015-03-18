@@ -254,6 +254,15 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         $cart->setIsActive(true)->save();
         $session->replaceQuote($cart);
 
+        // if setting failed_attempt_disable is on and the payment method is openinvoice ignore this payment mehthod the second time
+        if($this->_getConfigData('failed_attempt_disable', 'adyen_openinvoice') && $order->getPayment()->getMethod() == "adyen_openinvoice") {
+            // check if payment failed
+            $response = $this->getRequest()->getParams();
+            if($response['authResult'] == "REFUSED") {
+                $session->setOpenInvoiceInactiveForThisQuoteId($quoteId);
+            }
+        }
+
         //handle the old order here
         try {
             $order->setActionFlag(Mage_Sales_Model_Order::ACTION_FLAG_CANCEL, true);
