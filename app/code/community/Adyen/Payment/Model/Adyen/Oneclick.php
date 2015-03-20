@@ -31,7 +31,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_formBlockType = 'adyen/form_oneclick';
     protected $_infoBlockType = 'adyen/info_oneclick';
     protected $_paymentMethod = 'oneclick';
-    protected $_canUseInternal = false; // not possible through backoffice interface
+    protected $_canUseInternal = true; // not possible through backoffice interface
 
 
     /**
@@ -67,11 +67,19 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         }
         $info = $this->getInfoInstance();
 
+        // get storeId
+        if(Mage::app()->getStore()->isAdmin()) {
+            $store = Mage::getSingleton('adminhtml/session_quote')->getStore();
+        } else {
+            $store = Mage::app()->getStore();
+        }
+        $storeId = $store->getId();
+
         // Get recurringDetailReference from config
-        $recurringDetailReference = Mage::getStoreConfig("payment/".$this->getCode() . "/recurringDetailReference");
+        $recurringDetailReference = Mage::getStoreConfig("payment/".$this->getCode() . "/recurringDetailReference", $storeId);
         $info->setAdditionalInformation('recurring_detail_reference', $recurringDetailReference);
 
-        $ccType = Mage::getStoreConfig("payment/".$this->getCode() . "/variant");
+        $ccType = Mage::getStoreConfig("payment/".$this->getCode() . "/variant", $storeId);
         $info->setCcType($ccType);
 
         if ($this->isCseEnabled()) {
@@ -83,9 +91,9 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
             $expiryYear = $data->getOneclickExpYear();
             $cvcCode = $data->getOneclickCid();
 
-            $cardHolderName = Mage::getStoreConfig("payment/".$this->getCode() . "/card_holderName");
-            $last4Digits = Mage::getStoreConfig("payment/".$this->getCode() . "/card_number");
-            $cardHolderName = Mage::getStoreConfig("payment/".$this->getCode() . "/card_holderName");
+            $cardHolderName = Mage::getStoreConfig("payment/".$this->getCode() . "/card_holderName", $storeId);
+            $last4Digits = Mage::getStoreConfig("payment/".$this->getCode() . "/card_number", $storeId);
+            $cardHolderName = Mage::getStoreConfig("payment/".$this->getCode() . "/card_holderName", $storeId);
 
             // just set default data for info block only
             $info->setCcType($ccType)

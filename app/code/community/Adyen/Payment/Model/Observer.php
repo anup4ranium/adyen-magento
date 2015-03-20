@@ -31,7 +31,11 @@ class Adyen_Payment_Model_Observer {
      */
     public function addHppMethodsToConfig(Varien_Event_Observer $observer)
     {
-        $store = Mage::app()->getStore();
+        if(Mage::app()->getStore()->isAdmin()) {
+            $store = Mage::getSingleton('adminhtml/session_quote')->getStore();
+        } else {
+            $store = Mage::app()->getStore();
+        }
 
         // Add OneClick payment methods
         if (Mage::getStoreConfigFlag('payment/adyen_oneclick/active', $store)) {
@@ -137,35 +141,37 @@ class Adyen_Payment_Model_Observer {
         $adyenHelper = Mage::helper('adyen');
         $paymentMethods = array();
 
-        if($customer = Mage::getSingleton('customer/session')->isLoggedIn()) {
+        $merchantAccount = trim($adyenHelper->getConfigData('merchantAccount', 'adyen_abstract', $store->getId()));
 
+        if(Mage::app()->getStore()->isAdmin()) {
+            $customerId = Mage::getSingleton('adminhtml/session_quote')->getCustomerId();
+        } else if($customer = Mage::getSingleton('customer/session')->isLoggedIn()) {
             $customerData = Mage::getSingleton('customer/session')->getCustomer();
             $customerId = $customerData->getId();
+        }
 
-            $merchantAccount = trim($adyenHelper->_getConfigData('merchantAccount'));
-            $recurringType = $adyenHelper->_getConfigData('recurringtypes');
+        $recurringType = $adyenHelper->getConfigData('recurringtypes', 'adyen_abstract', $store->getId());
+        $recurringCarts = $adyenHelper->getRecurringCards($merchantAccount, $customerId, $recurringType);
 
-            $recurringCarts = $adyenHelper->getRecurringCards($merchantAccount, $customerId, $recurringType);
+        $paymentMethods = array();
+        foreach ($recurringCarts as $key => $paymentMethod) {
 
-            $paymentMethods = array();
-            foreach ($recurringCarts as $key => $paymentMethod) {
+            $paymentMethodCode = $paymentMethod['recurringDetailReference'];
+            $paymentMethods[$paymentMethodCode] = $paymentMethod;
 
-                $paymentMethodCode = $paymentMethod['recurringDetailReference'];
-                $paymentMethods[$paymentMethodCode] = $paymentMethod;
-
-                if($paymentMethod['variant'] == 'sepadirectdebit' || $paymentMethod['variant'] == 'ideal' || $paymentMethod['variant'] == 'openinvoice') {
-                    $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['bank_ownerName'] ;
-                } else if($paymentMethod['variant'] == 'elv') {
-                    $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['elv_accountHolderName'] ;
-                } else if(isset($paymentMethod["card_holderName"]) && isset($paymentMethod['card_number'])) {
-                    $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod["card_holderName"] . " **** " . $paymentMethod['card_number'];
-                } else {
-                    // for now ignore PayPal and Klarna because we have no information on what account this is linked to. You will only get these back when you have recurring enabled
+            if($paymentMethod['variant'] == 'sepadirectdebit' || $paymentMethod['variant'] == 'ideal' || $paymentMethod['variant'] == 'openinvoice') {
+                $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['bank_ownerName'] ;
+            } else if($paymentMethod['variant'] == 'elv') {
+                $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod['elv_accountHolderName'] ;
+            } else if(isset($paymentMethod["card_holderName"]) && isset($paymentMethod['card_number'])) {
+                $paymentMethods[$paymentMethodCode]['title'] = $paymentMethod["card_holderName"] . " **** " . $paymentMethod['card_number'];
+            } else {
+                // for now ignore PayPal and Klarna because we have no information on what account this is linked to. You will only get these back when you have recurring enabled
 //                    $paymentMethods[$paymentMethodCode]['title'] = Mage::helper('adyen')->__('Saved Card') . " " . $paymentMethod["variant"];
-                    unset($paymentMethods[$paymentMethodCode]);
-                }
+                unset($paymentMethods[$paymentMethodCode]);
             }
         }
+
         return $paymentMethods;
     }
 

@@ -88,7 +88,12 @@ class Adyen_Payment_Block_Form_Oneclick extends Adyen_Payment_Block_Form_Cc {
     }
 
     public function getRecurringDetails() {
-        $recurringDetails = Mage::getStoreConfig("payment/".$this->getMethodCode());
+        if(Mage::app()->getStore()->isAdmin()) {
+            $storeId = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
+        } else {
+            $storeId = Mage::app()->getStore()->getStoreId();
+        }
+        $recurringDetails = Mage::getStoreConfig("payment/".$this->getMethodCode(), $storeId);
         return $recurringDetails;
     }
 }

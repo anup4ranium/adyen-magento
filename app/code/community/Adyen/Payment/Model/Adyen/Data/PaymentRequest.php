@@ -137,8 +137,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->shopperInteraction = "Ecommerce";
                 }
 
-
-                if(Mage::app()->getStore()->isAdmin() && $enableMoto != null && $enableMoto == 1) {
+                if($paymentMethod == "adyen_cc" && Mage::app()->getStore()->isAdmin() && $enableMoto != null && $enableMoto == 1) {
                     $this->shopperInteraction = "Moto";
                 }
 
