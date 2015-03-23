@@ -150,6 +150,9 @@ class Adyen_Payment_Model_Observer {
         } else if($customer = Mage::getSingleton('customer/session')->isLoggedIn()) {
             $customerData = Mage::getSingleton('customer/session')->getCustomer();
             $customerId = $customerData->getId();
+        } else {
+            // not logged in so has no cards
+            return array();
         }
 
         $recurringType = $adyenHelper->getConfigData('recurringtypes', 'adyen_abstract', $store->getId());
