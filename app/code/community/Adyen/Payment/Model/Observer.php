@@ -29,7 +29,7 @@ class Adyen_Payment_Model_Observer {
      * @event controller_action_predispatch
      * @param Varien_Event_Observer $observer
      */
-    public function addHppMethodsToConfig(Varien_Event_Observer $observer)
+    public function addMethodsToConfig(Varien_Event_Observer $observer)
     {
         if(Mage::app()->getStore()->isAdmin()) {
             $store = Mage::getSingleton('adminhtml/session_quote')->getStore();
