@@ -62,10 +62,12 @@ class Adyen_Payment_Model_Observer {
     {
         Varien_Profiler::start(__CLASS__.'::'.__FUNCTION__);
 
-        foreach ($this->_fetchOneClickMethods($store) as $methodCode => $methodData) {
-            $this->createPaymentMethodFromOneClick($methodCode, $methodData, $store);
+        // Adyen CC needs to be active
+        if(Mage::getStoreConfigFlag('payment/adyen_cc/active', $store)) {
+            foreach ($this->_fetchOneClickMethods($store) as $methodCode => $methodData) {
+                $this->createPaymentMethodFromOneClick($methodCode, $methodData, $store);
+            }
         }
-
         $store->setConfig('payment/adyen_oneclick/active', 0);
 
         Varien_Profiler::stop(__CLASS__.'::'.__FUNCTION__);

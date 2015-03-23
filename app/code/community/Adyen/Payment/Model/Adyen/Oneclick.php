@@ -45,22 +45,6 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         return $this;
     }
 
-
-    /*
-     * only enable if adyen_cc is enabled
-     */
-    public function isAvailable($quote = null)
-    {
-        $isAvailable = parent::isAvailable($quote);
-
-        // check if adyen_cc is enabled if not disable oneclick as well
-        $isCCActive = $this->_getConfigData('active', 'adyen_cc');
-        if(!$isCCActive)
-            return false;
-
-        return $isAvailable;
-    }
-
     public function assignData($data) {
         if (!($data instanceof Varien_Object)) {
             $data = new Varien_Object($data);
