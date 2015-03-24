@@ -151,8 +151,12 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
         return trim(Mage::getStoreConfig("payment/adyen_cc/cse_publickey"));
     }
 
-    public function getRecurringType() {
-        return trim(Mage::getStoreConfig("payment/adyen_abstract/recurringtypes"));
+    public function showRememberThisCheckoutbox() {
+        $recurringType = $this->_getConfigData('recurringtypes');
+        if($recurringType == "ONECLICK" || $recurringType == "ONECLICK,RECURRING") {
+            return true;
+        }
+        return false;
     }
 
     /**
