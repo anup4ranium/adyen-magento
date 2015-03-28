@@ -270,7 +270,7 @@ $_code = $this->getMethodCode();
     </li>
     <?php endif;?>
 
-    <?php if($this->showRememberThisCheckoutbox()): ?>
+    <?php if($this->canCreateBillingAgreement()): ?>
     <li id="adyen-remember-these-details" class="adyen_payment_input_fields">
         <div class="input-box">
             <div class="v-fix">
