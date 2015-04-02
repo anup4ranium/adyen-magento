@@ -387,7 +387,6 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
      *
      * @param string $code
      *
-     * @todo    implement trim method for config value.
      * @return mixed
      */
     public function getConfigData($code, $paymentMethodCode = null, $storeId = null) {
@@ -395,9 +394,9 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
             $storeId = Mage::app()->getStore()->getStoreId();
         }
         if (empty($paymentMethodCode)) {
-            return Mage::getStoreConfig("payment/adyen_abstract/$code", $storeId);
+            return trim(Mage::getStoreConfig("payment/adyen_abstract/$code", $storeId));
         }
-        return Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId);
+        return trim(Mage::getStoreConfig("payment/$paymentMethodCode/$code", $storeId));
     }
 
     // Function to get the client ip address
