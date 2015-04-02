@@ -454,11 +454,11 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $this->writeLog("Request Headers: ");
         $this->writeLog($this->_pci()->obscureSensitiveData($this->_service->__getLastRequestHeaders()));
         $this->writeLog("Request:");
-        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastRequest()));
+        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastRequest())));
         $this->writeLog("Response Headers");
-        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastResponseHeaders()));
+        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastResponseHeaders())));
         $this->writeLog("Response");
-        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastResponse()));
+        $this->writeLog($this->_pci()->obscureSensitiveData(($this->_service->__getLastResponse())));
     }
 
     /**
