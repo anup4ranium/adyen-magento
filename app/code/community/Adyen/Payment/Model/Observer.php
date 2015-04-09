@@ -42,6 +42,7 @@ class Adyen_Payment_Model_Observer {
             try {
                 $this->_addOneClickMethodsToConfig($store);
             } catch (Exception $e) {
+                $store->setConfig('payment/adyen_oneclick/active', 0);
                 Mage::logException($e);
             }
         }
@@ -50,6 +51,7 @@ class Adyen_Payment_Model_Observer {
             try {
                 $this->_addHppMethodsToConfig($store);
             } catch (Exception $e) {
+                $store->setConfig('payment/adyen_hpp/active', 0);
                 Mage::logException($e);
             }
         }
