@@ -48,13 +48,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
     protected $_pciHelper;
 
     /**
-     * TODO: whether a captured transaction may be voided by this gateway
-     * This may happen when amount is captured, but not settled
-     * @var bool
-     */
-    protected $_canCancelInvoice = true;
-
-    /**
      * Magento Order Object
      * @var unknown_type
      */
@@ -383,7 +376,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         if($boletoPDF)
             $payment->getOrder()->setAdyenBoletoPdf($boletoPDF);
 
-        $comment = Mage::helper('adyen')->__('Adyen Result URL Notification(s): %s <br /> pspReference: %s', $responseCode, $pspReference);
+        $type = 'Adyen Result URL Notification(s):';
+        $comment = Mage::helper('adyen')->__('%s <br /> authResult: %s <br /> pspReference: %s <br /> paymentMethod: %s', $type, $responseCode, $pspReference, "");
         $payment->getOrder()->setAdyenEventCode($responseCode);
         $payment->getOrder()->addStatusHistoryComment($comment, $status);
         $payment->setAdyenEventCode($responseCode);
@@ -497,38 +491,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             $this->_order = Mage::getModel('sales/order')
                 ->loadByIncrementId($paymentInfo->getOrder()->getRealOrderId());
         }
-        return $this;
-    }
-
-    /**
-     * Void payment
-     *
-     * @param   Varien_Object $invoicePayment
-     * @return  Mage_Payment_Model_Abstract
-     */
-    public function void(Varien_Object $payment) {
-        parent::void();
-        $this->cancel($payment);
-        return $this;
-    }
-
-    /**
-     * @todo fix me validate()
-     * @see Mage_Payment_Model_Method_Abstract::validate()
-     */
-    public function validate() {
-        return $this;
-    }
-
-    /**
-     * @desc Cancel order
-     * @param Varien_Object $payment
-     * @param type $amount
-     * @return Adyen_Payment_Model_Adyen_Abstract
-     */
-    public function cancel(Varien_Object $payment, $amount = null) {
-        parent::cancel($payment);
-        $this->writeLog("abstract -> cancel()" . get_class($this));
         return $this;
     }
 

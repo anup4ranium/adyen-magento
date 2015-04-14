@@ -167,6 +167,46 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
         return number_format($amount, $format, '', '');
     }
 
+    public function originalAmount($amount, $currency) {
+        // check the format
+        switch($currency) {
+            case "JPY":
+            case "IDR":
+            case "KRW":
+            case "BYR":
+            case "VND":
+            case "CVE":
+            case "DJF":
+            case "GNF":
+            case "PYG":
+            case "RWF":
+            case "UGX":
+            case "VUV":
+            case "XAF":
+            case "XOF":
+            case "XPF":
+            case "GHC":
+                $format = 1;
+                break;
+            case "MRO":
+                $format = 10;
+                break;
+            case "BHD":
+            case "JOD":
+            case "KWD":
+            case "OMR":
+            case "LYD":
+            case "TND":
+                $format = 1000;
+                break;
+            default:
+                $format = 100;
+                break;
+        }
+
+        return ($amount / $format);
+    }
+
     /*
      * creditcard type that is selected is different from creditcard type that we get back from the request
      * this function get the magento creditcard type this is needed for getting settings like installments
