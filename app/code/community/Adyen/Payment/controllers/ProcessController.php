@@ -238,6 +238,15 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         }
     }
 
+    public function successPosRedirectAction()
+    {
+        $session = $this->_getCheckout();
+        $session->unsAdyenRealOrderId();
+        $session->setQuoteId($session->getAdyenQuoteId(true));
+        $session->getQuote()->setIsActive(false)->save();
+        $this->_redirect('checkout/onepage/success');
+    }
+
     /**
      * @desc reloads the items in the cart && cancel the order
      * @since v009
