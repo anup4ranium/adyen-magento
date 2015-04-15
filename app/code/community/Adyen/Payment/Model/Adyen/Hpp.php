@@ -77,7 +77,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $hppType = str_replace('adyen_hpp_', '', $info->getData('method'));
         $hppType = str_replace('adyen_ideal', 'ideal', $hppType);
 
-        $hppTypeLabel =  Mage::getStoreConfig('payments/'.$info->getData('method').'/title');
+        $hppTypeLabel =  Mage::getStoreConfig('payment/'.$info->getData('method').'/title');
         $info->setAdditionalInformation('hpp_type_label', $hppTypeLabel);
 
         $info->setCcType($hppType)
