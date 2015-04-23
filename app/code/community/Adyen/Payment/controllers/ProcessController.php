@@ -349,7 +349,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                     break;
             }
         } catch (Mage_Core_Exception $e) {
-            Mage::logException($e);
+            Adyen_Payment_Exception::logException($e);
         }
 
         $params = $this->getRequest()->getParams();
@@ -443,7 +443,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             }
 
         } catch (Exception $e) {
-            Mage::logException($e);
+            Adyen_Payment_Exception::logException($e);
         }
         return $this;
     }
