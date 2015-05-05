@@ -54,20 +54,56 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         //get soap request
         $request = Mage::registry('soap-request');
 
-
         if (empty($request)) {
             return false;
         }
 
+        $status = "";
         if (is_array($request->notification->notificationItems->NotificationRequestItem)) {
             foreach ($request->notification->notificationItems->NotificationRequestItem as $item) {
-                $this->processNotification($item);
+                $item = $this->formatSoapNotification($item);
+                $status = $this->processNotification($item);
             }
         } else {
             $item = $request->notification->notificationItems->NotificationRequestItem;
-            $this->processNotification($item);
+            $item = $this->formatSoapNotification($item);
+            $status = $this->processNotification($item);
         }
+
+        if($status == "401"){
+            $this->_return401();
+        }
+
         return $this;
+    }
+
+
+    /**
+     * @desc Format soap notification so it is allign with HTTP POST and JSON output
+     * @param $item
+     * @return mixed
+     */
+    protected function formatSoapNotification($item)
+    {
+        $additionalData = array();
+        foreach ($item->additionalData->entry as $additionalDataItem) {
+            $key = $additionalDataItem->key;
+            $value = $additionalDataItem->value;
+
+            if (strpos($key,'.') !== false) {
+                $results = explode('.', $key);
+                $size = count($results);
+                if($size == 2) {
+                    $additionalData[$results[0]][$results[1]] = $value;
+                } elseif($size == 3) {
+                    $additionalData[$results[0]][$results[1]][$results[2]] = $value;
+                }
+            } else {
+                $additionalData[$key] = $value;
+            }
+        }
+        $item->additionalData = $additionalData;
+        return $item;
     }
 
     public function openinvoiceAction() {
@@ -223,7 +259,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         try {
             $result = $this->validateResultUrl($response);
 
-           if ($result) {
+            if ($result) {
                 $session = $this->_getCheckout();
                 $session->unsAdyenRealOrderId();
                 $session->setQuoteId($session->getAdyenQuoteId(true));
@@ -334,6 +370,19 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                 $helper = Mage::helper('adyen');
                 $this->getResponse()->setBody($helper->getExtensionVersion());
                 return $this;
+            }
+
+            // add HTTP POST attributes as an array so it is the same as JSON and SOAP result
+            foreach($response as $key => $value) {
+                if (strpos($key,'_') !== false) {
+                    $results = explode('_', $key);
+                    $size = count($results);
+                    if($size == 2) {
+                        $response[$results[0]][$results[1]] = $value;
+                    } elseif($size == 3) {
+                        $response[$results[0]][$results[1]][$results[2]] = $value;
+                    }
+                }
             }
 
             $status = $this->processNotification($response);

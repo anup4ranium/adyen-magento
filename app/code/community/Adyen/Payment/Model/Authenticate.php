@@ -40,21 +40,7 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
                 break;
             default:
                 $authStatus = $this->_httpAuthenticate($varienObj);
-                if($authStatus === false){
-                	header('HTTP/1.1 401 Unauthorized',true,401);
-                	header('WWW-Authenticate: Basic realm="Notifications"');
-                	echo "";
-                	exit();
-                }
-                
                 break;
-        }
-        try {
-            if (false === $authStatus ) {
-                throw new SoapFault('200', Mage::helper('adyen')->__('Username or Password is incorrect, please contact Adyen for support!'));            
-            }
-        } catch(SoapFault $e) {
-            Mage::logException($e);
         }
         return $authStatus;
     }

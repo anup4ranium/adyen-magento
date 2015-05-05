@@ -57,14 +57,18 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $this->_debugData['response'] = $response;
         Mage::getResourceModel('adyen/adyen_debug')->assignData($response);
 
-        $params = new Varien_Object($response);
+//      $params = new Varien_Object($response);
+        // Create Varien_Object from response (soap compatible)
+        $params = new Varien_Object();
+        foreach ($response as $code => $value) {
+            $params->setData($code, $value);
+        }
         $actionName = $this->_getRequest()->getActionName();
 
         // authenticate result url
         $authStatus = Mage::getModel('adyen/authenticate')->authenticate($actionName, $params);
         if (!$authStatus) {
-            $this->_writeLog('authentification failure!');
-            $this->_debugData['error'] = 'ResultUrl authentification failure';
+            $this->_debugData['error'] = 'Autentication failure please check your notification username and password. This must be the same in Magento as in the Adyen platform';
             $this->_debug($storeId);
             return "401";
         }
@@ -147,15 +151,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         if($paymentMethod != '') {
             $orderPaymentMethod = strtolower($this->_paymentMethodCode($order));
 
-            if($orderPaymentMethod == 'adyen_cc' || $orderPaymentMethod == 'adyen_oneclick' || $orderPaymentMethod == 'adyen_pos') {
-                // not possible to do validation on these payment methods because naming is different between Magento and Adyen platform
-                return true;
-            } else if(substr($orderPaymentMethod, 0, 6) == 'adyen_') {
-                if(substr($orderPaymentMethod, 0, 10) == 'adyen_hpp_') {
-                    $orderPaymentMethod = substr($orderPaymentMethod, 10);
-                } else {
-                    $orderPaymentMethod = substr($orderPaymentMethod, 6);
+            // Only possible for the Adyen HPP payment method
+            if($orderPaymentMethod == 'adyen_hpp') {
+                if(substr($orderPaymentMethod, 0, 6) == 'adyen_') {
+                    if(substr($orderPaymentMethod, 0, 10) == 'adyen_hpp_') {
+                        $orderPaymentMethod = substr($orderPaymentMethod, 10);
+                    } else {
+                        $orderPaymentMethod = substr($orderPaymentMethod, 6);
+                    }
                 }
+            } else {
+                return true;
             }
 
             $this->_debugData['_validateNotification'] = 'Payment method in Magento is: ' . $orderPaymentMethod . ", payment method in notification is: " . $paymentMethod;
@@ -206,9 +212,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $this->_updateAdyenAttributes($order, $params);
 
         // check if success is true of false
-        if (strcmp($this->_success, 'false') == 0) {
-            // Only cancel the order when it is in state pending
-            if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
+        if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0) {
+            // Only cancel the order when it is in state pending or if the ORDER_CLOSED is failed (means split payment has not be successful)
+            if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
                 $this->_debugData['_updateOrder info'] = 'Going to cancel the order';
                 $this->_holdCancelOrder($order);
             } else {
@@ -237,16 +243,35 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $this->_success = trim($params->getData('success'));
         $this->_paymentMethod = trim($params->getData('paymentMethod'));
         $this->_reason = trim($params->getData('reason'));
-        $this->_value = Mage::helper('adyen')->originalAmount(trim($params->getValue()), $order->getOrderCurrencyCode());
+
+        $valueArray = $params->getData('amount');
+        if($valueArray && is_array($valueArray)) {
+            $this->_value = isset($valueArray['value']) ? $valueArray['value'] : "";
+        }
+
+        $additionalData = $params->getData('additionalData');
+
         // boleto data
         if($this->_paymentMethodCode($order) == "adyen_boleto") {
-            $this->_boletoOriginalAmount = trim($params->getData('additionalData_boletobancario_originalAmount'));
-            $this->_boletoPaidAmount = trim($params->getData('additionalData_boletobancario_paidAmount'));
+            if($additionalData && is_array($additionalData)) {
+                $boletobancario = isset($additionalData['boletobancario']) ? $additionalData['boletobancario'] : null;
+                if($boletobancario && is_array($boletobancario)) {
+                    $this->_boletoOriginalAmount = isset($boletobancario['originalAmount']) ? trim($boletobancario['originalAmount']) : "";
+                    $this->_boletoPaidAmount = isset($boletobancario['paidAmount']) ? trim($boletobancario['paidAmount']) : "";
+                }
+            }
         }
-        // cancel_or_refund data
-        $this->_modificationResult = trim($params->getData('additionalData_modification_action'));
-        // klarna number
-        $this->_klarnaReservationNumber = trim($params->getData('additionalData_additionalData_acquirerReference'));
+
+        if($additionalData && is_array($additionalData)) {
+            $modification = isset($additionalData['modification']) ? $additionalData['modification'] : null;
+            if($modification && is_array($modification)) {
+                $this->_modificationResult = isset($valueArray['action']) ? trim($modification['action']) : "";
+            }
+            $additionalData2 = isset($additionalData['additionalData']) ? $additionalData['additionalData'] : null;
+            if($additionalData2 && is_array($additionalData2)) {
+                $this->_klarnaReservationNumber = isset($additionalData2['acquirerReference']) ? trim($additionalData2['acquirerReference']) : "";
+            }
+        }
     }
 
     /**
@@ -257,22 +282,24 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     {
         $this->_debugData['_updateAdyenAttributes'] = 'Updating the Adyen attributes of the order';
 
-        $avsResult = $params->getData('additionalData_avsResult');
-        $cvcResult = $params->getData('additionalData_cvcResult');
-        $boletoPaidAmount = $params->getData('additionalData_boletobancario_paidAmount');
-        $totalFraudScore = $params->getData('additionalData_totalFraudScore');
+        $additionalData = $params->getData('additionalData');
+        if($additionalData && is_array($additionalData)) {
+            $avsResult = (isset($additionalData['avsResult'])) ? $additionalData['avsResult'] : "";
+            $cvcResult = (isset($additionalData['cvcResult'])) ? $additionalData['cvcResult'] : "";
+            $totalFraudScore = (isset($additionalData['totalFraudScore'])) ? $additionalData['totalFraudScore'] : "";
+            $ccLast4 = (isset($additionalData['cardSummary'])) ? $additionalData['cardSummary'] : "";
+        }
+
         $paymentObj = $order->getPayment();
         $_paymentCode = $this->_paymentMethodCode($order);
 
-        $ccLast4 = $params->getData('additionalData_cardSummary');
         // if there is no server communication setup try to get last4 digits from reason field
-        if($ccLast4 == "") {
+        if(!isset($ccLast4) || $ccLast4 == "") {
+            Mage::log("In _updateAdyenAttributes3.4", Zend_Log::DEBUG, "adyen_notification_soap.log", true);
             $ccLast4 = $this->_retrieveLast4DigitsFromReason($this->_reason);
         }
-
         $paymentObj->setLastTransId($this->_merchantReference)
-            ->setAdyenPaymentMethod($this->_paymentMethod);
-        ;
+                   ->setCcType($this->_paymentMethod);
 
         if ($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION
             || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY
@@ -282,19 +309,20 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if($this->_klarnaReservationNumber != "") {
                 $paymentObj->setAdyenKlarnaNumber($this->_klarnaReservationNumber);
             }
-            if($ccLast4 != "") {
+            if(isset($ccLast4) && $ccLast4 != "") {
                 $paymentObj->setccLast4($ccLast4);
             }
-            if($avsResult != "") {
+            if(isset($avsResult) && $avsResult != "") {
                 $paymentObj->setAdyenAvsResult($avsResult);
             }
-            if($cvcResult != "") {
+            if(isset($cvcResult) && $cvcResult != "") {
                 $paymentObj->setAdyenCvcResult($cvcResult);
             }
-            if($boletoPaidAmount != "") {
-                $paymentObj->setAdyenBoletoPaidAmount($boletoPaidAmount);
+            if($this->_boletoPaidAmount != "") {
+                $paymentObj->setAdyenBoletoPaidAmount($this->_boletoPaidAmount);
             }
-            if($totalFraudScore != "") {
+
+            if(isset($totalFraudScore) && $totalFraudScore != "") {
                 $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
             }
         }
@@ -327,7 +355,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      */
     protected function _storeNotification()
     {
-        $success = ($this->_success == "true") ? true : false;
+        $success = ($this->_success == "true" || $this->_success == "1") ? true : false;
 
         try {
             //save all response data for a pure duplicate detection
@@ -672,8 +700,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->_isBankTransfer($this->_paymentMethod);
 
-        // payment method ideal, cash or adyen_pos has direct capture
-        if (strcmp($this->_paymentMethod, 'ideal') === 0 || strcmp($this->_paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap")) {
+        // payment method ideal, cash adyen_boleto or adyen_pos has direct capture
+        if (strcmp($this->_paymentMethod, 'ideal') === 0 || strcmp($this->_paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap") || $_paymentCode == "adyen_boleto") {
             return true;
         }
         // if auto capture mode for openinvoice is turned on then use auto capture
@@ -804,7 +832,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      */
     protected function _addStatusHistoryComment($order)
     {
-        $success_result = (strcmp($this->_success, 'true') == 0) ? 'true' : 'false';
+        $success_result = (strcmp($this->_success, 'true') == 0 || strcmp($this->_success, '1') == 0) ? 'true' : 'false';
         $success = (!empty($this->_reason)) ? "$success_result <br />reason:$this->_reason" : $success_result;
 
         if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND) {
@@ -891,7 +919,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _addNotificationToQueue($params) {
 
         $eventCode = trim($params->getData('eventCode'));
-        $success = (trim($params->getData('success')) == 'true') ? true : false;
+        $success = (trim($params->getData('success')) == 'true' || trim($params->getData('success')) == '1') ? true : false;
         // only log the AUTHORISATION with Sucess true because with false the order will never be created in magento
         if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $success == true) {
             // pspreference is always numeric otherwise it is a test notification
