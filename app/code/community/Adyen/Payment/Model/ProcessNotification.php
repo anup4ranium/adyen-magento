@@ -869,6 +869,16 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $comment = Mage::helper('adyen')
             ->__('%s <br /> eventCode: %s <br /> pspReference: %s <br /> paymentMethod: %s <br /> success: %s %s %s', $type, $this->_eventCode, $this->_pspReference, $this->_paymentMethod, $success, $klarnaReservationNumberText, $boletoPaidAmountText);
 
+        // If notification is pending status and pending status is set add the status change to the comment history
+        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING)
+        {
+            $pendingStatus = $this->_getConfigData('pending_status', 'adyen_abstract', $order->getStoreId());
+            if($pendingStatus != "") {
+                $order->addStatusHistoryComment($comment, $pendingStatus);
+                $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $pendingStatus;
+                return;
+            }
+        }
 
         $order->addStatusHistoryComment($comment);
         $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification';
