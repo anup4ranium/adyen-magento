@@ -334,8 +334,13 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 $this->_addStatusHistory($payment, $responseCode, $pspReference, $this->_getConfigData('order_status'));
                 break;
             case "Received": // boleto payment
-                $additionalDataResult = $response->paymentResult->additionalData->entry;
-                $pdfUrl = $additionalDataResult[0]->value;
+                $pdfUrl = null;
+                $additionalDataResults = $response->paymentResult->additionalData->entry;
+                foreach($additionalDataResults as $additionalDataResult) {
+                    if($additionalDataResult->key == "boletobancario.url") {
+                        $pdfUrl = $additionalDataResult->value;
+                    }
+                }
                 $this->_addStatusHistory($payment, $responseCode, $pspReference, false, $pdfUrl);
                 break;
             case '[capture-received]':
