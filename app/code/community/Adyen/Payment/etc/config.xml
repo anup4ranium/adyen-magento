@@ -525,4 +525,16 @@
             </totals_sort>
         </sales>
     </default>
+    <crontab>
+        <jobs>
+            <adyen>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>adyen/cronjob::updateNotificationQueue</model>
+                </run>
+            </adyen>
+        </jobs>
+    </crontab>
 </config>

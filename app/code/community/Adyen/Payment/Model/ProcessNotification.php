@@ -111,8 +111,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $this->_debugData['processResponse info'] = 'Skipping duplicate notification';
         }
 
-        // update the queue
-        $this->_updateNotProcessedNotifications();
+        // update the queue if it is not processed by cronjob
+        if(!$this->_getConfigData('update_notification_cronjob')) {
+            $this->_updateNotProcessedNotifications();
+        }
 
         $this->_debug($storeId);
     }
@@ -985,6 +987,23 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         } else {
             $this->_debugData['AddNotificationToQueue'] = 'Notification is not a AUTHORISATION Notification so do not add to queue';
         }
+    }
+
+
+    /*
+     * This function is called from the cronjob
+     */
+    public function updateNotProcessedNotifications() {
+
+        $this->_debugData = array();
+
+        $this->_debugData['processPosResponse begin'] = 'Begin to process cronjob for updating notifications from the queue';
+
+        $this->_updateNotProcessedNotifications();
+
+        $this->_debugData['processPosResponse end'] = 'Cronjob ends';
+
+        return $this->_debugData;
     }
 
     /**
