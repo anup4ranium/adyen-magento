@@ -201,10 +201,9 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
      * @param unknown_type $responseData
      */
     protected function _processRequest(Varien_Object $payment, $amount, $request, $pspReference = null) {
-        $this->_initOrder();
 
         if (Mage::app()->getStore()->isAdmin()) {
-            $storeId = $this->_order->getStoreId();
+            $storeId = $payment->getOrder()->getStoreId();
         } else {
             $storeId = null;
         }
@@ -215,18 +214,18 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $enableMoto = (int) $this->_getConfigData('enable_moto', 'adyen_cc', $storeId);
         $modificationResult = Mage::getModel('adyen/adyen_data_modificationResult');
         $requestData = Mage::getModel('adyen/adyen_data_modificationRequest')
-            ->create($payment, $amount, $this->_order, $merchantAccount, $pspReference);
+            ->create($payment, $amount, $merchantAccount, $pspReference);
 
         switch ($request) {
             case "authorise":
                 $requestData = Mage::getModel('adyen/adyen_data_paymentRequest')
-                    ->create($payment, $amount, $this->_order, $this->_paymentMethod, $merchantAccount,$recurringType, $enableMoto);
+                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount,$recurringType, $enableMoto);
 
                 $response = $this->_service->authorise(array('paymentRequest' => $requestData));
                 break;
             case "authorise3d":
                 $requestData = Mage::getModel('adyen/adyen_data_paymentRequest3d')
-                    ->create($payment, $amount, $this->_order, $this->_paymentMethod, $merchantAccount);
+                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount);
 
                 $response = $this->_service->authorise3d(array('paymentRequest3d' => $requestData));
                 break;
@@ -254,7 +253,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         /*
          * clear the cache for recurring payments so new card will be added
          */
-        $cacheKey = $merchantAccount . "|" . $this->_order->getCustomerId() . "|" . $recurringType;
+        $cacheKey = $merchantAccount . "|" . $payment->getOrder()->getCustomerId() . "|" . $recurringType;
         Mage::app()->getCache()->remove($cacheKey);
 
         //debug || log
@@ -362,7 +361,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             ->setPspReference($pspReference)
             ->setAdyenEventCode($responseCode)
             ->setAdyenEventResult($responseCode)
-            ->setIncrementId($this->_order->getIncrementId())
+            ->setIncrementId($payment->getOrder()->getIncrementId())
             ->setPaymentMethod($this->getInfoInstance()->getCcType())
             ->setCreatedAt(now())
             ->saveData()
@@ -484,19 +483,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             'password' => $wsPassword
         );
         return $account;
-    }
-
-    /**
-     * @desc init order object
-     * @return Adyen_Payment_Model_Adyen_Abstract
-     */
-    protected function _initOrder() {
-        if (!$this->_order) {
-            $paymentInfo = $this->getInfoInstance();
-            $this->_order = Mage::getModel('sales/order')
-                ->loadByIncrementId($paymentInfo->getOrder()->getRealOrderId());
-        }
-        return $this;
     }
 
     /**
