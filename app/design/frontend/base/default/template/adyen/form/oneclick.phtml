@@ -144,7 +144,6 @@
                                 document.body.appendChild(script);
                             }
 
-                            alert("<?php echo $_code; ?>");
                             var fields = $$('#payment_form_<?php echo $_code ?> input, #payment_form_<?php echo $_code ?> textarea, #payment_form_<?php echo $_code ?> select');
                             fields.forEach(function(field) {
                                 field.observe('change', cseUpdateOneClick);
