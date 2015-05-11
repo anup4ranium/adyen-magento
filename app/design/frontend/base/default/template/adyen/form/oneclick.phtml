@@ -111,18 +111,19 @@
                             event.preventDefault();
                         }
 
-                        var cse_form_oneclick = $('payment_form_<?php echo $_code ?>');
                         var cse_key_oneclick = <?php echo json_encode($this->getCsePublicKey()); ?>;
                         var cse_options_oneclick = {
                             name:  'payment[encrypted_data]',
-                            force: true,
-                            dataEncryptedName: "data-encrypted-name-oneclick-<?php echo $_code ?>"
+                            force: true
                         };
+
 
                         var cseUpdateOneClick = function() {
 
                             try {
                                 if (payment.currentMethod && payment.currentMethod == '<?php echo $_code ?>') {
+                                    var cse_form_oneclick = $('payment_form_<?php echo $_code ?>');
+                                    cse_options_oneclick.dataEncryptedName = "data-encrypted-name-oneclick-<?php echo $_code ?>";
                                     adyen.encrypt.createEncryptedForm(cse_form_oneclick, cse_key_oneclick, cse_options_oneclick);
                                 }
                             } catch (e) {
@@ -143,6 +144,7 @@
                                 document.body.appendChild(script);
                             }
 
+                            alert("<?php echo $_code; ?>");
                             var fields = $$('#payment_form_<?php echo $_code ?> input, #payment_form_<?php echo $_code ?> textarea, #payment_form_<?php echo $_code ?> select');
                             fields.forEach(function(field) {
                                 field.observe('change', cseUpdateOneClick);
