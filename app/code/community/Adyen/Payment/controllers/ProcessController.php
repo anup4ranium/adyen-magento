@@ -55,7 +55,8 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         $request = Mage::registry('soap-request');
 
         if (empty($request)) {
-            return false;
+            $this->_return401();
+            exit;
         }
 
         $status = "";
@@ -72,6 +73,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
         if($status == "401"){
             $this->_return401();
+            exit;
         }
 
         return $this;
@@ -372,29 +374,47 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                 return $this;
             }
 
-            // add HTTP POST attributes as an array so it is the same as JSON and SOAP result
-            foreach($response as $key => $value) {
-                if (strpos($key,'_') !== false) {
-                    $results = explode('_', $key);
-                    $size = count($results);
-                    if($size == 2) {
-                        $response[$results[0]][$results[1]] = $value;
-                    } elseif($size == 3) {
-                        $response[$results[0]][$results[1]][$results[2]] = $value;
+            $notificationMode = isset($response['live']) ? $response['live'] : "";
+
+            if($notificationMode != "" && $this->_validateNotificationMode($notificationMode))
+            {
+                // add HTTP POST attributes as an array so it is the same as JSON and SOAP result
+                foreach($response as $key => $value) {
+                    if (strpos($key,'_') !== false) {
+                        $results = explode('_', $key);
+                        $size = count($results);
+                        if($size == 2) {
+                            $response[$results[0]][$results[1]] = $value;
+                        } elseif($size == 3) {
+                            $response[$results[0]][$results[1]][$results[2]] = $value;
+                        }
                     }
                 }
-            }
 
-            $status = $this->processNotification($response);
+                $status = $this->processNotification($response);
 
-            if($status == "401"){
-                $this->_return401();
-            } else {
-                $this->getResponse()
-                    ->setHeader('Content-Type', 'text/html')
-                    ->setBody("[accepted]");
+                if($status == "401"){
+                    $this->_return401();
+                    exit;
+                } else {
+                    $this->getResponse()
+                        ->setHeader('Content-Type', 'text/html')
+                        ->setBody("[accepted]");
+                    return;
+                }
+            } else
+            {
+                if($notificationMode == "") {
+                    $this->_return401();
+                    exit;
+                }
+
+                Mage::throwException(
+                    Mage::helper('adyen')->__('Mismatch between Live/Test modes of Magento store and the Adyen platform.')
+                );
                 return;
             }
+
         } catch (Exception $e) {
             Mage::logException($e);
         }
@@ -406,17 +426,35 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         try {
             $notificationItems = json_decode(file_get_contents('php://input'), true);
 
-            foreach($notificationItems['notificationItems'] as $notificationItem)
+            $notificationMode = isset($notificationItems['live']) ? $notificationItems['live'] : "";
+
+            if($notificationMode != "" && $this->_validateNotificationMode($notificationMode))
             {
-                $status = $this->processNotification($notificationItem['NotificationRequestItem']);
-                if($status == "401"){
-                    $this->_return401();
+                foreach($notificationItems['notificationItems'] as $notificationItem)
+                {
+                    $status = $this->processNotification($notificationItem['NotificationRequestItem']);
+                    if($status == "401"){
+                        $this->_return401();
+                        exit;
+                    }
                 }
+                $this->getResponse()
+                    ->setHeader('Content-Type', 'text/html')
+                    ->setBody("[accepted]");
+                return;
+            } else
+            {
+                if($notificationMode == "") {
+                    $this->_return401();
+                    exit;
+                }
+
+                Mage::throwException(
+                    Mage::helper('adyen')->__('Mismatch between Live/Test modes of Magento store and the Adyen platform')
+                );
             }
-            $this->getResponse()
-                ->setHeader('Content-Type', 'text/html')
-                ->setBody("[accepted]");
-            return;
+
+
         } catch (Exception $e) {
             Mage::logException($e);
         }
@@ -500,13 +538,24 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         return Mage::getModel('sales/order');
     }
 
+    protected function _validateNotificationMode($notificationMode)
+    {
+        $mode = $this->_getConfigData('demoMode');
+        if ($mode=='Y' &&  $notificationMode != 1 || $mode=='N' &&  $notificationMode == 1) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @desc Give Default settings
-     * @example $this->_getConfigData('demoMode','adyen_abstract')
-     * @since 0.0.2
-     * @param string $code
+     * @param $code
+     * @param null $paymentMethodCode
+     * @param null $storeId
+     * @return mixed
      */
     protected function _getConfigData($code, $paymentMethodCode = null, $storeId = null) {
-        return Mage::getModel('adyen/process')->getConfigData($code, $paymentMethodCode, $storeId);
+        return Mage::helper('adyen')->_getConfigData($code, $paymentMethodCode, $storeId);
     }
+
 }
