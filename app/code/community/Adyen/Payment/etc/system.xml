@@ -1371,6 +1371,51 @@
                         </visible_type>
                     </fields>
                 </adyen_sepa>
+                <adyen_pay_by_mail translate="label" module="adyen">
+                    <label>Adyen Pay By Mail</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>390</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sort_order>
+                        <visible_type>
+                            <label>Visible in:</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_VisibleType</source_model>
+                            <sort_order>70</sort_order>
+                            <comment>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </visible_type>
+                    </fields>
+                </adyen_pay_by_mail>
             </groups>
         </payment>
     </sections>

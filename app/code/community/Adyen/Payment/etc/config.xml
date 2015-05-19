@@ -396,6 +396,15 @@
                 <validate_iban>0</validate_iban>
                 <flow>sales</flow>
             </adyen_sepa>
+            <adyen_pay_by_mail>
+                <active>0</active>
+                <model>adyen/adyen_payByMail</model>
+                <group>adyen</group>
+                <order_status>processing</order_status>
+                <visible_type>backend</visible_type>
+                <title>Adyen Pay By Mail</title>
+                <sort_order>70</sort_order>
+            </adyen_pay_by_mail>
         </payment>
         <adyen>
             <payment>
