@@ -218,7 +218,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             // Only cancel the order when it is in state pending or if the ORDER_CLOSED is failed (means split payment has not be successful)
             if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
                 $this->_debugData['_updateOrder info'] = 'Going to cancel the order';
-                $this->_holdCancelOrder($order);
+                $this->_holdCancelOrder($order, false);
             } else {
                 $this->_debugData['_updateOrder info'] = 'Order is already processed so ignore this notification';
             }
@@ -435,12 +435,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE_FAILED:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLATION:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED:
-                $this->_holdCancelOrder($order);
+                $this->_holdCancelOrder($order, true);
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCEL_OR_REFUND:
                 if(isset($this->_modificationResult) && $this->_modificationResult != "") {
                     if($this->_modificationResult == "cancel") {
-                        $this->_holdCancelOrder($order);
+                        $this->_holdCancelOrder($order, true);
                     } elseif($this->_modificationResult == "refund") {
                         $this->_refundOrder($order);
                         //refund completed
@@ -890,7 +890,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      * @return bool
      * @deprecate not needed already cancelled in ProcessController
      */
-    protected function _holdCancelOrder($order)
+    protected function _holdCancelOrder($order, $ignoreHasInvoice)
     {
         $orderStatus = $this->_getConfigData('payment_cancelled', 'adyen_abstract', $order->getStoreId());
 
@@ -898,7 +898,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $helper = Mage::helper('adyen');
 
         // check if order has in invoice only cancel/hold if this is not the case
-        if (!$order->hasInvoices()) {
+        if ($ignoreHasInvoice || !$order->hasInvoices()) {
             $order->setActionFlag($orderStatus, true);
 
             if($orderStatus == Mage_Sales_Model_Order::STATE_HOLDED) {
