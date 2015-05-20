@@ -541,7 +541,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     protected function _validateNotificationMode($notificationMode)
     {
         $mode = $this->_getConfigData('demoMode');
-        if ($mode=='Y' &&  $notificationMode == "" || $mode=='N' &&  $notificationMode == 'true') {
+        if ($mode=='Y' &&  $notificationMode == "false" || $mode=='N' &&  $notificationMode == 'true') {
             return true;
         }
         return false;
