@@ -301,19 +301,19 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $isConfigDemoMode = $this->getConfigDataDemoMode();
         switch ($isConfigDemoMode) {
             case true:
-                if ($paymentRoutine == 'single' && empty($brandCode)) {
+                if ($paymentRoutine == 'single' && $this->getHppOptionsDisabled()) {
                     $url = 'https://test.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = (empty($brandCode))
+                    $url = ($this->getHppOptionsDisabled())
                         ? 'https://test.adyen.com/hpp/select.shtml'
                         : "https://test.adyen.com/hpp/details.shtml?brandCode=$brandCode";
                 }
                 break;
             default:
-                if ($paymentRoutine == 'single' && empty($brandCode)) {
+                if ($paymentRoutine == 'single' && $this->getHppOptionsDisabled()) {
                     $url = 'https://live.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = (empty($brandCode))
+                    $url = ($this->getHppOptionsDisabled())
                         ? 'https://live.adyen.com/hpp/select.shtml'
                         : "https://live.adyen.com/hpp/details.shtml?brandCode=$brandCode";
                 }
