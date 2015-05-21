@@ -56,7 +56,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
         if (empty($request)) {
             $this->_return401();
-            exit;
+            return;
         }
 
         $status = "";
@@ -73,7 +73,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
         if($status == "401"){
             $this->_return401();
-            exit;
+            return;
         }
 
         return $this;
@@ -395,7 +395,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
                 if($status == "401"){
                     $this->_return401();
-                    exit;
+                    return;
                 } else {
                     $this->getResponse()
                         ->setHeader('Content-Type', 'text/html')
@@ -406,7 +406,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             {
                 if($notificationMode == "") {
                     $this->_return401();
-                    exit;
+                    return;
                 }
 
                 Mage::throwException(
@@ -435,7 +435,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                     $status = $this->processNotification($notificationItem['NotificationRequestItem']);
                     if($status == "401"){
                         $this->_return401();
-                        exit;
+                        return;
                     }
                 }
                 $this->getResponse()
@@ -446,7 +446,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             {
                 if($notificationMode == "") {
                     $this->_return401();
-                    exit;
+                    return;
                 }
 
                 Mage::throwException(
@@ -519,7 +519,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     }
 
     protected function _return401(){
-        header('HTTP/1.1 401 Unauthorized',true,401);
+        $this->getResponse()->setHttpResponseCode(401);
     }
 
     public function processNotification($response) {
