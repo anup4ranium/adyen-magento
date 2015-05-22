@@ -167,8 +167,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $adyFields['skinCode']          = $skinCode;
         $adyFields['shopperLocale']     = $shopperLocale;
         $adyFields['countryCode']       = $countryCode;
-        $adyFields['shopperIP']         = $shopperIP;
-        $adyFields['browserInfo']       = $browserInfo;
+
         //order data
         $items          = $order->getAllItems();
         $shipmentAmount = number_format($order->getShippingAmount() + $order->getShippingTaxAmount(), 2, ',', ' ');
@@ -238,7 +237,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             $adyFields['deliveryAddressType'] .
             $adyFields['shopperType'];
         //Generate HMAC encrypted merchant signature
-        $secretWord               = $this->_getSecretWord();
+        $secretWord               = $this->_getSecretWord($order->getStoreId());
         $signMac                  = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
         $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
         // get extra fields
@@ -271,14 +270,14 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         return $adyFields;
     }
 
-    protected function _getSecretWord($options = null)
+    protected function _getSecretWord($storeId=null)
     {
         switch ($this->getConfigDataDemoMode()) {
             case true:
-                $secretWord = trim($this->_getConfigData('secret_wordt', 'adyen_hpp'));
+                $secretWord = trim($this->_getConfigData('secret_wordt', 'adyen_hpp', $storeId));
                 break;
             default:
-                $secretWord = trim($this->_getConfigData('secret_wordp', 'adyen_hpp'));
+                $secretWord = trim($this->_getConfigData('secret_wordp', 'adyen_hpp' ,$storeId));
                 break;
         }
         return $secretWord;
