@@ -46,14 +46,14 @@
                     </p>]]></comment>
                     <fields>
                         <version translate="label">
-                            <label>Extension version</label>
-                                    <frontend_type>label</frontend_type>
-                                    <frontend_model>Adyen_Payment_Block_Adminhtml_Version</frontend_model>
-                                    <sort_order>0</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                        </version>
+                                        <label>Extension version</label>
+                                                <frontend_type>label</frontend_type>
+                                                <frontend_model>Adyen_Payment_Block_Adminhtml_Version</frontend_model>
+                                                <sort_order>0</sort_order>
+                                                <show_in_default>1</show_in_default>
+                                                <show_in_website>1</show_in_website>
+                                                <show_in_store>1</show_in_store>
+                                    </version>
                         <merchantAccount translate="label">
                             <label>Merchant Account</label>
                             <comment><![CDATA[You can find this in the Adyen back-office. The Adyen back-office can be found on <a target="_blank" href="https://ca-test.adyen.com">https://ca-test.adyen.com</a> for test or <a target="_blank" href="https://ca-live.adyen.com">https://ca-live.adyen.com</a> for live.]]></comment>
@@ -362,6 +362,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </update_notification_cronjob>
+                        <fraud_manual_review_status>
+                            <label>Manual Review Status</label>
+                            <comment>If you are using Manual Review and a payment match your case set here the status it should have in magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a seperate status please keep it on -- Please Select --</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adyen/source_status_pending</source_model>
+                            <sort_order>250</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </fraud_manual_review_status>
                     </fields>
                 </adyen_abstract>
                 <!-- @Hpp only -->

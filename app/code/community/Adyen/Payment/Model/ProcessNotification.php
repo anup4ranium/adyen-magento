@@ -190,6 +190,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected $_boletoPaidAmount;
     protected $_modificationResult;
     protected $_klarnaReservationNumber;
+    protected $_fraudManualReview;
 
     /**
      * @param $order
@@ -265,6 +266,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
 
         if($additionalData && is_array($additionalData)) {
+
+            // check if the payment is in status manual review
+            $fraudManualReview = isset($additionalData['fraudManualReview']) ? $additionalData['fraudManualReview'] : "";
+            if($fraudManualReview == "true") {
+                $this->_fraudManualReview = true;
+            } else {
+                $this->_fraudManualReview = false;
+            }
+
             $modification = isset($additionalData['modification']) ? $additionalData['modification'] : null;
             if($modification && is_array($modification)) {
                 $this->_modificationResult = isset($valueArray['action']) ? trim($modification['action']) : "";
@@ -422,11 +432,14 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
-                // don't do anything it will send a CAPTURE notification when this payment is captured
+                $this->_setPaymentAuthorized($order, false);
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
                 if($_paymentCode != "adyen_pos") {
-                    $this->_setPaymentAuthorized($order);
+                    // ignore capture if you are on auto capture (this could be called if manual review is enabled and you have a capture delay)
+                    if (!$this->_isAutoCapture($order)) {
+                        $this->_setPaymentAuthorized($order, false);
+                    }
                 } else {
                     // FOR POS authorize the payment on the CAPTURE notification
                     $this->_authorizePayment($order, $this->_paymentMethod);
@@ -655,6 +668,19 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $order->addStatusHistoryComment(Mage::helper('adyen')->__('Capture Mode set to Manual'));
             $order->sendOrderUpdateEmail($_mail);
             $this->_debugData['_createInvoice done'] = 'Capture mode is set to Manual so don\'t create an invoice wait for the capture notification';
+
+            // show message if order is in manual review
+            if($this->_fraudManualReview) {
+                // check if different status is selected
+                $fraudManualReviewStatus = $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
+                if($fraudManualReviewStatus != "") {
+                    $status = $fraudManualReviewStatus;
+                    $comment = "Adyen Payment is in Manual Review check the Adyen platform";
+                    $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
+                }
+            }
+
+
             return;
         }
 
@@ -753,7 +779,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     /**
      * @param $order
      */
-    protected function _setPaymentAuthorized($order)
+    protected function _setPaymentAuthorized($order, $manualReviewComment = true)
     {
         $this->_debugData['_setPaymentAuthorized start'] = 'Set order to authorised';
 
@@ -795,8 +821,20 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             }
         }
 
+        $comment = "Adyen Payment Successfully completed";
+
+        // if manual review is true use the manual review status if this is set
+        if($manualReviewComment == true && $this->_fraudManualReview) {
+            // check if different status is selected
+            $fraudManualReviewStatus = $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
+            if($fraudManualReviewStatus != "") {
+                $status = $fraudManualReviewStatus;
+                $comment = "Adyen Payment is in Manual Review check the Adyen platform";
+            }
+        }
+
         $status = (!empty($status)) ? $status : $order->getStatus();
-        $order->addStatusHistoryComment(Mage::helper('adyen')->__('Adyen Payment Successfully completed'), $status);
+        $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
         $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
         $this->_debugData['_setPaymentAuthorized end'] = 'Order status is changed to authorised status, status is ' . $status;
     }
