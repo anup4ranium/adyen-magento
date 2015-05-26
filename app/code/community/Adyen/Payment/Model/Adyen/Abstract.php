@@ -74,6 +74,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
     protected $_testModificationUrl = 'https://pal-test.adyen.com/pal/adapter/httppost';
     protected $_liveModificationUrl = 'https://pal-live.adyen.com/pal/adapter/httppost';
 
+    protected $_paymentMethodType = 'api';
+
+    public function getPaymentMethodType() {
+        return $this->$_paymentMethodType;
+    }
+
     /**
      * @param Varien_Object $payment
      * @param unknown_type $amount
@@ -299,6 +305,10 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 }
                 $responseCode = $response->paymentResult->resultCode;
                 $pspReference = $response->paymentResult->pspReference;
+
+                // save pspreference to match with notification
+                $payment->setAdyenPspReference($pspReference);
+
                 break;
             case "refund":
                 $responseCode = $response->refundResult->response;

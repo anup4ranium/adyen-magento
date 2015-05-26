@@ -216,12 +216,22 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         // check if success is true of false
         if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0) {
-            // Only cancel the order when it is in state pending or if the ORDER_CLOSED is failed (means split payment has not be successful)
-            if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
+            // Only cancel the order when it is in state pending, payment review or if the ORDER_CLOSED is failed (means split payment has not be successful)
+            if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $order->getState() === Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
                 $this->_debugData['_updateOrder info'] = 'Going to cancel the order';
-                $this->_holdCancelOrder($order, false);
+
+                // if payment is API check, check if API result pspreference is the same as reference
+                if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $this->_getPaymentMethodType($order) == 'api') {
+                    if($this->_pspReference == $order->getPayment()->getAdyenPspReference()) {
+                        $this->_holdCancelOrder($order, false);
+                    } else {
+                        $this->_debugData['_updateOrder warning'] = 'order is not cancelled because pspReference does not match with the order';
+                    }
+                } else {
+                    $this->_holdCancelOrder($order, false);
+                }
             } else {
-                $this->_debugData['_updateOrder info'] = 'Order is already processed so ignore this notification';
+                $this->_debugData['_updateOrder info'] = 'Order is already processed so ignore this notification state is:' . $order->getState();
             }
         } else {
             // Notification is successful
@@ -622,7 +632,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $this->_setPrePaymentAuthorized($order);
 
-        $this->_createInvoice($order);
+        $this->_prepareInvoice($order);
 
         $_paymentCode = $this->_paymentMethodCode($order);
         if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos', $order->getStoreId()) && $_paymentCode == "adyen_pos"))
@@ -651,11 +661,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     /**
      * @param $order
      */
-    protected function _createInvoice($order)
+    protected function _prepareInvoice($order)
     {
-        $this->_debugData['_createInvoice'] = 'Creating invoice for order';
+        $this->_debugData['_prepareInvoice'] = 'Prepare invoice for order';
         $payment = $order->getPayment()->getMethodInstance();
-        $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail', 'adyen_abstract', $order->getStoreId());
+
         $_mail = (bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId());
 
         //Set order state to new because with order state payment_review it is not possible to create an invoice
@@ -667,7 +677,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         if (!$this->_isAutoCapture($order)) {
             $order->addStatusHistoryComment(Mage::helper('adyen')->__('Capture Mode set to Manual'));
             $order->sendOrderUpdateEmail($_mail);
-            $this->_debugData['_createInvoice done'] = 'Capture mode is set to Manual so don\'t create an invoice wait for the capture notification';
+            $this->_debugData['_prepareInvoice done'] = 'Capture mode is set to Manual so don\'t create an invoice wait for the capture notification';
 
             // show message if order is in manual review
             if($this->_fraudManualReview) {
@@ -679,10 +689,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
                 }
             }
-
-
             return;
         }
+
+        $this->_createInvoice($order);
+
+        $order->sendOrderUpdateEmail($_mail);
+    }
+
+    protected function _createInvoice($order)
+    {
+        $this->_debugData['_createInvoice'] = 'Creating invoice for order';
 
         if ($order->canInvoice()) {
             $invoice = $order->prepareInvoice();
@@ -696,6 +713,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     ->addObject($invoice)
                     ->addObject($invoice->getOrder())
                     ->save();
+                $this->_debugData['_createInvoice done'] = 'Created invoice';
             } catch (Exception $e) {
                 $this->_debugData['_createInvoice error'] = 'Error saving invoice. The error message is: ' . $e->getMessage();
                 Mage::logException($e);
@@ -704,13 +722,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             //selected adyen status
             $this->_setPaymentAuthorized($order);
 
+            $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail', 'adyen_abstract', $order->getStoreId());
             if ($invoiceAutoMail) {
                 $invoice->sendEmail();
             }
         } else {
             $this->_debugData['_createInvoice error'] = 'It is not possible to create invoice for this order';
         }
-        $order->sendOrderUpdateEmail($_mail);
     }
 
     /**
@@ -763,6 +781,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         return $order->getPayment()->getMethod();
     }
 
+    protected function _getPaymentMethodType($order) {
+        return $order->getPayment()->getPaymentMethodType();
+    }
+
     /**
      * @param $paymentMethod
      * @return bool
@@ -782,6 +804,16 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _setPaymentAuthorized($order, $manualReviewComment = true)
     {
         $this->_debugData['_setPaymentAuthorized start'] = 'Set order to authorised';
+
+        // if full amount is captured create invoice
+        $currency = $order->getOrderCurrencyCode();
+        $amount = $this->_value;
+        $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $currency);
+
+        $this->_debugData['_setPaymentAuthorized amount'] = 'amount notification:'.$amount . ' amount order:'.$orderAmount;
+        if($amount == $orderAmount) {
+            $this->_createInvoice($order);
+        }
 
         $status = $this->_getConfigData('payment_authorized', 'adyen_abstract', $order->getStoreId());
         // virtual order can have different status
@@ -875,13 +907,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $success_result = (strcmp($this->_success, 'true') == 0 || strcmp($this->_success, '1') == 0) ? 'true' : 'false';
         $success = (!empty($this->_reason)) ? "$success_result <br />reason:$this->_reason" : $success_result;
 
-        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND) {
+        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_REFUND || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE) {
 
             $currency = $order->getOrderCurrencyCode();
 
             // check if it is a full or partial refund
-            $amount = Mage::helper('adyen')->formatAmount(($this->_value), $currency);
-            $orderAmount = Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $currency);
+            $amount = $this->_value;
+            $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $currency);
+
+            $this->_debugData['_addStatusHistoryComment amount'] = 'amount notification:'.$amount . ' amount order:'.$orderAmount;
 
             if($amount == $orderAmount) {
                 $order->setAdyenEventCode($this->_eventCode . " : " . strtoupper($success_result));

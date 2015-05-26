@@ -42,6 +42,12 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     protected $_paymentMethod = 'hpp';
     protected $_isInitializeNeeded = true;
 
+    protected $_paymentMethodType = 'hpp';
+
+    public function getPaymentMethodType() {
+        return $this->$_paymentMethodType;
+    }
+
     /**
      * Ability to set the code, for dynamic payment methods.
      * @param $code
