@@ -136,16 +136,16 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $order             = $this->_order;
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
-        $skinCode          = trim($this->_getConfigData('skinCode', 'adyen_hpp'));
+        $skinCode          = trim($this->_getConfigData('skinCode', 'adyen_hpp', $order->getStoreId()));
         $amount            = Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
-        $merchantAccount   = trim($this->_getConfigData('merchantAccount'));
+        $merchantAccount   = trim($this->_getConfigData('merchantAccount', null, $order->getStoreId()));
         $shopperEmail      = $order->getCustomerEmail();
         $customerId        = $order->getCustomerId();
         $shopperIP         = $order->getRemoteIp();
         $browserInfo       = $_SERVER['HTTP_USER_AGENT'];
-        $shopperLocale     = trim($this->_getConfigData('shopperlocale'));
+        $shopperLocale     = trim($this->_getConfigData('shopperlocale', null, $order->getStoreId()));
         $shopperLocale     = (!empty($shopperLocale)) ? $shopperLocale : Mage::app()->getLocale()->getLocaleCode();
-        $countryCode       = trim($this->_getConfigData('countryCode'));
+        $countryCode       = trim($this->_getConfigData('countryCode', null, $order->getStoreId()));
         $countryCode       = (!empty($countryCode)) ? $countryCode : false;
         // if directory lookup is enabled use the billingadress as countrycode
         if ($countryCode == false) {
@@ -154,7 +154,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             }
         }
         $adyFields                      = array();
-        $deliveryDays                   = (int)$this->_getConfigData('delivery_days', 'adyen_hpp');
+        $deliveryDays                   = (int)$this->_getConfigData('delivery_days', 'adyen_hpp', $order->getStoreId());
         $deliveryDays                   = (!empty($deliveryDays)) ? $deliveryDays : 5;
         $adyFields['merchantAccount']   = $merchantAccount;
         $adyFields['merchantReference'] = $realOrderId;
@@ -195,7 +195,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         );
         $adyFields['shopperEmail']    = $shopperEmail;
         // recurring
-        $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
+        $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract', $order->getStoreId()));
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         //blocked methods
@@ -208,7 +208,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
          */
         $adyFields['merchantReturnData'] = "";
 
-        $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
+        $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice', $order->getStoreId());
         if ($this->_code == "adyen_openinvoice" || $this->getInfoInstance()->getCcType() == "klarna"
             || $this->getInfoInstance()->getCcType() == "afterpay_default"
         ) {
@@ -253,7 +253,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             }
         }
         // if option to put Return Url in request from magento is enabled add this in the request
-        $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp');
+        $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp', $order->getStoreId());
         if ($returnUrlInRequest) {
             $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
             $adyFields['resURL'] = $url;
@@ -296,11 +296,4 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         }
         return $url;
     }
-
-
-
-
-
-
-
 }
