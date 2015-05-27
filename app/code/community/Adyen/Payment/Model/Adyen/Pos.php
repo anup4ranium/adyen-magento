@@ -39,6 +39,12 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
      */
     const GUEST_ID = 'customer_';
 
+    protected $_paymentMethodType = 'pos';
+
+    public function getPaymentMethodType() {
+        return $this->$_paymentMethodType;
+    }
+
     /*
      * only enable if adyen_cc is enabled
      */

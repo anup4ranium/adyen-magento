@@ -35,6 +35,12 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
     protected $_canUseInternal = true;
     protected $_canUseForMultishipping = true;
 
+    protected $_paymentMethodType = 'hpp';
+
+    public function getPaymentMethodType() {
+        return $this->$_paymentMethodType;
+    }
+
     /**
      * @var GUEST_ID , used when order is placed by guests
      */
