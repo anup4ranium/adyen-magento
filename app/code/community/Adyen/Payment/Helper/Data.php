@@ -93,8 +93,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
     }
 
     public function hasCashExpressCheckout() {
-        if(Mage::getStoreConfig('payment/adyen_pos/active')) {
-            return (int) Mage::getStoreConfig('payment/adyen_pos/cash_express_checkout');
+        if(Mage::getStoreConfig('payment/adyen_cash/active')) {
+            return (int) Mage::getStoreConfig('payment/adyen_cash/cash_express_checkout');
         }
         return false;
     }
