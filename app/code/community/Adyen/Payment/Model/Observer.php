@@ -165,10 +165,10 @@ class Adyen_Payment_Model_Observer {
         }
 
         $recurringType = $adyenHelper->getConfigData('recurringtypes', 'adyen_abstract', $store->getId());
-        $recurringCarts = $adyenHelper->getRecurringCards($merchantAccount, $customerId, $recurringType);
+        $recurringCards = $adyenHelper->getRecurringCards($merchantAccount, $customerId, $recurringType);
 
         $paymentMethods = array();
-        foreach ($recurringCarts as $key => $paymentMethod) {
+        foreach ($recurringCards as $key => $paymentMethod) {
 
             $paymentMethodCode = $paymentMethod['recurringDetailReference'];
             $paymentMethods[$paymentMethodCode] = $paymentMethod;
