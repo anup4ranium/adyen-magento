@@ -55,8 +55,6 @@
                         <div class="creditcard-block">
                             <?php
                             $_bankFile = $value["variant"];
-                            $_filename = Mage::getBaseDir().DS.'skin'.DS.'frontend'.DS.'base'.DS.'default'.DS.'images'.DS.'adyen'.DS. $_bankFile ."_small.png";
-
                             $_filename = Mage::getDesign()->getFilename("images/adyen/{$_bankFile}.png", array('_type' => 'skin'));
                             $imageUrl = file_exists($_filename)
                                 ? $this->getSkinUrl("images/adyen/{$_bankFile}.png")
