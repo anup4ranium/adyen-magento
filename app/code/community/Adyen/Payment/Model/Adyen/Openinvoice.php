@@ -196,7 +196,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress)->getHouseNumber();
         $adyFields['billingAddress.city'] = $billingAddress->getCity();
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
-        $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegion();
+        $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
         $adyFields['billingAddress.country'] = $billingAddress->getCountryId();
         $sign = $adyFields['billingAddress.street'] .
             $adyFields['billingAddress.houseNumberOrName'] .
@@ -217,7 +217,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress)->getHouseNumber();
             $adyFields['deliveryAddress.city'] = $deliveryAddress->getCity();
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
-            $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegion();
+            $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
             $adyFields['deliveryAddress.country'] = $deliveryAddress->getCountryId();
             $sign = $adyFields['deliveryAddress.street'] .
                 $adyFields['deliveryAddress.houseNumberOrName'] .
