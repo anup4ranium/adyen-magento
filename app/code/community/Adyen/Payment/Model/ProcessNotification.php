@@ -317,7 +317,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         // if there is no server communication setup try to get last4 digits from reason field
         if(!isset($ccLast4) || $ccLast4 == "") {
-            Mage::log("In _updateAdyenAttributes3.4", Zend_Log::DEBUG, "adyen_notification_soap.log", true);
             $ccLast4 = $this->_retrieveLast4DigitsFromReason($this->_reason);
         }
         $paymentObj->setLastTransId($this->_merchantReference)
