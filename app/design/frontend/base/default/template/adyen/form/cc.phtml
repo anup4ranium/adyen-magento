@@ -131,6 +131,21 @@ $_code = $this->getMethodCode();
                             var interval = setInterval(getInstallments(selectedCard.cardtype), 500);
                         }
                     <?php endif; ?>
+
+                    cardSetCvcElementselectedCardType(selectedCard != null ? selectedCard.cardtype : null);
+
+                }
+
+                function cardSetCvcElementselectedCardType(selectedCardType) {
+                    var cvcCodeElem = document.getElementById( '<?php echo $_code; ?>_cc_cid' );
+
+                    if(selectedCardType == null) {
+                        // error do nothing
+                    } else if(selectedCardType == "AE") {
+                        cvcCodeElem.maxLength = 4;
+                    } else {
+                        cvcCodeElem.maxLength = 3;
+                    }
                 }
 
                 var ajaxReq;
@@ -223,7 +238,7 @@ $_code = $this->getMethodCode();
         <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
         <div class="input-box">
             <div class="v-fix">
-                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry" id="<?php echo $_code ?>_cc_cid" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_cid]\"" : "data-encrypted-name=\"cvc\""); ?> value="" maxlength="4" />
+                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry" id="<?php echo $_code ?>_cc_cid" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_cid]\"" : "data-encrypted-name=\"cvc\""); ?> value="" size="7" maxlength="4" />
             </div>
             <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
         </div>
