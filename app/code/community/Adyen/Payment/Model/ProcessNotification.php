@@ -450,6 +450,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setPaymentAuthorized($order, false);
                     }
                 } else {
+
+                    // uncancel the order just to be sure that order is going trough
+                    $this->_uncancelOrder($order);
+
                     // FOR POS authorize the payment on the CAPTURE notification
                     $this->_authorizePayment($order, $this->_paymentMethod);
                 }
@@ -537,6 +541,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
     }
 
+    protected function _uncancelOrder($order) {
+        foreach ($order->getAllItems() as $item) {
+            $item->setQtyCanceled(0);
+            $item->save();
+        }
+    }
     /**
      * @param $order
      * @return bool
@@ -623,10 +633,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
          */
         if($payment_method == "alipay" || $payment_method == "unionpay") {
             $this->_debugData['_authorizePayment info'] = 'Payment method is Alipay or unionpay so make sure all items are not cancelled';
-            foreach ($order->getAllItems() as $item) {
-                $item->setQtyCanceled(0);
-                $item->save();
-            }
+            $this->_uncancelOrder($order);
         }
 
         $this->_setPrePaymentAuthorized($order);
