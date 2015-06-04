@@ -1498,6 +1498,42 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </sort_order>
+                        <session_validity>
+                            <label>Session Validity</label>
+                            <comment>How many days do you want this payment page to be active</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </session_validity>
+                        <skin_code translate="label">
+                            <label>Skin Code</label>
+                            <comment>The skin code you want to use levae this empty if you want to use the same as Adyen HPP settings</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </skin_code>
+                        <secret_wordt translate="label">
+                            <label>HMAC Key for Test</label>
+                            <comment>Should match with the HMAC test key in the Adyen backoffice. Fill this in if you are using a different skin then defined in Adyen HPP</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secret_wordt>
+                        <secret_wordp translate="label">
+                            <label>HMAC Key for Live</label>
+                            <comment>Should match with the HMAC live key in the Adyen backoffice. Fill this in if you are using a different skin then defined in Adyen HPP</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secret_wordp>
                         <visible_type>
                             <label>Visible in:</label>
                             <frontend_type>select</frontend_type>

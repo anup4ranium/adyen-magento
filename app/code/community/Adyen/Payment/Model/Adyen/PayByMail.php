@@ -142,7 +142,18 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $order             = $this->_order;
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
-        $skinCode          = trim($this->_getConfigData('skinCode', 'adyen_hpp', $order->getStoreId()));
+
+        // check if paybymail has it's own skin
+        $skinCode = trim($this->_getConfigData('skin_code', 'adyen_pay_by_mail', $order->getStoreId()));
+        if($skinCode == "") {
+            // use HPP skin and HMAC
+            $skinCode = trim($this->_getConfigData('skinCode', 'adyen_hpp', $order->getStoreId()));
+            $secretWord = $this->_getSecretWord($order->getStoreId(), 'adyen_hpp');
+        } else {
+            // use paybymail skin and hmac
+            $secretWord = $this->_getSecretWord($order->getStoreId(), 'adyen_pay_by_mail');
+        }
+
         $amount            = Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
         $merchantAccount   = trim($this->_getConfigData('merchantAccount', null, $order->getStoreId()));
         $shopperEmail      = $order->getCustomerEmail();
@@ -195,10 +206,14 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             );
         }
         $adyFields['orderData']       = base64_encode(gzencode($prodDetails)); //depreacated by Adyen
-        $adyFields['sessionValidity'] = date(
-            DATE_ATOM,
-            mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y"))
-        );
+
+
+        $sessionValidity = (int) trim($this->_getConfigData('session_validity', 'adyen_pay_by_mail', $order->getStoreId()));
+        if($sessionValidity == "") {
+            $sessionValidity = 3;
+        }
+
+        $adyFields['sessionValidity'] = date("c",strtotime("+". $sessionValidity . " days"));
         $adyFields['shopperEmail']    = $shopperEmail;
         // recurring
         $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract', $order->getStoreId()));
@@ -243,7 +258,6 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             $adyFields['deliveryAddressType'] .
             $adyFields['shopperType'];
         //Generate HMAC encrypted merchant signature
-        $secretWord               = $this->_getSecretWord($order->getStoreId());
         $signMac                  = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
         $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
         // get extra fields
@@ -258,32 +272,19 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
                 $adyFields['idealIssuerId'] = $id['0'];
             }
         }
-        // if option to put Return Url in request from magento is enabled add this in the request
-        $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp', $order->getStoreId());
-        if ($returnUrlInRequest) {
-            $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
-            $adyFields['resURL'] = $url;
-        }
-        // pos over hpp
-//         disable this because no one using this and it will always show POS payment method
-//         $terminalcode = 'redirect';
-//         $adyFields['pos.serial_number'] = $terminalcode;
-//         // calculate signatature pos
-//         $strsign = "merchantSig:pos.serial_number|" . $adyFields['merchantSig'] . ":" . $terminalcode;
-//         $signPOS = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $strsign);
-//         $adyFields['pos.sig'] = base64_encode(pack('H*', $signPOS));
+
         Mage::log($adyFields, self::DEBUG_LEVEL, 'http-request.log', true);
         return $adyFields;
     }
 
-    protected function _getSecretWord($storeId=null)
+    protected function _getSecretWord($storeId=null, $paymentMethodCode)
     {
         switch ($this->getConfigDataDemoMode()) {
             case true:
-                $secretWord = trim($this->_getConfigData('secret_wordt', 'adyen_hpp', $storeId));
+                $secretWord = trim($this->_getConfigData('secret_wordt', $paymentMethodCode, $storeId));
                 break;
             default:
-                $secretWord = trim($this->_getConfigData('secret_wordp', 'adyen_hpp' ,$storeId));
+                $secretWord = trim($this->_getConfigData('secret_wordp', $paymentMethodCode ,$storeId));
                 break;
         }
         return $secretWord;

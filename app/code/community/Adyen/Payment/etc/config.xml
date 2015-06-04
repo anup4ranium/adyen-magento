@@ -413,6 +413,7 @@
                 <order_status>processing</order_status>
                 <visible_type>backend</visible_type>
                 <title>Adyen Pay By Mail</title>
+                <session_validity>3</session_validity>
                 <sort_order>70</sort_order>
             </adyen_pay_by_mail>
         </payment>
