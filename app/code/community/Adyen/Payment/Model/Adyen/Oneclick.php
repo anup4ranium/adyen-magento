@@ -59,9 +59,15 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         }
         $storeId = $store->getId();
 
-        // Get recurringDetailReference from config
-        $recurringDetailReference = Mage::getStoreConfig("payment/".$this->getCode() . "/recurringDetailReference", $storeId);
-        $info->setAdditionalInformation('recurring_detail_reference', $recurringDetailReference);
+        if($data->getRecurringDetailReference()) {
+            // this can be the case if you select the recurring card from the POS express checkout mechanisme
+            $info->setAdditionalInformation('recurring_detail_reference', $data->getRecurringDetailReference());
+        } else {
+            // Get recurringDetailReference from config
+            $recurringDetailReference = Mage::getStoreConfig("payment/".$this->getCode() . "/recurringDetailReference", $storeId);
+            $info->setAdditionalInformation('recurring_detail_reference', $recurringDetailReference);
+        }
+
 
         $ccType = Mage::getStoreConfig("payment/".$this->getCode() . "/variant", $storeId);
         $info->setCcType($ccType);

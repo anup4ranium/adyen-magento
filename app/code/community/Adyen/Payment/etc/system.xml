@@ -647,12 +647,33 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </express_checkout>
+                        <express_checkout_kiosk_mode>
+                            <label>Kiosk mode</label>
+                            <comment>If you turn kiosk modus on it will not autocomplete the customers based on the filled in email address</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>38</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </express_checkout_kiosk_mode>
+                        <express_checkout_recurring>
+                            <label>Show Recurring Cards</label>
+                            <comment>This will show the recurring cards beneath the express checkout and makes it possible to do a recurring online payment by clicking on the card</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>39</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><express_checkout_kiosk_mode>0</express_checkout_kiosk_mode></depends>
+                        </express_checkout_recurring>
                         <create_shipment>
                             <label>Create Shipment</label>
                             <comment>If you enable this there will be automatically be created a shipment if the invoice is created</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>38</sort_order>
+                            <sort_order>45</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>

@@ -58,4 +58,8 @@ class Adyen_Payment_Block_Form_Pos extends Mage_Payment_Block_Form {
 
         return $this->getData('_method_label_html');
     }
+
+    public function showRememberThisCheckoutbox() {
+        return $this->getMethod()->showRememberThisCheckoutbox();
+    }
 }

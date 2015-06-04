@@ -189,9 +189,12 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                         $kv->value = new SoapVar($payment->getAdditionalInformation("encrypted_data"), XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
                         $this->additionalData->entry = $kv;
                     } else {
-                        Mage::throwException(
-                            Mage::helper('adyen')->__('Missing the encrypted data value. Make sure the Client Side Encryption(CSE) script did encrypt the Credit Card details')
-                        );
+                        if($paymentMethod == 'cc') {
+                            // For CC encrypted data is needed if you use CSE
+                            Mage::throwException(
+                                Mage::helper('adyen')->__('Missing the encrypted data value. Make sure the Client Side Encryption(CSE) script did encrypt the Credit Card details')
+                            );
+                        }
                     }
 				}
 				else {

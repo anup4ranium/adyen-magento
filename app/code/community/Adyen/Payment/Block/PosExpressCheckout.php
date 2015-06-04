@@ -48,4 +48,29 @@ class Adyen_Payment_Block_PosExpressCheckout extends Mage_Core_Block_Template
         }
     }
 
+    public function inKioskMode()
+    {
+        return Mage::helper('adyen')->getConfigData("express_checkout_kiosk_mode", "adyen_pos", null);
+    }
+
+    public function showExpressCheckoutRecurringCards() {
+        return Mage::helper('adyen')->getConfigData("express_checkout_recurring", "adyen_pos", null);
+    }
+
+    public function enabledCashDrawer() {
+        return Mage::helper('adyen')->getConfigData("cash_drawer", "adyen_cash", null);
+    }
+
+    public function getCashDrawerPrinterIp() {
+        return Mage::helper('adyen')->getConfigData("cash_drawer_printer_ip", "adyen_cash", null);
+    }
+
+    public function getCashDrawerPrinterPort() {
+        return Mage::helper('adyen')->_getConfigData("cash_drawer_printer_port", "adyen_pos", null);
+    }
+
+    public function getCashDrawerPrinterDeviceId() {
+        return Mage::helper('adyen')->_getConfigData("cash_drawer_printer_device_id", "adyen_pos", null);
+    }
+
 }
