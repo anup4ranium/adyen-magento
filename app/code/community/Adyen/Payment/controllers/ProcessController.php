@@ -279,6 +279,10 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     public function successPosRedirectAction()
     {
         $session = $this->_getCheckout();
+
+        // clear session for email shopper
+        $session->setAdyenEmailShopper("");
+
         $session->unsAdyenRealOrderId();
         $session->setQuoteId($session->getAdyenQuoteId(true));
         $session->getQuote()->setIsActive(false)->save();
@@ -292,6 +296,10 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     public function cancel() {
 
         $session = $this->_getCheckout();
+
+        // clear session for email shopper
+        $session->setAdyenEmailShopper("");
+
         $order = Mage::getModel('sales/order');
         $incrementId = $session->getLastRealOrderId();
 
@@ -346,7 +354,17 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             $session->addError($this->__('Your payment failed, Please try again later'));
         }
 
-        $this->_redirectCheckoutCart();
+        // if payment method is adyen_pos or adyen_cash redirect to checkout if the kiosk mode is turned off
+        if(!$this->_getConfigData('express_checkout_kiosk_mode', 'adyen_pos') && ($order->getPayment()->getMethod() == "adyen_pos" || $order->getPayment()->getMethod() == "adyen_cash")) {
+
+            // add email to session so this can be shown
+            $session->setAdyenEmailShopper($order->getCustomerEmail());
+
+            $redirect = Mage::getUrl('checkout/cart');
+            $this->_redirectUrl($redirect);
+        } else {
+            $this->_redirectCheckoutCart();
+        }
     }
 
     protected function _redirectCheckoutCart()
