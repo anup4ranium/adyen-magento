@@ -38,6 +38,10 @@ class Adyen_Payment_Block_PosExpressCheckout extends Mage_Core_Block_Template
         }
     }
 
+    public function getExpressCheckoutTitle() {
+        return Mage::helper('adyen')->getConfigData("title", "adyen_pos", null);
+    }
+
     public function hasCashExpressCheckout()
     {
         // must be login to show this checkout option
@@ -46,6 +50,10 @@ class Adyen_Payment_Block_PosExpressCheckout extends Mage_Core_Block_Template
         } else {
             return false;
         }
+    }
+
+    public function getCashExpressCheckoutTitle() {
+        return Mage::helper('adyen')->getConfigData("title", "adyen_cash", null);
     }
 
     public function inKioskMode()

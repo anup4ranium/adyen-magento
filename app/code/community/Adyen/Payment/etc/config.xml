@@ -310,7 +310,7 @@
                 <active>0</active>
                 <model>adyen/adyen_pos</model>
                 <group>adyen</group>
-                <title>Adyen POS</title>
+                <title>PIN</title>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <enable_scanner>0</enable_scanner>
                 <submit_scanner>0</submit_scanner>
@@ -325,7 +325,7 @@
                 <active>0</active>
                 <model>adyen/adyen_cash</model>
                 <group>adyen</group>
-                <title>Adyen Cash</title>
+                <title>Cash</title>
                 <sort_order>90</sort_order>
                 <visible_type>both</visible_type>
                 <cash_express_checkout>0</cash_express_checkout>

@@ -147,7 +147,7 @@
 
             <?php if($this->hasExpressCheckout()): ?>
                 <button id="CheckoutWithPos" style="" type="submit" title="Checkout with POS" class="button btn-proceed-checkout btn-checkout adyen-checkout-button">
-                    <span><span>Checkout with POS</span></span>
+                    <span><span><?php echo $this->__($this->getExpressCheckoutTitle()); ?></span></span>
                 </button>
             <?php endif; ?>
 
@@ -157,7 +157,7 @@
             <form id="AdyenFormCheckoutWithCash" action="<?php echo $this->getUrl("adyen/checkoutCash", array('_secure'=>true)); ?>" method="post">
 
                 <button id="CheckoutWithCash" style="" type="submit" title="Checkout with Cash" class="button btn-proceed-checkout btn-checkout adyen-checkout-button">
-                    <span><span>Checkout with Cash</span></span>
+                    <span><span><?php echo $this->__($this->getCashExpressCheckoutTitle()); ?></span></span>
                 </button>
 
             </form>
