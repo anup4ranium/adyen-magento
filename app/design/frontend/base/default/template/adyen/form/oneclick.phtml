@@ -62,12 +62,21 @@
                     </div>
                 </div>
 
-                <?php if($this->isNotRecurring()): ?>
+                <?php if($this->isNotRecurring()):
+                    // set max lenght cvc code
+                    if($recurringDetails["variant"] == "amex") {
+                        $maxLenght = "4";
+                        $class = "validate-length maximum-length-4 minimum-length-4 validate-digits";
+                    } else {
+                        $maxLenght = "3";
+                        $class = "validate-length maximum-length-3 minimum-length-3 validate-digits";
+                    }
+                ?>
                     <div class="columns three c">
                         <label><?php echo $this->__('Card Verification Number') ?></label>
                         <?php if($this->hasVerification()): ?>
                             <div class="cvc_block" id="cvc_block_<?php echo $_code;?>">
-                                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry" id="<?php echo $_code ?>_cc_cid" <?php echo (!$this->isCseEnabled() ? "name=\"payment[oneclick_cid_".$_code."]\"" : "data-encrypted-name-oneclick-" . $_code ."=cvc"); ?> value="" />
+                                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry <?php echo $class; ?>" id="<?php echo $_code ?>_cc_cid" <?php echo (!$this->isCseEnabled() ? "name=\"payment[oneclick_cid_".$_code."]\"" : "data-encrypted-name-oneclick-" . $_code ."=cvc"); ?> value="" size="7" maxlength="<?php echo $maxLenght; ?>" />
                                 <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
                             </div>
                         <?php endif; ?>
@@ -113,7 +122,7 @@
 
                         var cse_key_oneclick = <?php echo json_encode($this->getCsePublicKey()); ?>;
                         var cse_options_oneclick = {
-                            name:  'payment[encrypted_data]',
+                            name:  'payment[encrypted_data_oneclick]',
                             force: true
                         };
 
