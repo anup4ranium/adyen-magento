@@ -391,6 +391,9 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                     }
                 }
 
+                // create amount array so it is the same as JSON SOAP response
+                $response['amount'] = array('value' => $response['value'], 'currency' => $response['currency']);
+
                 $status = $this->processNotification($response);
 
                 if($status == "401"){
@@ -477,30 +480,36 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     }
 
     /* START actions for POS */
-    public function successPosAction() {
+    public function successPosAction()
+    {
+//        $response = $this->getRequest();
+        // need to get the full request
+        $response = $_REQUEST;
 
-        echo $this->processPosResponse();
+        $html = $this->processPosResponse($response);
+
+        $this->getResponse()
+            ->setHeader('Content-Type', 'text/html')
+            ->setBody($html);
+
         return $this;
     }
 
     public function getOrderStatusAction()
     {
-        if($_POST['merchantReference'] != "") {
-            // get the order
-            $order = Mage::getModel('sales/order')->loadByIncrementId($_POST['merchantReference']);
-            // if order is not cancelled then order is success
-            if($order->getStatus() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_POSAPPROVED || substr($order->getAdyenEventCode(), 0, 13)  == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
-                echo 'true';
-            } elseif($order->getStatus() == 'pending' &&  $order->getAdyenEventCode() == "") {
-                echo 'wait';
-                Mage::log("NO MATCH! JUST WAIT order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
-            } else {
-                Mage::log("NO MATCH! order is not matching with merchantReference:".$_POST['merchantReference'] . " status is:" . $order->getStatus() . " and adyen event status is:" . $order->getAdyenEventCode(), Zend_Log::DEBUG, "adyen_notification_pos.log", true);
-            }
+        $merchantReference = $this->getRequest()->getParam('merchantReference');
+        $result = Mage::getModel('adyen/getPosOrderStatus')->hasApprovedOrderStatus($merchantReference);
 
-            // extra check cancelled
+        $response = "";
+
+        if($result) {
+            $response = 'true';
         }
-        return;
+
+//        $this->getResponse()->clearHeaders()->setHeader('Content-type','application/json',true);
+        $this->getResponse()->setBody($response);
+
+        return $this;
     }
 
     public function cancelAction()
@@ -509,8 +518,8 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     }
 
 
-    public function processPosResponse() {
-        return Mage::getModel('adyen/process')->processPosResponse();
+    public function processPosResponse($response) {
+        return Mage::getModel('adyen/processPosResult')->processPosResponse($response);
     }
     /* END actions for POS */
 
