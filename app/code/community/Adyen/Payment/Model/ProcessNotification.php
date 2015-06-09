@@ -208,6 +208,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $this->_declareVariables($order, $params);
 
+        $previousAdyenEventCode = $order->getAdyenEventCode();
+
         // add notification to comment history status is current status
         $this->_addStatusHistoryComment($order);
 
@@ -223,12 +225,22 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 // if payment is API check, check if API result pspreference is the same as reference
                 if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $this->_getPaymentMethodType($order) == 'api') {
                     if($this->_pspReference == $order->getPayment()->getAdyenPspReference()) {
-                        $this->_holdCancelOrder($order, false);
+                        // don't cancel the order if previous state is authorisation with success=true
+                        if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
+                            $this->_holdCancelOrder($order, false);
+                        } else {
+                            $this->_debugData['_updateOrder warning'] = 'order is not cancelled because previous notification was a authorisation that succeeded';
+                        }
                     } else {
                         $this->_debugData['_updateOrder warning'] = 'order is not cancelled because pspReference does not match with the order';
                     }
                 } else {
-                    $this->_holdCancelOrder($order, false);
+                    // don't cancel the order if previous state is authorisation with success=true
+                    if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
+                        $this->_holdCancelOrder($order, false);
+                    } else {
+                        $this->_debugData['_updateOrder warning'] = 'order is not cancelled because previous notification was a authorisation that succeeded';
+                    }
                 }
             } else {
                 $this->_debugData['_updateOrder info'] = 'Order is already processed so ignore this notification state is:' . $order->getState();
@@ -241,8 +253,30 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // save event for duplication
         $this->_storeNotification();
 
+        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0)) {
+
+            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+            $order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
+            $order->setBaseDiscountCanceled(0);
+            $order->setBaseShippingCanceled(0);
+            $order->setBaseSubtotalCanceled(0);
+            $order->setBaseTaxCanceled(0);
+            $order->setBaseTotalCanceled(0);
+            $order->setDiscountCanceled(0);
+            $order->setShippingCanceled(0);
+            $order->setSubtotalCanceled(0);
+            $order->setTaxCanceled(0);
+            $order->setTotalCanceled(0);
+        }
+
         // update the order with status/adyen event and comment history
         $order->save();
+
+        // if notification is AUTHORISATION true revert cancel order
+
+        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0)) {
+            $this->_uncancelOrder($order);
+        }
 
         Mage::dispatchEvent('adyen_payment_process_notifications_after', array('order' => $order, 'adyen_response' => $params));
     }
@@ -542,9 +576,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     }
 
     protected function _uncancelOrder($order) {
-        foreach ($order->getAllItems() as $item) {
-            $item->setQtyCanceled(0);
-            $item->save();
+        try {
+            foreach ($order->getAllItems() as $item) {
+                $item->setQtyCanceled(0);
+                $item->setTaxCanceled(0);
+                $item->setHiddenTaxCanceled(0);
+                $item->save();
+                $item->save();
+            }
+        } catch(Excpetion $e) {
+            $this->_debugData['_uncancelOrder'] = 'Failed to cancel orderlines exception: ' . $e->getMessage();
+
         }
     }
     /**
@@ -631,10 +673,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
          * a AUTHORISATION true notification. The second time it must revert the cancelled of the first notification before we can
          * assign a new status
          */
-        if($payment_method == "alipay" || $payment_method == "unionpay") {
-            $this->_debugData['_authorizePayment info'] = 'Payment method is Alipay or unionpay so make sure all items are not cancelled';
+//        if($payment_method == "alipay" || $payment_method == "unionpay") {
+//            $this->_debugData['_authorizePayment info'] = 'Payment method is Alipay or unionpay so make sure all items are not cancelled';
             $this->_uncancelOrder($order);
-        }
+//        }
 
         $this->_setPrePaymentAuthorized($order);
 
