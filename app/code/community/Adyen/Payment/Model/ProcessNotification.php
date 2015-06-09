@@ -229,6 +229,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
                             $this->_holdCancelOrder($order, false);
                         } else {
+                            $order->setAdyenEventCode($previousAdyenEventCode); // do not update the adyenEventCode
                             $this->_debugData['_updateOrder warning'] = 'order is not cancelled because previous notification was a authorisation that succeeded';
                         }
                     } else {
@@ -239,6 +240,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
                         $this->_holdCancelOrder($order, false);
                     } else {
+                        $order->setAdyenEventCode($previousAdyenEventCode); // do not update the adyenEventCode
                         $this->_debugData['_updateOrder warning'] = 'order is not cancelled because previous notification was a authorisation that succeeded';
                     }
                 }
