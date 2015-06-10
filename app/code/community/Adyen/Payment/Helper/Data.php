@@ -363,7 +363,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
         $result = curl_exec($ch);
 
         if($result === false) {
-            Mage::log("Disable recurring contract is failing, error is: " . curl_error($ch), self::DEBUG_LEVEL, 'http-request.log',true);
+            Mage::log("Disable recurring contract is failing, error is: " . curl_error($ch), self::DEBUG_LEVEL, 'adyen_http-request.log',true);
             Mage::throwException(Mage::helper('adyen')->__('Disable recurring contract is generating the error see the log'));
         } else{
 
@@ -371,7 +371,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
             $result = utf8_encode(urldecode($result));
 
             if($result != "disableResult.response=[detail-successfully-disabled]") {
-                Mage::log("Disable contract is not succeeded the response is: " . $result, self::DEBUG_LEVEL, 'http-request.log',true);
+                Mage::log("Disable contract is not succeeded the response is: " . $result, self::DEBUG_LEVEL, 'adyen_http-request.log',true);
                 return false;
             }
             return true;

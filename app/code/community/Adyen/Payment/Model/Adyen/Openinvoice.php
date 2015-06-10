@@ -405,7 +405,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign_additional_data);
         $adyFields['openinvoicedata.sig'] =  base64_encode(pack('H*', $signMac));
 
-        Mage::log($adyFields, self::DEBUG_LEVEL, 'http-request.log');
+        Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
 
         return $adyFields;
     }
