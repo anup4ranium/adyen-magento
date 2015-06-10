@@ -33,7 +33,7 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
     protected $_infoBlockType = 'adyen/info_pos';
     protected $_paymentMethod = 'pos';
     protected $_isInitializeNeeded = true;
-    
+
     /**
      * @var GUEST_ID , used when order is placed by guests
      */
@@ -122,7 +122,7 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
         $adyFields['paymentAmount'] = $amount;
         $adyFields['merchantReference'] = $realOrderId;
         $adyFields['paymentAmountGrandTotal'] = $order->formatPrice($order->getGrandTotal()); // for showing only
-        
+
         // for recurring payments
         $recurringType = $this->_getConfigData('recurringtypes', 'adyen_pos');
 
@@ -133,8 +133,8 @@ class Adyen_Payment_Model_Adyen_Pos extends Adyen_Payment_Model_Adyen_Abstract {
         $adyFields['shopperReference'] = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         $adyFields['shopperEmail'] = $customerEmail;
 
-        Mage::log($adyFields, self::DEBUG_LEVEL, 'http-request.log',true);
-        
+        Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log',true);
+
         return $adyFields;
     }
 

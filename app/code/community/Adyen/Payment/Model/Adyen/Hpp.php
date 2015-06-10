@@ -276,7 +276,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 //         $strsign = "merchantSig:pos.serial_number|" . $adyFields['merchantSig'] . ":" . $terminalcode;
 //         $signPOS = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $strsign);
 //         $adyFields['pos.sig'] = base64_encode(pack('H*', $signPOS));
-        Mage::log($adyFields, self::DEBUG_LEVEL, 'http-request.log', true);
+        Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log', true);
         return $adyFields;
     }
 
