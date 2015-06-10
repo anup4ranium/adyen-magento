@@ -73,8 +73,12 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
             $url = urlencode(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true)."adyen/process/successPos");
 
             // detect ios or android
-            $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-            $android = stripos($ua,'android');
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+            $iPod    = stripos($userAgent,"iPod");
+            $iPhone  = stripos($userAgent,"iPhone");
+            $iPad    = stripos($userAgent,"iPad");
+            $Android = stripos($userAgent,"Android");
+            $webOS   = stripos($userAgent,"webOS");
 
             // extra parameters so that you alway's return these paramters from the application
             $extra_paramaters = urlencode("/?originalCustomCurrency=".$adyFields['currencyCode']."&originalCustomAmount=".$adyFields['paymentAmount']. "&originalCustomMerchantReference=".$adyFields['merchantReference'] . "&originalCustomSessionId=".session_id());
@@ -95,13 +99,7 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
             $receiptOrderLines = base64_encode("");
 
             // important url must be the latest parameter before extra parameters! otherwise extra parameters won't return in return url
-//            if($android !== false) { // && stripos($ua,'mobile') !== false) {
-//                // watch out some attributes are different from ios (sessionid and callback_automatic) added start_immediately
-//                $launchlink = "adyen://www.adyen.com/?sessionid=".date('U')."&amount=".$adyFields['paymentAmount']."&currency=".$adyFields['currencyCode']."&description=".$adyFields['merchantReference']. $recurring_parameters . "&receiptOrderLines=" . urlencode($receiptOrderLines) . "&callback=".$url . $extra_paramaters;
-//            } else {
-            //$launchlink = "adyen://payment?currency=".$adyFields['currencyCode']."&amount=".$adyFields['paymentAmount']."&description=".$adyFields['merchantReference']."&callback=".$url."&sessionId=".session_id()."&callbackAutomatic=1".$extra_paramaters;
             $launchlink = "adyen://payment?sessionId=".session_id()."&amount=".$adyFields['paymentAmount']."&currency=".$adyFields['currencyCode']."&merchantReference=".$adyFields['merchantReference']. $recurring_parameters . "&receiptOrderLines=" . urlencode($receiptOrderLines) .  "&callback=".$url . $extra_paramaters;
-//            }
 
             // log the launchlink
             $this->_debugData['LaunchLink'] = $launchlink;
@@ -117,15 +115,16 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
     					<div class=\"amount-box\">".
                 $adyFields['paymentAmountGrandTotal'] .
                 "<a id=\"launchlink\" href=\"".$launchlink ."\" >Payment</a> ".
-                "</div>";
+                "<span id=\"adyen-redirect-text\">If you stuck on this page please press the payment button</span></div>";
 
             $html .= '<script type="text/javascript">
-    				
+    				//<![CDATA[
     				function checkStatus() {
 	    				$.ajax({
 						    url: "'. $this->getUrl('adyen/process/getOrderStatus', array('_secure'=>true)) . '",
 						    type: "POST",
 						    data: "merchantReference='.$adyFields['merchantReference'] .'",
+						    asynchronous: false,
 						    success: function(data) {
 						    	if(data == "true") {
 						    		// redirect to success page
@@ -137,31 +136,50 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
 						});
 					}';
 
-            if($android !== false) {
-                $html .= 'url = document.getElementById(\'launchlink\').href;';
-                $html .= 'window.location.assign(url);';
-                $html .= 'window.onfocus = function(){setTimeout("checkStatus()", 500);};';
+            $expressCheckoutRedirectConnect = $this->_getConfigData("express_checkout_redirect_connect", "adyen_pos", null);
 
-//                //Prepare to handle the return of control via a visibility change event
-//                $html .= 'var eventName = "visibilitychange";
-//                          document.addEventListener(eventName,visibilityChanged,false);
-//                          //Checking the result when needed: when the Cash Register is put in control
-//                          function visibilityChanged() {
-//                                if (document.hidden || document.mozHidden || document.msHidden || document.webkitHidden)
-//                                {
-//                                    //Page got hidden; Adyen App called and transaction on terminal triggered
-//                                } else {
-//                                    //The page is showing again; Cash Register regained control from Adyen App
-//                                    checkStatus();
-//                                }
-//                            }
-//                ';
+            if($expressCheckoutRedirectConnect) {
+
+                if($iPod || $iPhone || $iPad) {
+                    $html .= 'document.getElementById(\'launchlink\').click();';
+                    $html .= 'setTimeout("checkStatus()", 5000);';
+                } else {
+                    // android
+                    $html .= 'var isActive;
+                    window.onfocus = function () {
+                      isActive = true;
+                    };
+
+                    window.onblur = function () {
+                      isActive = false;
+                    };
+
+                    // test
+                    setInterval(function () {
+                        checkStatus();
+                    }, 1000);';
+                    $html .= 'url = document.getElementById(\'launchlink\').href;';
+                    $html .= 'window.location = url;';
+                }
             } else {
-                $html .= 'document.getElementById(\'launchlink\').click();';
-                $html .= 'setTimeout("checkStatus()", 5000);';
+
+                $html .= '  var eventName = "visibilitychange";
+                            document.addEventListener(eventName,visibilityChanged,false);
+                            function visibilityChanged() {
+                                if (document.hidden || document.mozHidden || document.msHidden || document.webkitHidden)
+                                {
+                                    //Page got hidden; Adyen App called and transaction on terminal triggered
+                                } else {
+                                    //The page is showing again; Cash Register regained control from Adyen App
+                                    checkStatus();
+                                }
+                            }';
             }
 
-            $html .= '</script></div>';
+            $html .= '
+                        //]]>
+                        </script>
+                    </div>';
         } else {
             $form = new Varien_Data_Form();
             $form->setAction($payment->getFormUrl())

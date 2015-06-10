@@ -143,8 +143,20 @@
 #pos-redirect-page .logo { margin:10px 0 0 10px; width:336px; height:111px; background:url(../images/adyen/adyen_logo_large.png) left top no-repeat; }
 #pos-redirect-page .grey-header { background-color: #4C4C4C;  width:100%; margin:10px 0;}
 	#pos-redirect-page .grey-header h1 { padding: 16px 10px; font-family: sans-serif; font-size:24px;color:white; }
-#pos-redirect-page .amount-box { width:300px; height:150px; padding-top:75px; margin:50px auto; border:1px solid #797c83; color:#797c83; text-align:center; font-weight:bold; font-size:34px; background-color: #f5f5f5; box-shadow: 0 0 2px 2px #888;}
-#pos-redirect-page #launchlink { margin-top:10px; clear:both; display:block; color:#797C83; text-decoration:none; }
+#pos-redirect-page .amount-box { width:300px; padding-top:75px; margin:50px auto; border:1px solid #797c83; color:#797c83; text-align:center; font-weight:bold; font-size:34px; background-color: #f5f5f5; box-shadow: 0 0 2px 2px #888;}
+#pos-redirect-page #launchlink { margin-top:10px; clear:both; display:block; color:#797C83; text-decoration:none;
+
+    background: #3c8a2e;
+    color:white;
+    margin:20px;
+    padding:30px;
+    overflow:hidden;
+
+}
+
+#pos-redirect-page #adyen-redirect-text { font-size:18px; padding-bottom:15px; display:block;}
+
+#pos-redirect-page #launchlink:hover, #pos-redirect-page #launchlink:active { opacity: 0.9; }
 
 .adyenExpressCheckoutBlockLeft { float:left; padding-right:10px; }
 .adyenExpressCheckoutBlockLeft .input-box label { max-width:100%;}

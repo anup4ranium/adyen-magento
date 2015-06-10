@@ -87,7 +87,7 @@ class Adyen_Payment_Model_GetPosOrderStatus extends Mage_Core_Model_Abstract {
             sleep(1);
             ++$count;
 
-            if($count > 3) {
+            if($count > 5) {
                 $this->_debugData['getOrderStatus count: '.$count . ' end'] = 'order has the status: '.$order->getStatus() . ' this is the third try so cancel the order';
                 return false;
             }
@@ -103,7 +103,7 @@ class Adyen_Payment_Model_GetPosOrderStatus extends Mage_Core_Model_Abstract {
             sleep(1);
             ++$count;
 
-            if($count > 3) {
+            if($count > 5) {
                 $this->_debugData['getOrderStatus count: '.$count . ' end'] = 'order has the status: '.$order->getStatus() . ' this is the third try so cancel the order';
                 return false;
             }

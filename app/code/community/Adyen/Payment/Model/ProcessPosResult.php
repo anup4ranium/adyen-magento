@@ -135,7 +135,7 @@ class Adyen_Payment_Model_ProcessPosResult extends Mage_Core_Model_Abstract {
 
     protected function _validateChecksum($params)
     {
-        $checksum = $params->getData('checksum');
+        $checksum = $params->getData('cs');
         $result = $params->getData('result');
         $amount = $params->getData('originalCustomAmount');
         $currency = $params->getData('originalCustomCurrency');
