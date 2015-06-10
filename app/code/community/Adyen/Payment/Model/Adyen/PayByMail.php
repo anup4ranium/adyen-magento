@@ -273,7 +273,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             }
         }
 
-        Mage::log($adyFields, self::DEBUG_LEVEL, 'http-request.log', true);
+        Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log', true);
         return $adyFields;
     }
 
