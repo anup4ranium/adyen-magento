@@ -336,7 +336,30 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 $this->_addStatusHistory($payment, $responseCode, $pspReference, $this->_getConfigData('order_status'));
                 break;
             case "Refused":
-                $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
+
+                if($response->paymentResult->refusalReason) {
+
+                    $refusalReason = $response->paymentResult->refusalReason;
+                    $refusalReason = "CVC Declined";
+                    $refusalReason = "CVC Declined";
+                    switch($refusalReason) {
+                        case "Transaction Not Permitted":
+                            $errorMsg = Mage::helper('adyen')->__('The transaction is not permitted.');
+                            break;
+                        case "CVC Declined":
+                            $errorMsg = Mage::helper('adyen')->__('Declined due to the Card Security Code(CVC) being incorrect. Please check your CVC code!');
+                            break;
+                        case "Restricted Card":
+                            $errorMsg = Mage::helper('adyen')->__('The card is restricted.');
+                            break;
+                        default:
+                            $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
+                            break;
+                    }
+                } else {
+                    $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
+                }
+
                 Mage::throwException($errorMsg);
                 break;
             case "Authorised":
