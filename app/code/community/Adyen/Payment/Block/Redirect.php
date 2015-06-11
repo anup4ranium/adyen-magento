@@ -298,7 +298,7 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
                 array('display'=>Zend_Currency::NO_SYMBOL),
                 false
             );
-            $myReceiptOrderLines .= "  " . (int) $item->getQtyOrdered() . " " . substr($item->getName(),0, 25) . "| " . $currency . " " . $singlePriceFormat . " " . $itemAmountFormat . "|\n";
+            $myReceiptOrderLines .= "  " . (int) $item->getQtyOrdered() . "  " . trim(substr($item->getName(),0, 25)) . "| " . $currency . " " . $singlePriceFormat . "  " . $currency . " " . $itemAmountFormat . "|\n";
         }
 
         //discount cost
