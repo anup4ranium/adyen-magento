@@ -346,6 +346,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $cvcResult = (isset($additionalData['cvcResult'])) ? $additionalData['cvcResult'] : "";
             $totalFraudScore = (isset($additionalData['totalFraudScore'])) ? $additionalData['totalFraudScore'] : "";
             $ccLast4 = (isset($additionalData['cardSummary'])) ? $additionalData['cardSummary'] : "";
+            $refusalReasonRaw = (isset($additionalData['refusalReasonRaw'])) ? $additionalData['refusalReasonRaw'] : "";
+            $acquirerReference = (isset($additionalData['acquirerReference'])) ? $additionalData['acquirerReference'] : "";
+            $authCode = (isset($additionalData['authCode'])) ? $additionalData['authCode'] : "";
         }
 
         $paymentObj = $order->getPayment();
@@ -378,9 +381,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if($this->_boletoPaidAmount != "") {
                 $paymentObj->setAdyenBoletoPaidAmount($this->_boletoPaidAmount);
             }
-
             if(isset($totalFraudScore) && $totalFraudScore != "") {
                 $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
+            }
+            if(isset($refusalReasonRaw) && $refusalReasonRaw != "") {
+                $paymentObj->setAdyenRefusalReasonRaw($refusalReasonRaw);
+            }
+            if(isset($acquirerReference) && $acquirerReference != "") {
+                $paymentObj->setAdyenAcquirerReference($acquirerReference);
+            }
+            if(isset($authCode) && $authCode != "") {
+                $paymentObj->setAdyenAuthCode($authCode);
             }
         }
 
