@@ -312,6 +312,7 @@
                 <group>adyen</group>
                 <title>PIN</title>
                 <recurringtypes>ONECLICK</recurringtypes>
+                <add_receipt_order_lines>1</add_receipt_order_lines>
                 <enable_scanner>0</enable_scanner>
                 <submit_scanner>0</submit_scanner>
                 <express_checkout>0</express_checkout>

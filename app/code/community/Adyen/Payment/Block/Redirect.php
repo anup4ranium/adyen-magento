@@ -90,16 +90,18 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
                 $recurring_parameters = "&recurringContract=".urlencode($adyFields['recurringContract'])."&shopperReference=".urlencode($adyFields['shopperReference']). "&shopperEmail=".urlencode($adyFields['shopperEmail']);
             }
 
-            //add orderlines
-//            print_r($this->getReceiptOrderLines($this->_getOrder()));die();
 
-//            $receiptOrderLines = $this->getReceiptOrderLines($this->_getOrder());
-//            Mage::log("orderlines:".$receiptOrderLines, Zend_Log::DEBUG, "adyen_notification.log", true);
-//            $receiptOrderLines = base64_encode($receiptOrderLines);
-            $receiptOrderLines = base64_encode("");
+
+            $addReceiptOrderLines = $this->_getConfigData("add_receipt_order_lines", "adyen_pos", null);
+
+            $receiptOrderLines = "";
+            if($addReceiptOrderLines) {
+                $orderLines = base64_encode($this->getReceiptOrderLines($this->_getOrder()));
+                $receiptOrderLines = "&receiptOrderLines=" . urlencode($orderLines);
+            }
 
             // important url must be the latest parameter before extra parameters! otherwise extra parameters won't return in return url
-            $launchlink = "adyen://payment?sessionId=".session_id()."&amount=".$adyFields['paymentAmount']."&currency=".$adyFields['currencyCode']."&merchantReference=".$adyFields['merchantReference']. $recurring_parameters . "&receiptOrderLines=" . urlencode($receiptOrderLines) .  "&callback=".$url . $extra_paramaters;
+            $launchlink = "adyen://payment?sessionId=".session_id()."&amount=".$adyFields['paymentAmount']."&currency=".$adyFields['currencyCode']."&merchantReference=".$adyFields['merchantReference']. $recurring_parameters . $receiptOrderLines .  "&callback=".$url . $extra_paramaters;
 
             // log the launchlink
             $this->_debugData['LaunchLink'] = $launchlink;
@@ -260,42 +262,81 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
         // temp
         $currency = $order->getOrderCurrencyCode();
         $formattedAmountValue = Mage::helper('core')->formatPrice($order->getGrandTotal(), false);
+
+        $formattedAmountValue = Mage::getModel('directory/currency')->format(
+            $order->getGrandTotal(),
+            array('display'=>Zend_Currency::NO_SYMBOL),
+            false
+        );
+
+        $taxAmount = Mage::helper('checkout')->getQuote()->getShippingAddress()->getData('tax_amount');
+        $formattedTaxAmount = Mage::getModel('directory/currency')->format(
+            $taxAmount,
+            array('display'=>Zend_Currency::NO_SYMBOL),
+            false
+        );
+
         $paymentAmount = "1000";
 
         $myReceiptOrderLines .= "---||C\n".
             "====== YOUR ORDER DETAILS ======||CB\n".
             "---||C\n".
-            " No. Description |$/Piece  Subtotal|\n";
+            " No. Description |Piece  Subtotal|\n";
 
         foreach ($order->getItemsCollection() as $item) {
             //skip dummies
             if ($item->isDummy()) continue;
+            $singlePriceFormat = Mage::getModel('directory/currency')->format(
+                $item->getPriceInclTax(),
+                array('display'=>Zend_Currency::NO_SYMBOL),
+                false
+            );
 
-            $myReceiptOrderLines .= "  " . (int) $item->getQtyOrdered() . " " . substr($item->getName(),0, 25) . "| " . $currency . " " . Mage::helper('core')->formatPrice($item->getPriceInclTax(), false) . " " . Mage::helper('core')->formatPrice(($item->getPriceInclTax() * (int) $item->getQtyOrdered()), false) . "|\n";
-
+            $itemAmount = $item->getPriceInclTax() * (int) $item->getQtyOrdered();
+            $itemAmountFormat = Mage::getModel('directory/currency')->format(
+                $itemAmount,
+                array('display'=>Zend_Currency::NO_SYMBOL),
+                false
+            );
+            $myReceiptOrderLines .= "  " . (int) $item->getQtyOrdered() . " " . substr($item->getName(),0, 25) . "| " . $currency . " " . $singlePriceFormat . " " . $itemAmountFormat . "|\n";
         }
 
         //discount cost
         if($order->getDiscountAmount() > 0 || $order->getDiscountAmount() < 0)
         {
-            $myReceiptOrderLines .= "  " . 1 . " " . $this->__('Total Discount') . "| " . $currency . " " . Mage::helper('core')->formatPrice($order->getDiscountAmount(), false)."|\n";
+            $discountAmountFormat = Mage::getModel('directory/currency')->format(
+                $order->getDiscountAmount(),
+                array('display'=>Zend_Currency::NO_SYMBOL),
+                false
+            );
+            $myReceiptOrderLines .= "  " . 1 . " " . $this->__('Total Discount') . "| " . $currency . " " . $discountAmountFormat ."|\n";
         }
 
         //shipping cost
         if($order->getShippingAmount() > 0 || $order->getShippingTaxAmount() > 0)
         {
-            $myReceiptOrderLines .= "  " . 1 . " " . $order->getShippingDescription() . "| " . $currency . " " . Mage::helper('core')->formatPrice($order->getShippingAmount(), false)."|\n";
+            $shippingAmountFormat = Mage::getModel('directory/currency')->format(
+                $order->getShippingAmount(),
+                array('display'=>Zend_Currency::NO_SYMBOL),
+                false
+            );
+            $myReceiptOrderLines .= "  " . 1 . " " . $order->getShippingDescription() . "| " . $currency . " " . $shippingAmountFormat ."|\n";
 
         }
 
         if($order->getPaymentFeeAmount() > 0) {
-            $myReceiptOrderLines .= "  " . 1 . " " . $this->__('Payment Fee') . "| " . $currency . " " . Mage::helper('core')->formatPrice($order->getPaymentFeeAmount(), false)."|\n";
+            $paymentFeeAmount =  Mage::getModel('directory/currency')->format(
+                $order->getPaymentFeeAmount(),
+                array('display'=>Zend_Currency::NO_SYMBOL),
+                false
+            );
+            $myReceiptOrderLines .= "  " . 1 . " " . $this->__('Payment Fee') . "| " . $currency . " " . $paymentFeeAmount ."|\n";
 
         }
 
         $myReceiptOrderLines .=    "|--------|\n".
             "|Order Total:  ".$currency." ".$formattedAmountValue."|B\n".
-            "|Tax:  ".$currency." ".$formattedAmountValue."|B\n".
+            "|Tax:  ".$currency." ".$formattedTaxAmount."|B\n".
             "||C\n";
 
         //Cool new header for card details section! Default location is After Header so simply add to Order Details as separator
