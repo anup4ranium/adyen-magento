@@ -29,26 +29,6 @@ $_code = $this->getMethodCode();
 ?>
 <fieldset class="form-list">
     <ul id="payment_form_<?php echo $_code ?>" style="display:none">
-        <li>
-            <label for="<?php echo $_code ?>_account_number">Selecteer een rekening uit de lijst of voeg een nieuwe toe.</label><br />
-            <select name="payment[billing_agreement]">
-                <?php foreach($this->getBillingAgreements() as $agreement): ?>
-                <option value="<?php echo $agreement->getId(); ?>">Schrijf af van <?php echo $agreement->getReferenceId(); ?></option>
-                <?php endforeach; ?>
-                <option value="">Nieuwe Doorlopende SEPA Betaling...</option>
-            </select>
-            <script>
-                jQuery(function($){
-                    $('[name="payment[billing_agreement]"]').on('change', function(){
-                        if ($(this).val()) {
-                            $('.no-agreement').hide();
-                        } else {
-                            $('.no-agreement').show();
-                        }
-                    }).trigger('change');
-                });
-            </script>
-        </li>
         <li class="no-agreement" style="display:none;">
             <div class="input-box">
                 <label for="<?php echo $_code ?>_account_number"><?php echo $this->__('Bank account holder name') ?> <span class="required">*</span></label><br />
