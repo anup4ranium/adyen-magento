@@ -54,9 +54,6 @@
     <checkout_cart_index>
         <reference name="head">
             <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
-            <action method="addJs">
-                <file helper="adyen/loadEposJs" />
-            </action>
         </reference>
         <reference name="top.container">
             <block type="adyen/scanProduct" name="adyen.scanProduct" template="adyen/scan_product.phtml"/>
