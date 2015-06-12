@@ -501,10 +501,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setRefundAuthorized($order);
                     }
                 } else {
-                    if($order->canCancel() || $order->canHold()) {
+                    $orderStatus = $this->_getConfigData('order_status', 'adyen_abstract', $order->getStoreId());
+                    if(($orderStatus != Mage_Sales_Model_Order::STATE_HOLDED && $order->canCancel()) || ($orderStatus == Mage_Sales_Model_Order::STATE_HOLDED && $order->canHold())) {
                         // cancel order
+                        $this->_debugData['_processNotification'] = 'try to cancel the order';
                         $this->_holdCancelOrder($order, true);
                     } else {
+                        $this->_debugData['_processNotification'] = 'try to refund the order';
                         // refund
                         $this->_refundOrder($order);
                         //refund completed
