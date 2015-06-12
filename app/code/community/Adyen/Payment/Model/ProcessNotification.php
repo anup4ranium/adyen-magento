@@ -466,7 +466,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
-                $this->_setPaymentAuthorized($order, false);
+                // only process this if you are on auto capture. On manual capture you will always get Capture or CancelOrRefund notification
+                if ($this->_isAutoCapture($order)) {
+                    $this->_setPaymentAuthorized($order, false);
+                }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE:
                 if($_paymentCode != "adyen_pos") {
@@ -498,9 +501,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setRefundAuthorized($order);
                     }
                 } else {
-                    // not sure if it cancelled or refund the order
-                    $helper = Mage::helper('adyen');
-                    $order->addStatusHistoryComment($helper->__('Order is cancelled or refunded'));
+                    // cancel the order
+                    $this->_holdCancelOrder($order, true);
                 }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_RECURRING_CONTRACT:
