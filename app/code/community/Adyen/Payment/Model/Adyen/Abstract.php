@@ -231,7 +231,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 break;
             case "authorise3d":
                 $requestData = Mage::getModel('adyen/adyen_data_paymentRequest3d')
-                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount);
+                    ->create($payment, $merchantAccount);
 
                 $response = $this->_service->authorise3d(array('paymentRequest3d' => $requestData));
                 break;
