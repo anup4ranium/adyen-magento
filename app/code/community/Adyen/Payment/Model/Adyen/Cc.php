@@ -123,13 +123,6 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
     }
 
     /**
-     * @desc Called just after asssign data
-     */
-    public function prepareSave() {
-        parent::prepareSave();
-    }
-
-    /**
      * @desc Helper functions to get config data
      */
     public function isCseEnabled() {
