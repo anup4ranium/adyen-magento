@@ -501,8 +501,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setRefundAuthorized($order);
                     }
                 } else {
-                    // cancel the order
-                    $this->_holdCancelOrder($order, true);
+                    if($order->canCancel() || $order->canHold()) {
+                        // cancel order
+                        $this->_holdCancelOrder($order, true);
+                    } else {
+                        // refund
+                        $this->_refundOrder($order);
+                        //refund completed
+                        $this->_setRefundAuthorized($order);
+                    }
                 }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_RECURRING_CONTRACT:
