@@ -315,6 +315,8 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         $quoteId = $order->getQuoteId();
         $cart = Mage::getModel('sales/quote')->load($quoteId);
         $cart->setIsActive(true)->save();
+        // reset reserverOrderId because already used by previous order
+        $cart->setReservedOrderId(null);
         $session->replaceQuote($cart);
 
         // if setting failed_attempt_disable is on and the payment method is openinvoice ignore this payment mehthod the second time
