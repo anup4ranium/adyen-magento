@@ -264,7 +264,7 @@
                 <ws_password_live></ws_password_live>
                 <demoMode>Y</demoMode>
                 <debug>1</debug>
-                <order_status>processing</order_status>
+                <order_status>pending</order_status>
                 <payment_authorized>processing</payment_authorized>
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
                 <payment_cancelled_redirect>checkout/cart</payment_cancelled_redirect>
@@ -289,7 +289,6 @@
                 <ws_password_test></ws_password_test>
                 <ws_username_live></ws_username_live>
                 <ws_password_live></ws_password_live>
-                <order_status>processing</order_status>
                 <allowspecific>0</allowspecific>
                 <disable_hpptypes>0</disable_hpptypes>
                 <sort_order>30</sort_order>
