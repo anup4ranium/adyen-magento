@@ -28,7 +28,7 @@
 "Bank Location (City)","Locatie Bank (Stad)"
 "Bank Location ID","Bank locatie ID"
 "Bank Name","Banknaam"
-"Bank code: %s"
+"Bank code: %s", "Bank code %s"
 "Bank name: %s","Banknaam: %s"
 "Card Verification Number","Kaart verificatie nummer"
 "Credit Card Number","Credit Card Nummer"
