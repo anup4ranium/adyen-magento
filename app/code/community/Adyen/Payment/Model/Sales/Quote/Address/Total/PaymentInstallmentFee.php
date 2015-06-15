@@ -38,6 +38,7 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentInstallmentFee extend
         parent::collect($address);
 
         $quote = $address->getQuote();
+        nstallmentKey = $numberOfInstallments - 1;
 
         if ($address->getAllItems()) {
             $currentAmount = $address->getPaymentInstallmentFeeAmount();
@@ -71,12 +72,6 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentInstallmentFee extend
                         }
 
                         $installmentKey = $numberOfInstallments - 1;
-
-                        Mage::log("installment key:" . $ccTypeInstallments, Zend_Log::DEBUG, "adyen_installments.log", true);
-//                        echo $installmentKey;
-//print_r($all_installments[$installmentKey]);
-//                        die();
-
                         $installment = $all_installments[$installmentKey];
 
                         if($installment != null && is_array($installment)) {
