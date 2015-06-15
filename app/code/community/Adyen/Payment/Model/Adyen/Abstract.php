@@ -340,8 +340,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 if($response->paymentResult->refusalReason) {
 
                     $refusalReason = $response->paymentResult->refusalReason;
-                    $refusalReason = "CVC Declined";
-                    $refusalReason = "CVC Declined";
                     switch($refusalReason) {
                         case "Transaction Not Permitted":
                             $errorMsg = Mage::helper('adyen')->__('The transaction is not permitted.');
