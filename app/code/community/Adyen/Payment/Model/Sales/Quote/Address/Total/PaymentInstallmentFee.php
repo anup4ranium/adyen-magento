@@ -38,7 +38,6 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentInstallmentFee extend
         parent::collect($address);
 
         $quote = $address->getQuote();
-        nstallmentKey = $numberOfInstallments - 1;
 
         if ($address->getAllItems()) {
             $currentAmount = $address->getPaymentInstallmentFeeAmount();
