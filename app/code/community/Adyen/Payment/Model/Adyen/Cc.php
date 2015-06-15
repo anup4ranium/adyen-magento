@@ -89,13 +89,12 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract {
                 ->setPoNumber($data->getAdditionalData());
         }
 
-        // recalculate the totals so that extra fee is defined
-        $quote = (Mage::getModel('checkout/type_onepage') !== false)? Mage::getModel('checkout/type_onepage')->getQuote(): Mage::getModel('checkout/session')->getQuote();
-        $quote->setTotalsCollectedFlag(false);
-        $quote->collectTotals();
-        // not needed
-//        $quote->save();
-
+        if($info->getAdditionalInformation('number_of_installments') != "") {
+            // recalculate the totals so that extra fee is defined
+            $quote = (Mage::getModel('checkout/type_onepage') !== false)? Mage::getModel('checkout/type_onepage')->getQuote(): Mage::getModel('checkout/session')->getQuote();
+            $quote->setTotalsCollectedFlag(false);
+            $quote->collectTotals();
+        }
 
         return $this;
     }

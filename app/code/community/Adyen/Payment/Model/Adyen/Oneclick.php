@@ -70,6 +70,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
 
 
         $ccType = Mage::getStoreConfig("payment/".$this->getCode() . "/variant", $storeId);
+        $ccType = Mage::helper('adyen')->getMagentoCreditCartType($ccType);
         $info->setCcType($ccType);
 
         if ($this->isCseEnabled()) {
@@ -101,10 +102,12 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
 
         }
 
-        // recalculate the totals so that extra fee is defined
-        $quote = (Mage::getModel('checkout/type_onepage') !== false)? Mage::getModel('checkout/type_onepage')->getQuote(): Mage::getModel('checkout/session')->getQuote();
-        $quote->setTotalsCollectedFlag(false);
-        $quote->collectTotals();
+        if($info->getAdditionalInformation('number_of_installments') != "") {
+            // recalculate the totals so that extra fee is defined
+            $quote = (Mage::getModel('checkout/type_onepage') !== false)? Mage::getModel('checkout/type_onepage')->getQuote(): Mage::getModel('checkout/session')->getQuote();
+            $quote->setTotalsCollectedFlag(false);
+            $quote->collectTotals();
+        }
 
         return $this;
     }
