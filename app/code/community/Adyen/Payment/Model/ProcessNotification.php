@@ -89,17 +89,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if($incrementId) {
                 $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
                 if ($order->getId()) {
+                    // set StoreId for retrieving debug log setting
+                    $storeId = $order->getStoreId();
 
-                    if($this->_validateNotification($order, $params)) {
-
-                        // set StoreId for retrieving debug log setting
-                        $storeId = $order->getStoreId();
-
-                        $this->_updateOrder($order, $params);
-
-                    } else {
-                        $this->_debugData['info'] = 'Order does not validate payment method in Magento don\'t match with payment method in notification';
-                    }
+                    $this->_updateOrder($order, $params);
                 } else {
                     $this->_debugData['error'] = 'Order does not exists with increment_id: ' . $incrementId;
                     $this->_addNotificationToQueue($params);
@@ -138,44 +131,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Extra validation check on the payment method
-     * @param $order
-     * @param $params
-     * @return bool
-     */
-    protected function _validateNotification($order, $params)
-    {
-        $paymentMethod = trim(strtolower($params->getData('paymentMethod')));
-
-        if($paymentMethod != '') {
-            $orderPaymentMethod = strtolower($this->_paymentMethodCode($order));
-
-            // Only possible for the Adyen HPP payment method
-            if($orderPaymentMethod == 'adyen_hpp') {
-                if(substr($orderPaymentMethod, 0, 6) == 'adyen_') {
-                    if(substr($orderPaymentMethod, 0, 10) == 'adyen_hpp_') {
-                        $orderPaymentMethod = substr($orderPaymentMethod, 10);
-                    } else {
-                        $orderPaymentMethod = substr($orderPaymentMethod, 6);
-                    }
-                }
-            } else {
-                return true;
-            }
-
-            $this->_debugData['_validateNotification'] = 'Payment method in Magento is: ' . $orderPaymentMethod . ", payment method in notification is: " . $paymentMethod;
-
-            if($orderPaymentMethod == $paymentMethod) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        // if payment method in notification is empty just process it
-        return true;
     }
 
     // notification attributes
