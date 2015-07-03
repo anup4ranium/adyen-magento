@@ -24,6 +24,7 @@ You can create issues on our Magento Repository or if you have some specific pro
 * #329 Remove validation on Notification for HPP payments
 * #333 Missing closing ) of Javascript function
 * #341 Put back the IP version check for Adyen POS and added it for adyen cash
+* #349 Content-Type headers need to be cleared for use with php-fpm / nginx.
 
 <h2>Previous Releases</h2>
 <h3>2.3.0</h3>
