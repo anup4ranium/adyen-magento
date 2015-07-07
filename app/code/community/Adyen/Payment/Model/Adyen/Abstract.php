@@ -115,9 +115,11 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         /*
          * Do not send a email notification when order is created.
          * Only do this on the AUHTORISATION notification.
-         * This is needed for old versions where there is no check if email is already send
+         * For Boleto send it on order creation
          */
-        $order->setCanSendNewEmailFlag(false);
+        if($this->getCode() != 'adyen_boleto') {
+            $order->setCanSendNewEmailFlag(false);
+        }
 
         if ($this->getCode() == 'adyen_boleto' || $this->getCode() == 'adyen_cc' || substr($this->getCode(), 0, 14) == 'adyen_oneclick' || $this->getCode() == 'adyen_elv' || $this->getCode() == 'adyen_sepa') {
 

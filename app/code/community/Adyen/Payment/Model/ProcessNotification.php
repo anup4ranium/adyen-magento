@@ -664,10 +664,14 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $this->_prepareInvoice($order);
 
-        // send order confirmation mail after invoice creation so merchant can add invoicePDF to this mail
-        $order->sendNewOrderEmail(); // send order email
-
         $_paymentCode = $this->_paymentMethodCode($order);
+
+        // for boleto confirmation mail is send on order creation
+        if($payment_method != "adyen_boleto") {
+            // send order confirmation mail after invoice creation so merchant can add invoicePDF to this mail
+            $order->sendNewOrderEmail(); // send order email
+        }
+
         if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos', $order->getStoreId()) && $_paymentCode == "adyen_pos"))
         {
             $this->_createShipment($order);
