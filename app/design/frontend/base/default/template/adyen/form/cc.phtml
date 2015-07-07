@@ -204,7 +204,9 @@ $_code = $this->getMethodCode();
                 }
 
                 // default
-                cardSetCardBrand(null, false, group_types);
+                window.onload = function(){
+                    cardSetCardBrand(null, false, group_types);
+                }
 
                 // observers
                 Event.observe($('<?php echo $_code ?>_cc_number'), 'change', selectBrand);
