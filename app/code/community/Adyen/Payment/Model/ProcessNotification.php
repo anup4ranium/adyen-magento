@@ -657,14 +657,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _authorizePayment($order, $payment_method)
     {
         $this->_debugData['_authorizePayment'] = 'Authorisation of the order';
-        //pre-authorise if success
-        $order->sendNewOrderEmail(); // send order email
 
         $this->_uncancelOrder($order);
 
         $this->_setPrePaymentAuthorized($order);
 
         $this->_prepareInvoice($order);
+
+        // send order confirmation mail after invoice creation so merchant can add invoicePDF to this mail
+        $order->sendNewOrderEmail(); // send order email
 
         $_paymentCode = $this->_paymentMethodCode($order);
         if($payment_method == "c_cash" || ($this->_getConfigData('create_shipment', 'adyen_pos', $order->getStoreId()) && $_paymentCode == "adyen_pos"))
