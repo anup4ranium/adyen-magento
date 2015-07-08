@@ -598,7 +598,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
 
         $_mail = (bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId());
-        $amount = $this->_value;
+
+        $currency = $order->getOrderCurrencyCode(); // use orderCurrency because adyen respond in the same currency as in the request
+        $amount = Mage::helper('adyen')->originalAmount($this->_value, $currency);
 
         if ($order->canCreditmemo()) {
             $service = Mage::getModel('sales/service_order', $order);
@@ -730,11 +732,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
 
         // validate if amount is total amount
-        $orderCurrencyCode = $order->getOrderCurrencyCode();
-        if ($this->_value == Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode)) {
-
-        }
-
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
 
