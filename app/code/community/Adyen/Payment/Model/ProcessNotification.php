@@ -662,7 +662,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $this->_uncancelOrder($order);
 
-        $this->_setPrePaymentAuthorized($order);
+        $fraudManualReviewStatus = $this->_getFraudManualReviewStatus($order);
+
+
+        // If manual review is active and a seperate status is used then ignore the pre authorized status
+        if($this->_fraudManualReview != true || $fraudManualReviewStatus == "") {
+            $this->_setPrePaymentAuthorized($order);
+        } else {
+            $this->_debugData['_authorizePayment info'] = 'Ignore the pre authorized status because the order is under manual review and use the Manual review status';
+        }
 
         $this->_prepareInvoice($order);
 
@@ -721,7 +729,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             // show message if order is in manual review
             if($this->_fraudManualReview) {
                 // check if different status is selected
-                $fraudManualReviewStatus = $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
+                $fraudManualReviewStatus = $this->_getFraudManualReviewStatus($order);
                 if($fraudManualReviewStatus != "") {
                     $status = $fraudManualReviewStatus;
                     $comment = "Adyen Payment is in Manual Review check the Adyen platform";
@@ -766,6 +774,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
 
         $order->sendOrderUpdateEmail($_mail);
+    }
+
+
+    protected function _getFraudManualReviewStatus($order)
+    {
+        return $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
     }
 
     protected function _isTotalAmount($orderAmount) {
@@ -946,7 +960,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // if manual review is true use the manual review status if this is set
         if($manualReviewComment == true && $this->_fraudManualReview) {
             // check if different status is selected
-            $fraudManualReviewStatus = $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
+            $fraudManualReviewStatus = $this->_getFraudManualReviewStatus($order);
             if($fraudManualReviewStatus != "") {
                 $status = $fraudManualReviewStatus;
                 $comment = "Adyen Payment is in Manual Review check the Adyen platform";
