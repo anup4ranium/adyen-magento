@@ -788,24 +788,25 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $this->_debugData['_createInvoice'] = 'Creating invoice for order';
 
         if ($order->canInvoice()) {
-            $invoice = $order->prepareInvoice();
-            $invoice->getOrder()->setIsInProcess(true);
-            // set transaction id so you can do a online refund this is used instead of online capture
-            // because it is already auto capture in Adyen Backoffice
-            $invoice->setTransactionId(1);
-            $invoice->register()->pay();
+
+            /* We do not use this inside a transaction because order->save() is always done on the end of the notification
+             * and it could result in a deadlock see https://github.com/Adyen/magento/issues/334
+             */
             try {
-                Mage::getModel('core/resource_transaction')
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder())
-                    ->save();
+                $invoice = $order->prepareInvoice();
+                $invoice->getOrder()->setIsInProcess(true);
+
+                // set transaction id so you can do a online refund from credit memo
+                $invoice->setTransactionId(1);
+                $invoice->register()->pay();
+                $invoice->save();
+
                 $this->_debugData['_createInvoice done'] = 'Created invoice';
             } catch (Exception $e) {
                 $this->_debugData['_createInvoice error'] = 'Error saving invoice. The error message is: ' . $e->getMessage();
                 Mage::logException($e);
             }
 
-            //selected adyen status
             $this->_setPaymentAuthorized($order);
 
             $invoiceAutoMail = (bool) $this->_getConfigData('send_invoice_update_mail', 'adyen_abstract', $order->getStoreId());
