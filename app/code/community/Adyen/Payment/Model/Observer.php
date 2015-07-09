@@ -197,9 +197,9 @@ class Adyen_Payment_Model_Observer {
     {
         $adyenHelper = Mage::helper('adyen');
 
+        $skinCode          = $adyenHelper->getConfigData('skinCode', 'adyen_hpp', $store->getId());
+        $merchantAccount   = $adyenHelper->getConfigData('merchantAccount', null, $store->getId());
 
-        $skinCode          = $adyenHelper->getConfigData('skinCode', 'adyen_hpp', $store);
-        $merchantAccount   = $adyenHelper->getConfigData('merchantAccount', null, $store);
         if (!$skinCode || !$merchantAccount) {
             return array();
         }
@@ -214,8 +214,8 @@ class Adyen_Payment_Model_Observer {
                 DATE_ATOM,
                 mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y"))
             ),
-            "countryCode"       => $this->_getCurrentCountryCode(),
-            "shopperLocale"     => Mage::app()->getLocale()->getLocaleCode()
+            "countryCode"       => $this->_getCurrentCountryCode($adyenHelper, $store),
+            "shopperLocale"     => $this->_getCurrentLocaleCode($adyenHelper, $store)
         );
         $responseData = $this->_getDirectoryLookupResponse($adyFields, $store);
 
@@ -270,8 +270,13 @@ class Adyen_Payment_Model_Observer {
     /**
      * @return string
      */
-    protected function _getCurrentLocaleCode()
+    protected function _getCurrentLocaleCode($adyenHelper, $store)
     {
+        $localeCode = $adyenHelper->getConfigData('shopperlocale', 'adyen_abstract', $store->getId());
+        if($localeCode != "") {
+            return $localeCode;
+        }
+
         return Mage::app()->getLocale()->getLocaleCode();
     }
 
@@ -288,8 +293,15 @@ class Adyen_Payment_Model_Observer {
     /**
      * @return string
      */
-    protected function _getCurrentCountryCode()
+    protected function _getCurrentCountryCode($adyenHelper, $store)
     {
+        // if fixed countryCode is setup in config use this
+        $countryCode = $adyenHelper->getConfigData('countryCode', 'adyen_abstract', $store->getId());
+
+        if($countryCode != "") {
+            return $countryCode;
+        }
+
         $billingParams = Mage::app()->getRequest()->getParam('billing');
         if (isset($billingParams['country_id'])) {
             return $billingParams['country_id'];
@@ -305,7 +317,6 @@ class Adyen_Payment_Model_Observer {
 
         return null;
     }
-
 
     /**
      * @return bool|int
