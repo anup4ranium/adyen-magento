@@ -97,4 +97,12 @@ class Adyen_Payment_Adminhtml_Adyen_Event_QueueController extends Mage_Adminhtml
         $this->_redirect('*/*/');
     }
 
+    /**
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('sales/adyen_payment');
+    }
+
 }
