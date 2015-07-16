@@ -63,7 +63,7 @@ $_recurringDetails = $this->getRecurringDetails();
 
                 <?php if(! $this->isRecurring()):
                     // set max lenght cvc code
-                    if($recurringDetails["variant"] == "amex") {
+                    if($_recurringDetails["variant"] == "amex") {
                         $maxLenght = "4";
                         $class = "validate-length maximum-length-4 minimum-length-4 validate-digits";
                     } else {
