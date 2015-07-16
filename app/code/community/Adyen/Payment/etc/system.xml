@@ -112,7 +112,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <sort_order>30</sort_order>
-                            <frontend_model>paypal/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <order_status translate="label">
                                     <label>New order status</label>
@@ -246,7 +246,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <sort_order>40</sort_order>
-                            <frontend_model>paypal/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <notification_username translate="label">
                                     <label>Notification Username</label>
@@ -343,7 +343,7 @@
                             <!--<show_in_website>1</show_in_website>-->
                             <!--<show_in_store>1</show_in_store>-->
                             <sort_order>50</sort_order>
-                            <frontend_model>paypal/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <comment>
                                 <![CDATA[
                                 <p>
@@ -381,7 +381,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <sort_order>60</sort_order>
-                            <frontend_model>paypal/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <ws_username_test translate="label">
                                     <label>Adyen ws username for Test</label>
@@ -457,7 +457,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <sort_order>220</sort_order>
-                            <frontend_model>paypal/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <payment_cancelled_redirect>
                                     <label>Redirect to page after cancellation</label>

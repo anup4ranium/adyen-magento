@@ -721,7 +721,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
      * Create billing agreement by token specified in request
      *
      * @param Mage_Payment_Model_Billing_AgreementAbstract $agreement
-     * @return Mage_Paypal_Model_Method_Agreement
+     * @return Exception
      */
     public function placeBillingAgreement(Mage_Payment_Model_Billing_AgreementAbstract $agreement)
     {
@@ -734,7 +734,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
      * Init billing agreement
      *
      * @param Mage_Payment_Model_Billing_AgreementAbstract $agreement
-     * @return Mage_Paypal_Model_Method_Agreement
+     * @return Exception
      */
     public function initBillingAgreementToken(Mage_Payment_Model_Billing_AgreementAbstract $agreement)
     {

@@ -24,27 +24,13 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
+
 /**
- * Fieldset renderer for Adyen export settings button
+ * Fielset renderer which expanded by default
  */
-class Adyen_Payment_Block_Adminhtml_System_Config_Fieldset_Fieldset
-        extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
+class Adyen_Payment_Block_Adminhtml_System_Config_Fieldset_Expanded
+    extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
 {
-
-    /**
-     * Get config data model
-     *
-     * @return Mage_Adminhtml_Model_Config_Data
-     */
-    protected function _getConfigDataModel()
-    {
-        if (!$this->hasConfigDataModel()) {
-            $this->setConfigDataModel(Mage::getSingleton('adminhtml/config_data'));
-        }
-
-        return $this->getConfigDataModel();
-    }
-
     /**
      * Return collapse state
      *
@@ -58,6 +44,6 @@ class Adyen_Payment_Block_Adminhtml_System_Config_Fieldset_Fieldset
             return $extra['configState'][$element->getId()];
         }
 
-        return false;
+        return true;
     }
 }
