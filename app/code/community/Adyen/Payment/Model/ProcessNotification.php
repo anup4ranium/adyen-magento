@@ -238,6 +238,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $valueArray = $params->getData('amount');
         if($valueArray && is_array($valueArray)) {
             $this->_value = isset($valueArray['value']) ? $valueArray['value'] : "";
+        } elseif(is_object($valueArray)) {
+            $this->_value = $valueArray->value; // for soap
         }
 
         $additionalData = $params->getData('additionalData');
