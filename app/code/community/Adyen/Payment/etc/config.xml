@@ -285,6 +285,7 @@
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
                 <payment_cancelled_redirect>checkout/cart</payment_cancelled_redirect>
                 <capture_mode>auto</capture_mode>
+                <create_pending_invoice>0</create_pending_invoice>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <auto_capture_openinvoice>0</auto_capture_openinvoice>
                 <paypal_capture_mode>0</paypal_capture_mode>

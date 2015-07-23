@@ -735,7 +735,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         if (!$this->_isAutoCapture($order)) {
             $order->addStatusHistoryComment(Mage::helper('adyen')->__('Capture Mode set to Manual'));
             $order->sendOrderUpdateEmail($_mail);
-            $this->_debugData['_prepareInvoice done'] = 'Capture mode is set to Manual so don\'t create an invoice wait for the capture notification';
+            $this->_debugData['_prepareInvoice capture mode'] = 'Capture mode is set to Manual';
 
             // show message if order is in manual review
             if($this->_fraudManualReview) {
@@ -747,7 +747,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
                 }
             }
-            return;
+
+            $createPendingInvoice = (bool) $this->_getConfigData('create_pending_invoice', 'adyen_abstract', $order->getStoreId());
+            if(!$createPendingInvoice) {
+                $this->_debugData['_prepareInvoice done'] = 'Setting pending invoice is off so don\'t create an invoice wait for the capture notification';
+                return;
+            }
         }
 
         // validate if amount is total amount
@@ -823,7 +828,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
                 // set transaction id so you can do a online refund from credit memo
                 $invoice->setTransactionId(1);
-                $invoice->register()->pay();
+
+                $autoCapture = $this->_isAutoCapture($order);
+                $createPendingInvoice = (bool) $this->_getConfigData('create_pending_invoice', 'adyen_abstract', $order->getStoreId());
+
+                if((!$autoCapture) && ($createPendingInvoice)) {
+                    $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::NOT_CAPTURE);
+                    $invoice->register();
+                } else {
+                    $invoice->register()->pay();
+                }
+
                 $invoice->save();
 
                 $this->_debugData['_createInvoice done'] = 'Created invoice';
