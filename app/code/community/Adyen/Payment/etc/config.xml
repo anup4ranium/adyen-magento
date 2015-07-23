@@ -389,6 +389,7 @@
                 <group>adyen</group>
                 <title>Adyen OneClick</title>
                 <sort_order>1</sort_order>
+                <recurring_payment_type>ONECLICK</recurring_payment_type>
             </adyen_oneclick>
             <adyen_elv translate="title" module="adyen">
                 <active>0</active>

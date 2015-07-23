@@ -246,6 +246,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $this->_initService($storeId);
         $merchantAccount = trim($this->_getConfigData('merchantAccount', 'adyen_abstract', $storeId));
         $recurringType = $this->_getConfigData('recurringtypes', 'adyen_abstract', $storeId);
+        $recurringPaymentType = $this->_getConfigData('recurring_payment_type', 'adyen_oneclick', $storeId);
         $enableMoto = (int) $this->_getConfigData('enable_moto', 'adyen_cc', $storeId);
         $modificationResult = Mage::getModel('adyen/adyen_data_modificationResult');
         $requestData = Mage::getModel('adyen/adyen_data_modificationRequest')
@@ -254,7 +255,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         switch ($request) {
             case "authorise":
                 $requestData = Mage::getModel('adyen/adyen_data_paymentRequest')
-                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount,$recurringType, $enableMoto);
+                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount,$recurringType, $recurringPaymentType, $enableMoto);
 
                 $response = $this->_service->authorise(array('paymentRequest' => $requestData));
                 break;

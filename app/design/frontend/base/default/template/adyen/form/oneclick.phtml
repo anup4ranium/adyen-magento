@@ -61,7 +61,7 @@ $_recurringDetails = $this->getRecurringDetails();
                     </div>
                 </div>
 
-                <?php if(! $this->isRecurring()):
+                <?php if( $this->showCvc()):
                     // set max lenght cvc code
                     if($_recurringDetails["variant"] == "amex") {
                         $maxLenght = "4";

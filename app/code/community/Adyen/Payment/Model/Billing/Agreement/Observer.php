@@ -70,7 +70,14 @@ class Adyen_Payment_Model_Billing_Agreement_Observer
         $baCollection->addActiveFilter();
 
         foreach ($baCollection as $billingAgreement) {
-            $this->_createPaymentMethodFromBA($billingAgreement, $store);
+
+            // Only show payment methods that are enabled by the merchant
+            $agreementData = json_decode($billingAgreement->agreement_data, true);
+            $recurringPaymentType = Mage::getStoreConfig('payment/adyen_oneclick/recurring_payment_type', $store);
+
+            if(isset($agreementData['recurring_type']) && ($agreementData['recurring_type'] == $recurringPaymentType || $agreementData['recurring_type'] == "ONECLICK,RECURRING")) {
+                $this->_createPaymentMethodFromBA($billingAgreement, $store);
+            }
         }
 
         Varien_Profiler::stop(__CLASS__.'::'.__FUNCTION__);

@@ -32,8 +32,7 @@ class Adyen_Payment_Model_Api extends Mage_Core_Model_Abstract
 
     protected $_recurringTypes = [
         self::RECURRING_TYPE_ONECLICK,
-        self::RECURRING_TYPE_RECURRING,
-        self::RECURRING_TYPE_ONECLICK_RECURRING
+        self::RECURRING_TYPE_RECURRING
     ];
 
     protected $_paymentMethodMap;
@@ -70,10 +69,21 @@ class Adyen_Payment_Model_Api extends Mage_Core_Model_Abstract
         $recurringContracts = [];
         foreach ($this->_recurringTypes as $recurringType) {
             try {
-                $recurringContracts = array_merge($recurringContracts, $this->listRecurringContractByType($shopperReference, $store, $recurringType));
+                // merge ONECLICK and RECURRING into one record with recurringType ONECLICK,RECURRING
+                $listRecurringContractByType = $this->listRecurringContractByType($shopperReference, $store, $recurringType);
+
+                foreach($listRecurringContractByType as $recurringContract) {
+                    $recurringDetailReference = $recurringContract['recurringDetailReference'];
+                    // check if recurring reference is already in array
+                    if(isset($recurringContracts[$recurringDetailReference])) {
+                        // recurring reference already exists so recurringType is possible for ONECLICK and RECURRING
+                        $recurringContracts[$recurringDetailReference]['recurring_type']= "ONECLICK,RECURRING";
+                    } else {
+                        $recurringContracts[$recurringDetailReference] = $recurringContract;
+                    }
+                }
             } catch (Adyen_Payment_Exception $exception) { }
         }
-
         return $recurringContracts;
     }
 
@@ -132,8 +142,8 @@ class Adyen_Payment_Model_Api extends Mage_Core_Model_Abstract
         // unset the recurringDetailsResult because this is not a card
         unset($recurringContracts["recurringDetailsResult"]);
 
-        foreach ($recurringContracts as &$recurringContract) {
-            $recurringContract += $recurringContractExtra;
+        foreach ($recurringContracts as $key => $recurringContract) {
+            $recurringContracts[$key] = $recurringContracts[$key] + $recurringContractExtra;
         }
 
         return $recurringContracts;

@@ -71,6 +71,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $paymentMethod = null,
         $merchantAccount = null,
         $recurringType = null,
+        $recurringPaymentType = null,
         $enableMoto = null
     ) {
         $order = $payment->getOrder();
@@ -92,19 +93,27 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $this->shopperIP = $order->getRemoteIp();
         $this->shopperReference = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
 
-        // add recurring type for oneclick and recurring
+        // Set the recurring contract
         if($recurringType) {
-            /**
-             * if user uncheck the checkbox store creditcard don't set ONECLICK in the recurring contract
-             * for contracttype  oneclick,recurring it means it will use recurring and if contracttype is recurring this can stay on recurring
-             */
-            if ($paymentMethod == 'oneclick' && $recurringType == 'ONECLICK,RECURRING') {
-                $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
-                $this->recurring->contract = "RECURRING";
-            } elseif($paymentMethod == "cc" && $payment->getAdditionalInformation("store_cc") == "" && $recurringType == "ONECLICK,RECURRING") {
-                $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
-                $this->recurring->contract = "RECURRING";
-            } elseif(!($paymentMethod == "cc" && $payment->getAdditionalInformation("store_cc") == "" && $recurringType != "RECURRING")) {
+            if($paymentMethod == "oneclick") {
+                // For ONECLICK look at the recurringPaymentType that the merchant has selected in Adyen ONECLICK settings
+                if($recurringPaymentType == "RECURRING") {
+                    $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                    $this->recurring->contract = "RECURRING";
+                } else {
+                    $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                    $this->recurring->contract = "ONECLICK";
+                }
+            } elseif($paymentMethod == "cc") {
+                // if save card is disabled only shoot in as recurring if recurringType is set to ONECLICK,RECURRING
+                if($payment->getAdditionalInformation("store_cc") == "" && $recurringType == "ONECLICK,RECURRING") {
+                    $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                    $this->recurring->contract = "RECURRING";
+                } elseif($payment->getAdditionalInformation("store_cc") == "1") {
+                    $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                    $this->recurring->contract = $recurringType;
+                }
+            } else {
                 $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                 $this->recurring->contract = $recurringType;
             }
@@ -164,14 +173,14 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
 
                 if($paymentMethod == "oneclick") {
                     $recurringDetailReference = $payment->getAdditionalInformation("recurring_detail_reference");
+
+                    if($recurringType == "RECURRING") {
+                        $this->shopperInteraction = "ContAuth";
+                    } else {
+                        $this->shopperInteraction = "Ecommerce";
+                    }
                 } else {
                     $recurringDetailReference = null;
-                }
-
-                // set shopperInteraction
-                if($recurringType == "RECURRING" || $recurringType == 'ONECLICK,RECURRING') {
-                    $this->shopperInteraction = "ContAuth";
-                } else {
                     $this->shopperInteraction = "Ecommerce";
                 }
 

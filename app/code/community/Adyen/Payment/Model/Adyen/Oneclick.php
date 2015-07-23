@@ -115,17 +115,10 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     /**
      * @return bool
      */
-    public function isRecurring()
+    public function getRecurringPaymentType()
     {
-        $recurringType = $this->_getConfigData('recurringtypes');
-        if(in_array($recurringType, array(
-            Adyen_Payment_Model_Api::RECURRING_TYPE_ONECLICK_RECURRING,
-            Adyen_Payment_Model_Api::RECURRING_TYPE_RECURRING
-        ))) {
-            return true;
-        }
-
-        return false;
+        $recurringPaymentType = $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
+        return $recurringPaymentType;
     }
 
 
