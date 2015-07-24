@@ -78,11 +78,7 @@ class Adyen_Payment_Block_Form_Oneclick extends Adyen_Payment_Block_Form_Cc {
      * @return mixed
      */
     public function showCvc() {
-        $recurringType = $this->getMethod()->getRecurringPaymentType();
-        if($recurringType == "ONECLICK") {
-            return true;
-        }
-        return false;
+        return $this->getMethod()->hasCustomerInteraction();
     }
 
 

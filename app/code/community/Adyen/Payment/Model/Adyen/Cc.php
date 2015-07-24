@@ -162,4 +162,16 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract
 
         return $adyFields;
     }
+
+    public function canCreateAdyenSubscription() {
+
+        // validate if recurringType is correctly configured
+        $recurringType = $this->_getConfigData('recurringtypes', 'adyen_abstract');
+        if($recurringType == "RECURRING" || $recurringType == "ONECLICK,RECURRING") {
+            return true;
+        }
+        return false;
+
+        // TODO: add config where merchant can set the payment types that are available for subscription
+    }
 }

@@ -32,7 +32,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_infoBlockType = 'adyen/info_oneclick';
     protected $_paymentMethod = 'oneclick';
     protected $_canUseInternal = true; // not possible through backoffice interface
-
+    private $_customerInteraction;
 
     /**
      * Ability to set the code, for dynamic payment methods.
@@ -111,16 +111,26 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         return $this;
     }
 
-
     /**
-     * @return bool
+     * @desc CustoemrInteraction is set by the recurring_payment_type or controlled by Adyen_Subscription module
+     * @param $customerInteraction
      */
-    public function getRecurringPaymentType()
-    {
-        $recurringPaymentType = $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
-        return $recurringPaymentType;
+    public function setCustomerInteraction($customerInteraction) {
+        $this->_customerInteraction = $customerInteraction;
     }
 
+    public function hasCustomerInteraction() {
+        if(!$this->_customerInteraction) {
+
+            $recurringPaymentType = $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
+            if($recurringPaymentType == "ONECLICK") {
+                $this->_customerInteraction = true;
+            }
+            $this->_customerInteraction = false;
+        }
+        return $this->_customerInteraction;
+
+    }
 
     /**
      * @param Adyen_Payment_Model_Billing_Agreement $billingAgreement
@@ -144,6 +154,25 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     public function isBillingAgreement()
     {
         return true;
+    }
+
+    public function canCreateAdyenSubscription() {
+
+        // get storeId
+        if(Mage::app()->getStore()->isAdmin()) {
+            $store = Mage::getSingleton('adminhtml/session_quote')->getStore();
+        } else {
+            $store = Mage::app()->getStore();
+        }
+        $storeId = $store->getId();
+
+        // Only cards that are saved as RECURRING or ONECLICK,RECURRING can be used for subscription
+        $recurringType = $this->getConfigData('recurring_type', $storeId);
+        if($recurringType == "RECURRING" || $recurringType == "ONECLICK,RECURRING") {
+            return true;
+        }
+        // TODO: add config where merchant can set the payment types that are available for subscription
+        return false;
     }
 
     /**
