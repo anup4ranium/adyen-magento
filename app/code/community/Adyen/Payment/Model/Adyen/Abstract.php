@@ -282,6 +282,13 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 break;
         }
 
+
+        // log the request
+        Mage::getResourceModel('adyen/adyen_debug')->assignData($response);
+        $this->_debugAdyen();
+        Mage::log($this->_pci()->obscureSensitiveData($requestData), self::DEBUG_LEVEL, "$request.log", true);
+
+
         if (!empty($response)) {
             $this->_processResponse($payment, $response, $request);
         }
@@ -292,10 +299,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $cacheKey = $merchantAccount . "|" . $payment->getOrder()->getCustomerId() . "|" . $recurringType;
         Mage::app()->getCache()->remove($cacheKey);
 
-        //debug || log
-        Mage::getResourceModel('adyen/adyen_debug')->assignData($response);
-        $this->_debugAdyen();
-        Mage::log($this->_pci()->obscureSensitiveData($requestData), self::DEBUG_LEVEL, "$request.log", true);
+        // log the result
         Mage::log("Response from Adyen:", self::DEBUG_LEVEL, "$request.log", true);
         Mage::log($this->_pci()->obscureSensitiveData($response), self::DEBUG_LEVEL, "$request.log", true);
 
