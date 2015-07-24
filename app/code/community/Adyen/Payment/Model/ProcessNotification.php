@@ -865,13 +865,18 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _isAutoCapture($order)
     {
         $captureMode = trim($this->_getConfigData('capture_mode', 'adyen_abstract', $order->getStoreId()));
-        $sepaFlow = trim($this->_getConfigData('capture_mode', 'adyen_sepa', $order->getStoreId()));
+        $sepaFlow = trim($this->_getConfigData('flow', 'adyen_sepa', $order->getStoreId()));
         $_paymentCode = $this->_paymentMethodCode($order);
         $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract', $order->getStoreId());
         $captureModePayPal = trim($this->_getConfigData('paypal_capture_mode', 'adyen_abstract', $order->getStoreId()));
 
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->_isBankTransfer($this->_paymentMethod);
+
+        // if you are using authcap the payment method is manual. There will be a capture send to indicate if payment is succesfull
+        if($_paymentCode == "adyen_sepa" && $sepaFlow == "authcap") {
+            return false;
+        }
 
         // payment method ideal, cash adyen_boleto or adyen_pos has direct capture
         if (strcmp($this->_paymentMethod, 'ideal') === 0 || strcmp($this->_paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap") || $_paymentCode == "adyen_boleto") {
