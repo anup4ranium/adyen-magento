@@ -649,23 +649,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         return Mage::helper('adyen')->getConfigDataWsPassword($storeId);
     }
 
-    /**
-     * @since 0.0.2
-     */
-    public function getAvailableCCTypes() {
-        $types = Mage::helper('adyen')->getCcTypes();
-        $availableTypes = $this->_getConfigData('cctypes', 'adyen_cc');
-        if ($availableTypes) {
-            $availableTypes = explode(',', $availableTypes);
-            foreach ($types as $code => $name) {
-                if (!in_array($code, $availableTypes)) {
-                    unset($types[$code]);
-                }
-            }
-        }
-        return $types;
-    }
-
     public function getAvailableBoletoTypes() {
         $types = Mage::helper('adyen')->getBoletoTypes();
         $availableTypes = $this->_getConfigData('boletotypes', 'adyen_boleto');

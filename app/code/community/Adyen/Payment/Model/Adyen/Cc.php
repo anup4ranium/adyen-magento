@@ -33,6 +33,7 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract
     protected $_infoBlockType = 'adyen/info_cc';
     protected $_paymentMethod = 'cc';
     protected $_canCreateBillingAgreement = true;
+    protected $_ccTypes;
 
     /**
      * 1) Called everytime the adyen_cc is called or used in checkout
@@ -163,6 +164,34 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract
         return $adyFields;
     }
 
+    /**
+     * @desc setAvailableCCypes to remove MAESTRO as creditcard type for the Adyen_Subscription module
+     * @param $ccTypes
+     */
+    public function setAvailableCCypes($ccTypes) {
+        $this->_ccTypes = $ccTypes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAvailableCCTypes() {
+        if(!$this->_ccTypes) {
+            $types = Mage::helper('adyen')->getCcTypes();
+            $availableTypes = $this->_getConfigData('cctypes', 'adyen_cc');
+            if ($availableTypes) {
+                $availableTypes = explode(',', $availableTypes);
+                foreach ($types as $code => $name) {
+                    if (!in_array($code, $availableTypes)) {
+                        unset($types[$code]);
+                    }
+                }
+            }
+            $this->_ccTypes = $types;
+        }
+        return $this->_ccTypes;
+    }
+
     public function canCreateAdyenSubscription() {
 
         // validate if recurringType is correctly configured
@@ -171,7 +200,5 @@ class Adyen_Payment_Model_Adyen_Cc extends Adyen_Payment_Model_Adyen_Abstract
             return true;
         }
         return false;
-
-        // TODO: add config where merchant can set the payment types that are available for subscription
     }
 }

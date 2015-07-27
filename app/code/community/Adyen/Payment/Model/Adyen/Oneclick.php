@@ -112,7 +112,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     }
 
     /**
-     * @desc CustoemrInteraction is set by the recurring_payment_type or controlled by Adyen_Subscription module
+     * @desc CustomerInteraction is set by the recurring_payment_type or controlled by Adyen_Subscription module
      * @param $customerInteraction
      */
     public function setCustomerInteraction($customerInteraction) {
@@ -228,5 +228,17 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         }
 
         return $this;
+    }
+
+    public function getRecurringDetails() {
+
+        if(Mage::app()->getStore()->isAdmin()) {
+            $storeId = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
+        } else {
+            $storeId = Mage::app()->getStore()->getStoreId();
+        }
+
+        $recurringDetails = Mage::getStoreConfig("payment/".$this->getCode(), $storeId);
+        return $recurringDetails;
     }
 }
