@@ -199,9 +199,10 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
 
 				if (Mage::getModel('adyen/adyen_cc')->isCseEnabled()) {
 
+                    $this->card = null;
+
                     // this is only needed for creditcards
                     if($payment->getAdditionalInformation("encrypted_data") != "") {
-                        $this->card = null;
                         $kv = new Adyen_Payment_Model_Adyen_Data_AdditionalDataKVPair();
                         $kv->key = new SoapVar("card.encrypted.json", XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
                         $kv->value = new SoapVar($payment->getAdditionalInformation("encrypted_data"), XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
