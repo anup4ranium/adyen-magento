@@ -102,4 +102,31 @@ class Adyen_Payment_Model_Billing_Agreement
 
         return $this->getData('customer_reference');
     }
+
+    /**
+     * Payment method instance
+     *
+     * @var Mage_Payment_Model_Method_Abstract
+     */
+    protected $_paymentMethodInstance = null;
+
+    /**
+     * Retreive payment method instance
+     *
+     * @return Mage_Payment_Model_Method_Abstract
+     */
+    public function getPaymentMethodInstance()
+    {
+        if (is_null($this->_paymentMethodInstance)) {
+            $methodCode = $this->getMethodCode();
+            $referenceId = $this->getReferenceId();
+            $methodInstanceName = $methodCode . "_" . $referenceId;
+            $this->_paymentMethodInstance = Mage::helper('payment')->getMethodInstance($methodInstanceName);
+        }
+        if ($this->_paymentMethodInstance) {
+            $this->_paymentMethodInstance->setStore($this->getStoreId());
+        }
+        return $this->_paymentMethodInstance;
+    }
+
 }
