@@ -34,6 +34,29 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_canUseInternal = true; // not possible through backoffice interface
     private $_customerInteraction;
 
+
+    public function isAvailable($quote=null) {
+        $isAvailble = parent::isAvailable($quote);
+
+        // extra check if contract_type is allowed
+        if($isAvailble) {
+            $recurringPaymentType = $this->getRecurringPaymentType();
+            $recurringDetails = $this->getRecurringDetails();
+
+            if(isset($recurringDetails['recurring_type'])) {
+
+                $result = strpos($recurringDetails['recurring_type'], $recurringPaymentType);
+
+                if($result !== false) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return $isAvailble;
+    }
+
     /**
      * Ability to set the code, for dynamic payment methods.
      * @param $code
@@ -121,15 +144,20 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
 
     public function hasCustomerInteraction() {
         if(!$this->_customerInteraction) {
-
-            $recurringPaymentType = $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
+            $recurringPaymentType = $this->getRecurringPaymentType();
             if($recurringPaymentType == "ONECLICK") {
                 $this->_customerInteraction = true;
+            } else {
+                $this->_customerInteraction = false;
             }
-            $this->_customerInteraction = false;
         }
         return $this->_customerInteraction;
 
+    }
+
+    public function getRecurringPaymentType()
+    {
+     return $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
     }
 
     /**
@@ -146,6 +174,12 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
             $recurringDetailReference = $billingAgreement->getReferenceId();
             $paymentInfo->setMethod('adyen_oneclick_'.$recurringDetailReference);
             $paymentInfo->setAdditionalInformation('recurring_detail_reference', $recurringDetailReference);
+
+            // set the ccType needed for Sepa, Sofort and Ideal
+            $agreementData = $billingAgreement->getAgreementData();
+            if(isset($agreementData['variant'])) {
+                $paymentInfo->setCcType($agreementData['variant']);
+            }
         } catch(Exception $e) {
             Adyen_Payment_Exception::logException($e);
         }
@@ -175,7 +209,6 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         if($recurringType == "RECURRING" || $recurringType == "ONECLICK,RECURRING") {
             return true;
         }
-        // TODO: add config where merchant can set the payment types that are available for subscription
         return false;
     }
 
