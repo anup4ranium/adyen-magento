@@ -73,13 +73,16 @@ class Adyen_Payment_Model_Api extends Mage_Core_Model_Abstract
                 $listRecurringContractByType = $this->listRecurringContractByType($shopperReference, $store, $recurringType);
 
                 foreach($listRecurringContractByType as $recurringContract) {
-                    $recurringDetailReference = $recurringContract['recurringDetailReference'];
-                    // check if recurring reference is already in array
-                    if(isset($recurringContracts[$recurringDetailReference])) {
-                        // recurring reference already exists so recurringType is possible for ONECLICK and RECURRING
-                        $recurringContracts[$recurringDetailReference]['recurring_type']= "ONECLICK,RECURRING";
-                    } else {
-                        $recurringContracts[$recurringDetailReference] = $recurringContract;
+
+                    if(isset($recurringContract['recurringDetailReference'])) {
+                        $recurringDetailReference = $recurringContract['recurringDetailReference'];
+                        // check if recurring reference is already in array
+                        if(isset($recurringContracts[$recurringDetailReference])) {
+                            // recurring reference already exists so recurringType is possible for ONECLICK and RECURRING
+                            $recurringContracts[$recurringDetailReference]['recurring_type']= "ONECLICK,RECURRING";
+                        } else {
+                            $recurringContracts[$recurringDetailReference] = $recurringContract;
+                        }
                     }
                 }
             } catch (Adyen_Payment_Exception $exception) { }
