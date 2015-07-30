@@ -179,6 +179,13 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     } else {
                         $this->shopperInteraction = "ContAuth";
                     }
+
+                    // For recurring Ideal and Sofort needs to be converted to SEPA for this it is mandatory to set selectBrand to sepadirectdebit
+                    if(!$payment->getMethodInstance()->hasCustomerInteraction()) {
+                        if($payment->getCcType() == "directEbanking" || $payment->getCcType() == "ideal") {
+                            $this->selectedBrand = "sepadirectdebit";
+                        }
+                    }
                 } else {
                     $recurringDetailReference = null;
                     $this->shopperInteraction = "Ecommerce";
