@@ -741,6 +741,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
      */
     public function updateBillingAgreementStatus(Mage_Payment_Model_Billing_AgreementAbstract $agreement)
     {
+        Mage::dispatchEvent('adyen_payment_update_billing_agreement_status', array('agreement' => $agreement));
+
         $targetStatus = $agreement->getStatus();
         $adyenHelper = Mage::helper('adyen');
 
