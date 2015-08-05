@@ -134,10 +134,12 @@ $_code = $this->getMethodCode();
                     var cvcCodeElem = document.getElementById( '<?php echo $_code; ?>_cc_cid' );
 
                     // first remove classnames
-                    cvcCodeElem.removeClassName('maximum-length-3');
-                    cvcCodeElem.removeClassName('minimum-length-3');
-                    cvcCodeElem.removeClassName('maximum-length-4');
-                    cvcCodeElem.removeClassName('minimum-length-4');
+                    if(cvcCodeElem != null) {
+                        cvcCodeElem.removeClassName('maximum-length-3');
+                        cvcCodeElem.removeClassName('minimum-length-3');
+                        cvcCodeElem.removeClassName('maximum-length-4');
+                        cvcCodeElem.removeClassName('minimum-length-4');
+                    }
 
                     if(selectedCardType == null) {
                         // error do nothing
