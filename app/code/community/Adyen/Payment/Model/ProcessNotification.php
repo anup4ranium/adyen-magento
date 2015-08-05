@@ -532,14 +532,16 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                             }
                         }
 
-                        // check if all references still are active on Adyen platform. If not set them to status canceled
+                        // update status of the agreements in magento
                         $billingAgreements = Mage::getResourceModel('adyen/billing_agreement_collection')
-                            ->addFieldToFilter('customer_id', $agreement->getCustomerReference())
-                            ->addFieldToFilter('status', Adyen_Payment_Model_Billing_Agreement::STATUS_ACTIVE);
+                            ->addFieldToFilter('customer_id', $agreement->getCustomerReference());
 
                         foreach($billingAgreements as $billingAgreement) {
                             if(!in_array($billingAgreement->getReferenceId(), $recurringReferencesList)) {
                                 $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_CANCELED);
+                                $billingAgreement->save();
+                            } else {
+                                $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_ACTIVE);
                                 $billingAgreement->save();
                             }
                         }
