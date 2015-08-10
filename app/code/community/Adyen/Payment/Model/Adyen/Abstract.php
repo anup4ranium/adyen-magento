@@ -378,6 +378,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                             break;
                         case "803 PaymentDetail not found":
                             $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen because the save card is removed please try an other saved card or payment method.');
+                            break;
                         default:
                             $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
                             break;
@@ -386,7 +387,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
                 }
 
-                $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
                 Adyen_Payment_Exception::throwException($errorMsg);
                 break;
             case "Authorised":
