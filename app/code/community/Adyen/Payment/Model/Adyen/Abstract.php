@@ -290,6 +290,10 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
 
         if (!empty($response)) {
+            // log the result
+            Mage::log("Response from Adyen:", self::DEBUG_LEVEL, "$request.log", true);
+            Mage::log($this->_pci()->obscureSensitiveData($response), self::DEBUG_LEVEL, "$request.log", true);
+
             $this->_processResponse($payment, $response, $request);
         }
 
@@ -298,10 +302,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
          */
         $cacheKey = $merchantAccount . "|" . $payment->getOrder()->getCustomerId() . "|" . $recurringType;
         Mage::app()->getCache()->remove($cacheKey);
-
-        // log the result
-        Mage::log("Response from Adyen:", self::DEBUG_LEVEL, "$request.log", true);
-        Mage::log($this->_pci()->obscureSensitiveData($response), self::DEBUG_LEVEL, "$request.log", true);
 
         //return $this;
         return $response;
@@ -376,6 +376,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                         case "Restricted Card":
                             $errorMsg = Mage::helper('adyen')->__('The card is restricted.');
                             break;
+                        case "803 PaymentDetail not found":
+                            $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen because the save card is removed please try an other saved card or payment method.');
                         default:
                             $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
                             break;
