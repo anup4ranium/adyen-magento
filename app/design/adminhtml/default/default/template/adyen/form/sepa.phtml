@@ -63,6 +63,13 @@ $_code=$this->getMethodCode();
             </select>
         </div>
     </li>
+
+    <li>
+        <div class="input-box">
+            <input class="required-entry" type="checkbox" name="payment[accept_sepa]" id="<?php echo $_code ?>_accept_sepa" />
+            <label for="<?php echo $_code ?>_accept_sepa"><?php echo $this->__('I agree that the above amount will be debited from my bank account.') ?></label>
+        </div>
+    </li>
 </ul>
 
 <div>

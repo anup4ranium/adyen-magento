@@ -51,7 +51,8 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract
         $sepa = array(
             'account_name' => $data->getAccountName(),
             'iban' => $data->getIban(),
-            'country' => $data->getCountry()
+            'country' => $data->getCountry(),
+            'accept_sepa' => $data->getAcceptSepa()
         );
 
         $info = $this->getInfoInstance();
@@ -62,7 +63,6 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract
                 ->setCcNumberEnc($data->getBankCode())
                 ->setPoNumber(serialize($sepa)); /* @note misused field for the elv */
 
-        $info->setAcceptSepa($data->getAcceptSepa());
         return $this;
     }
 
@@ -71,18 +71,16 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract
         parent::validate();
 
         $info = $this->getInfoInstance();
+        $sepa = unserialize($info->getPoNumber());
 
-        if(!$info->getAcceptSepa()) {
+        if(!$sepa['accept_sepa']) {
             $errorMsg = Mage::helper('adyen')->__('Please accept the conditions for a SEPA direct debit.');
             Mage::throwException($errorMsg);
         }
-
         // check if validator is on
         $ibanValidation = $this->_getConfigData("validate_iban", "adyen_sepa");
 
         if($ibanValidation) {
-
-            $sepa = unserialize($info->getPoNumber());
 
             if(!$this->validateIban($sepa['iban']) || empty($sepa['iban'])){
                 $errorCode = 'invalid_data';
