@@ -144,14 +144,13 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 $this->shopperName = null;
             	$this->elv = null;
                 $this->bankAccount = null;
-                $this->deliveryAddress = new Adyen_Payment_Model_Adyen_Data_DeliveryAddress();
-                $this->billingAddress = new Adyen_Payment_Model_Adyen_Data_BillingAddress();
 
                 $billingAddress = $order->getBillingAddress();
                 $helper = Mage::helper('adyen');
 
                 if($billingAddress)
                 {
+                    $this->billingAddress = new Adyen_Payment_Model_Adyen_Data_BillingAddress();
                     $this->billingAddress->street = $helper->getStreet($billingAddress)->getName();
                     $this->billingAddress->houseNumberOrName = $helper->getStreet($billingAddress)->getHouseNumber();
                     $this->billingAddress->city = $billingAddress->getCity();
@@ -163,6 +162,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 $deliveryAddress = $order->getShippingAddress();
                 if($deliveryAddress)
                 {
+                    $this->deliveryAddress = new Adyen_Payment_Model_Adyen_Data_DeliveryAddress();
                     $this->deliveryAddress->street = $helper->getStreet($billingAddress)->getName();
                     $this->deliveryAddress->houseNumberOrName = $helper->getStreet($billingAddress)->getHouseNumber();
                     $this->deliveryAddress->city = $billingAddress->getCity();
