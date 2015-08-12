@@ -33,7 +33,7 @@ $_code = $this->getMethodCode();
     <li class="adyen_payment_creditcard_labels">
         <?php $count = 0;
         foreach ($this->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
-            <?php $_filename = $this->getSkinUrl('images'.DS.'adyen'.DS. strtolower($_typeCode) . "_small.png"); ?>
+            <?php $_filename = $this->getSkinUrl('images/adyen/' . strtolower($_typeCode) . '_small.png'); ?>
             <img id="cc_type_<?php echo $count; ?>" width="40" height="22" src="<?php echo $_filename; ?>" alt="" class="mid" />
             <?php ++$count;
         endforeach; ?>
