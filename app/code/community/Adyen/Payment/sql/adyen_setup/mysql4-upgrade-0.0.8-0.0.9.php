@@ -28,7 +28,6 @@
 
 /** @var Adyen_Payment_Model_Resource_Setup $installer */
 $installer = $this;
+
 /* @var $installer Adyen_Payment_Model_Resource_Setup */
-$installer->removeAttribute('order_payment', 'adyen_event_code');
-$installer->addAttribute('order_payment', 'adyen_event_code', array());
 $installer->addAttribute('order_payment', 'adyen_payment_method', array());
