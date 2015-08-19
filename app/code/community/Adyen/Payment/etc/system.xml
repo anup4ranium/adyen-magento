@@ -237,6 +237,17 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </fraud_manual_review_status>
+                                <fraud_manual_review_accept_status>
+                                    <label>Manual Review Accepted Status</label>
+                                    <comment>If you do not have an action defined when you accept a manual review you can define a status here. If you have already an action that will be executed or don't want a seperate status please keep it on -- Please Select --</comment>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_order_status_processing</source_model>
+                                    <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
+                                    <sort_order>260</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </fraud_manual_review_accept_status>
                             </fields>
                         </order_process>
                         <order_notifications type="group" translate="label comment">

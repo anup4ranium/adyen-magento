@@ -825,6 +825,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         return $this->_getConfigData('fraud_manual_review_status', 'adyen_abstract', $order->getStoreId());
     }
 
+    protected function _getFraudManualReviewAcceptStatus($order)
+    {
+        return $this->_getConfigData('fraud_manual_review_accept_status', 'adyen_abstract', $order->getStoreId());
+    }
+
     protected function _isTotalAmount($orderAmount) {
 
         $this->_debugData['_isTotalAmount'] = 'Validate if AUTHORISATION notification has the total amount of the order';
@@ -1114,6 +1119,16 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $pendingStatus;
                 return;
             }
+        }
+
+        // if manual review is accepted and a status is selected. Change the status through this comment history item
+        if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT
+            && $this->_getFraudManualReviewAcceptStatus($order) != "")
+        {
+            $manualReviewAcceptStatus = $this->_getFraudManualReviewAcceptStatus($order);
+            $order->addStatusHistoryComment($comment, $manualReviewAcceptStatus);
+            $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $manualReviewAcceptStatus;
+            return;
         }
 
         $order->addStatusHistoryComment($comment);
