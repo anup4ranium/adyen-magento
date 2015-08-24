@@ -310,7 +310,6 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
-                                            <depends><capture_mode>manual</capture_mode></depends>
                                         </create_pending_invoice>
                                         <auto_capture_openinvoice>
                                             <label>Auto capture Openinvoice(AfterPay/Klarna) payment methods</label>
