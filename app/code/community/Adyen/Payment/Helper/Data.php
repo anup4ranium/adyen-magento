@@ -25,8 +25,9 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
-
+class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
+{
+    const XML_PATH_HPP_PAYMENT_METHOD_FEE   = 'payment/adyen_hpp/fee';
     /**
      * @return array
      */
@@ -180,14 +181,28 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
      */
     public function isPaymentFeeEnabled($object)
     {
-        $fee = Mage::getStoreConfig('payment/adyen_openinvoice/fee');
         $paymentMethod = $object->getPayment()->getMethod() ;
-        if ($paymentMethod == 'adyen_openinvoice' && $fee > 0) {
-            return true;
+
+        if($paymentMethod == 'adyen_openinvoice')
+        {
+            $fee = Mage::getStoreConfig('payment/adyen_openinvoice/fee');
+            if($fee > 0) {
+                return true;
+            }
+        } elseif($paymentMethod == 'adyen_ideal') {
+            $fee = Mage::getStoreConfig('payment/adyen_ideal/fee');
+            if($fee > 0) {
+                return true;
+            }
+        } elseif(substr($paymentMethod,0, 10)  == 'adyen_hpp_') {
+
+            $fee = $this->getHppPaymentMethodFee($paymentMethod);
+            if($fee) {
+                return true;
+            }
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
 
 
@@ -197,8 +212,46 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data {
      */
     public function getPaymentFeeAmount($object)
     {
-        return Mage::getStoreConfig('payment/adyen_openinvoice/fee');
+        $paymentMethod = $object->getPayment()->getMethod() ;
+        if ($paymentMethod == 'adyen_openinvoice') {
+            return Mage::getStoreConfig('payment/adyen_openinvoice/fee');
+        } elseif($paymentMethod == 'adyen_ideal') {
+            return Mage::getStoreConfig('payment/adyen_ideal/fee');
+        } elseif(substr($paymentMethod,0, 10)  == 'adyen_hpp_') {
+            return $this->getHppPaymentMethodFee($paymentMethod);
+        }
+        return 0;
     }
+
+    /**
+     * @return array
+     */
+    public function getHppPaymentMethodFees()
+    {
+        $config = Mage::getStoreConfig(self::XML_PATH_HPP_PAYMENT_METHOD_FEE);
+
+        return $config ? unserialize($config) : array();
+    }
+
+    public function getHppPaymentMethodFee($paymentMethod)
+    {
+        $paymentMethod = str_replace('adyen_hpp_', '', $paymentMethod);
+
+        $paymentFees = $this->getHppPaymentMethodFees();
+
+        if($paymentFees && is_array($paymentFees) && !empty($paymentFees)) {
+
+            foreach($paymentFees as $paymentFee) {
+                if(isset($paymentFee['code']) && $paymentFee['code'] == $paymentMethod) {
+                    if(isset($paymentFee['amount']) && $paymentFee['amount'] > 0) {
+                        return $paymentFee['amount'];
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
 
     /**

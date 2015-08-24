@@ -660,6 +660,14 @@
                             <show_in_store>1</show_in_store>
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
+                        <fee translate="label">
+                            <label>Fee</label>
+                            <frontend_model>adyen/adminhtml_system_config_hppPaymentMethodFee</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <comment><![CDATA[]]></comment>
+                        </fee>
                     </fields>
                 </adyen_hpp>
                 <adyen_ideal translate="label" module="adyen">
@@ -699,6 +707,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </show_ideal_logos>
+                        <fee translate="label">
+                            <label>Fee</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>38</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>validate-number</validate>
+                        </fee>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>
