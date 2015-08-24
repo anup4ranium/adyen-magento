@@ -72,9 +72,10 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </version>
-                                <merchantAccount translate="label">
+                                <merchantAccount translate="label comment tooltip">
                                     <label>Merchant Account</label>
                                     <comment><![CDATA[You can find this in the Adyen back-office. The Adyen back-office can be found on <a target="_blank" href="https://ca-test.adyen.com">https://ca-test.adyen.com</a> for test or <a target="_blank" href="https://ca-live.adyen.com">https://ca-live.adyen.com</a> for live.]]></comment>
+                                    <tooltip><![CDATA[ If you did not find it check out our Magento Quick Integration Guide]]></tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/merchantAccount</config_path>
                                     <sort_order>10</sort_order>
@@ -226,28 +227,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </send_email_bank_sepa_on_pending>
-                                <fraud_manual_review_status>
-                                    <label>Manual Review Status</label>
-                                    <comment>If you are using Manual Review and a payment match your case set here the status it should have in magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a seperate status please keep it on -- Please Select --</comment>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adyen/source_status_pending</source_model>
-                                    <config_path>payment/adyen_abstract/fraud_manual_review_status</config_path>
-                                    <sort_order>250</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </fraud_manual_review_status>
-                                <fraud_manual_review_accept_status>
-                                    <label>Manual Review Accepted Status</label>
-                                    <comment>If you do not have an action defined when you accept a manual review you can define a status here. If you have already an action that will be executed or don't want a seperate status please keep it on -- Please Select --</comment>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_order_status_processing</source_model>
-                                    <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
-                                    <sort_order>260</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </fraud_manual_review_accept_status>
                             </fields>
                         </order_process>
                         <order_notifications type="group" translate="label comment">
@@ -524,6 +503,47 @@
                                 </countryCode>
                             </fields>
                         </checkout_experience>
+                        <manual_review type="group" translate="label comment">
+                            <label>Manual Review</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>300</sort_order>
+                            <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
+                            <comment>
+                                <![CDATA[
+                                <p>
+                                    Adyen's Risk analysis tool allows merchants to confgure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
+                                    If you want this to be turned on please contact magento@adyen.com
+                                </p>
+                                ]]>
+                            </comment>
+                            <fields>
+                                <fraud_manual_review_status>
+                                    <label>Manual Review Status</label>
+                                    <comment>If you are using Manual Review and a payment match your case set here the status it should have in magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a seperate status please keep it on -- Please Select --</comment>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adyen/source_status_pending</source_model>
+                                    <config_path>payment/adyen_abstract/fraud_manual_review_status</config_path>
+                                    <sort_order>10</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </fraud_manual_review_status>
+                                <fraud_manual_review_accept_status>
+                                    <label>Manual Review Accepted Status</label>
+                                    <comment>If you do not have an action defined when you accept a manual review you can define a status here. If you have already an action that will be executed or don't want a seperate status please keep it on -- Please Select --</comment>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_order_status_processing</source_model>
+                                    <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
+                                    <sort_order>20</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </fraud_manual_review_accept_status>
+                            </fields>
+                        </manual_review>
                     </fields>
                 </adyen_abstract>
                 <!-- @Hpp only -->
