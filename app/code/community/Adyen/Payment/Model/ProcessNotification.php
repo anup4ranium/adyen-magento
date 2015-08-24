@@ -982,7 +982,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $this->_createInvoice($order);
         }
 
-        $status = $this->_getConfigData('payment_authorized', 'adyen_abstract', $order->getStoreId());
+        // if you have capture on shipment enabled don't set update the status of the payment
+        $captureOnShipment = $this->_getConfigData('capture_on_shipment', 'adyen_abstract', $order->getStoreId());
+        if(!$captureOnShipment) {
+            $status = $this->_getConfigData('payment_authorized', 'adyen_abstract', $order->getStoreId());
+        }
+
         // virtual order can have different status
         if($order->getIsVirtual()) {
             $virtual_status = $this->_getConfigData('payment_authorized_virtual');

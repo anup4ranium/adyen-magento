@@ -192,6 +192,14 @@
                     </adyen_payment_billing_agreement>
                 </observers>
             </controller_action_predispatch>
+            <sales_order_shipment_save_after>
+                <observers>
+                    <adyen_payment_capture_invoice_on_shipment>
+                        <class>adyen/observer</class>
+                        <method>captureInvoiceOnShipment</method>
+                    </adyen_payment_capture_invoice_on_shipment>
+                </observers>
+            </sales_order_shipment_save_after>
         </events>
     </global>
 
@@ -309,7 +317,6 @@
                 <allowspecific>0</allowspecific>
                 <disable_hpptypes>0</disable_hpptypes>
                 <sort_order>30</sort_order>
-                <cache_directory_lookup>0</cache_directory_lookup>
                 <return_url_in_request>0</return_url_in_request>
             </adyen_hpp>
             <adyen_ideal translate="title" module="adyen">

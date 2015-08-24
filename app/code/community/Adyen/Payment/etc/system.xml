@@ -213,6 +213,17 @@
                                                 <show_in_store>0</show_in_store>
                                                 <comment>When an order status is changed, should we send an email</comment>
                                             </send_update_mail>
+                                            <capture_on_shipment>
+                                                <label>Capture on shipment</label>
+                                                <frontend_type>select</frontend_type>
+                                                <comment>If you enable this function it will do a capture request to adyen platform if you do a shipment</comment>
+                                                <source_model>adminhtml/system_config_source_yesno</source_model>
+                                                <config_path>payment/adyen_abstract/capture_on_shipment</config_path>
+                                                <sort_order>205</sort_order>
+                                                <show_in_default>1</show_in_default>
+                                                <show_in_website>1</show_in_website>
+                                                <show_in_store>0</show_in_store>
+                                            </capture_on_shipment>
                                             <send_invoice_update_mail translate="label">
                                                 <label>Invoice email</label>
                                                 <frontend_type>select</frontend_type>

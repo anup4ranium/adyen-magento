@@ -454,4 +454,68 @@ class Adyen_Payment_Model_Observer {
     {
         return strpos($order->getPayment()->getMethod(), 'adyen') !== false;
     }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     */
+    public function captureInvoiceOnShipment(Varien_Event_Observer $observer)
+    {
+
+        /* @noinspection PhpUndefinedMethodInspection */
+        /* @var Mage_Sales_Model_Order_Shipment $shipment */
+        $shipment = $observer->getShipment();
+
+        /** @var Mage_Sales_Model_Order $order */
+        $order = $shipment->getOrder();
+
+        $adyenHelper = Mage::helper('adyen');
+        $storeId = $order->getStoreId();
+
+        $captureOnShipment = $adyenHelper->getConfigData('capture_on_shipment', 'adyen_abstract', $storeId);
+        $createPendingInvoice = $adyenHelper->getConfigData('create_pending_invoice', 'adyen_abstract', $storeId);
+
+        // validate if payment method is adyen and if capture_on_shipment is enabled
+        if($this->isPaymentMethodAdyen($order) && $captureOnShipment) {
+            if($createPendingInvoice) {
+                $transaction = Mage::getModel('core/resource_transaction');
+                $transaction->addObject($order);
+
+                foreach ($order->getInvoiceCollection() as $invoice) {
+                    /* @var Ho_Invoice_Model_Sales_Order_Invoice $invoice */
+                    if (! $invoice->canCapture()) {
+                        continue;
+                    }
+
+                    $invoice->capture();
+                    $invoice->setCreatedAt(now());
+                    $transaction->addObject($invoice);
+                }
+
+                $order->setIsInProcess(true);
+                $transaction->save();
+            } else {
+                // create an invoice and do a capture to adyen
+                if ($order->canInvoice()) {
+                    try {
+                        $invoice = $order->prepareInvoice();
+                        $invoice->getOrder()->setIsInProcess(true);
+
+                        // set transaction id so you can do a online refund from credit memo
+                        $invoice->setTransactionId(1);
+                        $invoice->register()->capture();
+                        $invoice->save();
+                    } catch (Exception $e) {
+                        Mage::logException($e);
+                    }
+
+                    $invoiceAutoMail = (bool) $adyenHelper->getConfigData('send_invoice_update_mail', 'adyen_abstract', $storeId);
+                    if ($invoiceAutoMail) {
+                        $invoice->sendEmail();
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
 }
