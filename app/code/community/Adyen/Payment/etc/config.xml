@@ -352,6 +352,7 @@
                 <group>adyen</group>
                 <title>Cash</title>
                 <sort_order>90</sort_order>
+                <create_shipment>1</create_shipment>
                 <visible_type>both</visible_type>
                 <cash_express_checkout>0</cash_express_checkout>
                 <cash_drawer>0</cash_drawer>
