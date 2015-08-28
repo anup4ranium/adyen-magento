@@ -865,7 +865,15 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 $createPendingInvoice = (bool) $this->_getConfigData('create_pending_invoice', 'adyen_abstract', $order->getStoreId());
 
                 if((!$autoCapture) && ($createPendingInvoice)) {
-                    $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::NOT_CAPTURE);
+
+                    // if amount is zero create a offline invoice
+                    $value = (int)$this->_value;
+                    if($value == 0) {
+                        $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
+                    } else {
+                        $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::NOT_CAPTURE);
+                    }
+
                     $invoice->register();
                 } else {
                     $invoice->register()->pay();
@@ -990,6 +998,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         // virtual order can have different status
         if($order->getIsVirtual()) {
+            $this->_debugData['_setPaymentAuthorized virtual'] = 'Product is a virtual product';
             $virtual_status = $this->_getConfigData('payment_authorized_virtual');
             if($virtual_status != "") {
                 $status = $virtual_status;

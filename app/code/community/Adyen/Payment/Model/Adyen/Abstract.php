@@ -139,6 +139,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $payment->setLastTransId($this->getTransactionId())->setIsTransactionPending(true);
 
         $order = $payment->getOrder();
+
+        // by zero authentication payment is authorised when api responds is succesfull
+        if($order->getGrandTotal() == 0) {
+            $payment->setIsTransactionPending(false);
+        }
+
         /*
          * Do not send a email notification when order is created.
          * Only do this on the AUHTORISATION notification.
