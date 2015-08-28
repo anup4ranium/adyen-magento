@@ -145,7 +145,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
 
     public function hasCustomerInteraction()
     {
-        if(!$this->_customerInteraction) {
+        if($this->_customerInteraction === null) {
             $recurringPaymentType = $this->getRecurringPaymentType();
             if($recurringPaymentType == "ONECLICK") {
                 $this->_customerInteraction = true;
