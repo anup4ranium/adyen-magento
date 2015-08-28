@@ -136,7 +136,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
     /**
      * @return bool|int
      */
-    public function hasExpressCheckout() {
+    public function hasExpressCheckout()
+    {
         if(Mage::getStoreConfig('payment/adyen_pos/active')) {
             // check if metmethod is available
             $methodModel = Mage::getModel('adyen/adyen_pos');
@@ -152,9 +153,10 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
     /**
      * @return bool|int
      */
-    public function hasCashExpressCheckout() {
-        if(Mage::getStoreConfig('payment/adyen_cash/active')) {
-
+    public function hasCashExpressCheckout()
+    {
+        if(Mage::getStoreConfig('payment/adyen_cash/active'))
+        {
             // check if metmethod is available
             $methodModel = Mage::getModel('adyen/adyen_cash');
             if ($methodModel) {
@@ -302,7 +304,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
         return number_format($amount, $format, '', '');
     }
 
-    public function originalAmount($amount, $currency) {
+    public function originalAmount($amount, $currency)
+    {
         // check the format
         switch($currency) {
             case "JPY":
@@ -349,7 +352,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param $ccType
      * @return mixed
      */
-    public function getMagentoCreditCartType($ccType) {
+    public function getMagentoCreditCartType($ccType)
+    {
 
         $ccTypesMapper = Mage::helper('adyen')->getCcTypesAltData();
 
@@ -423,7 +427,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      *
      * @return mixed
      */
-    public function getConfigData($code, $paymentMethodCode = null, $storeId = null) {
+    public function getConfigData($code, $paymentMethodCode = null, $storeId = null)
+    {
         if (null === $storeId) {
             $storeId = Mage::app()->getStore()->getStoreId();
         }
@@ -438,7 +443,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * Get the client ip address
      * @return string
      */
-    public function getClientIp() {
+    public function getClientIp()
+    {
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
         } elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -467,7 +473,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      *
      * @return bool
      */
-    public function ipInRange($ip, $from, $to) {
+    public function ipInRange($ip, $from, $to)
+    {
         $ip = ip2long($ip);
         $lowIp = ip2long($from);
         $highIp = ip2long($to);
@@ -484,7 +491,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param type $address
      * @return Varien_Object
      */
-    public function getStreet($address) {
+    public function getStreet($address)
+    {
         if (empty($address)) return false;
         $street = self::formatStreet($address->getStreet());
         $streetName = $street['0'];
@@ -501,7 +509,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param type $street
      * @return type $street
      */
-    static public function formatStreet($street) {
+    static public function formatStreet($street)
+    {
         if (count($street) != 1) {
             return $street;
         }
