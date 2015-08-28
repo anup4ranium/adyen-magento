@@ -25,6 +25,10 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
+
+/**
+ * @method Adyen_Payment_Model_Adyen_Oneclick getMethod()
+ */
 class Adyen_Payment_Block_Form_Oneclick extends Adyen_Payment_Block_Form_Cc {
 
     protected function _construct() {
@@ -77,7 +81,8 @@ class Adyen_Payment_Block_Form_Oneclick extends Adyen_Payment_Block_Form_Cc {
     /**
      * @return mixed
      */
-    public function showCvc() {
+    public function showCvc()
+    {
         return $this->getMethod()->hasCustomerInteraction();
     }
 
