@@ -28,7 +28,7 @@
 class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
     protected $_code = 'payment_fee';
-    
+
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
         parent::collect($address);
@@ -37,10 +37,22 @@ class Adyen_Payment_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sale
         $this->_setBaseAmount(0);
 
         $quote = $address->getQuote();
-		$val = Mage::Helper('adyen')->isPaymentFeeEnabled($quote);
-        if ($address->getAllItems() && $val) {
-            $currentAmount = $address->getPaymentFeeAmount();
-            $fee = Mage::Helper('adyen')->getPaymentFeeAmount($quote);
+        $val = Mage::Helper('adyen')->isPaymentFeeEnabled($quote);
+        $currentAmount = $address->getPaymentFeeAmount();
+
+        if ($address->getAllItems() && ($val || $currentAmount == 0)) {
+
+            // For SEPA,IDeal and Sofort zero authentication is not possible so set this to 1 cent
+            $paymentMethod = $quote->getPayment()->getMethod();
+            if(($paymentMethod == "adyen_ideal" || $paymentMethod == "adyen_hpp_sofort" ||
+                $paymentMethod == "adyen_sepa" || $paymentMethod == "adyen_hpp_sepa")
+                && $currentAmount == 0 && !$val)
+            {
+                $fee = "0.01";
+            } else {
+                $fee = Mage::Helper('adyen')->getPaymentFeeAmount($quote);
+            }
+
             $balance = $fee - $currentAmount;
 
             $address->setPaymentFeeAmount($address->getQuote()->getStore()->convertPrice($balance));

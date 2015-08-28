@@ -183,7 +183,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      */
     public function isPaymentFeeEnabled($object)
     {
-        $paymentMethod = $object->getPayment()->getMethod() ;
+        $paymentMethod = $object->getPayment()->getMethod();
 
         if($paymentMethod == 'adyen_openinvoice')
         {
