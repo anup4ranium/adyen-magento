@@ -97,7 +97,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         if($recurringType) {
             if($paymentMethod == "oneclick") {
                 // For ONECLICK look at the recurringPaymentType that the merchant has selected in Adyen ONECLICK settings
-                if($payment->getMethodInstance()->hasCustomerInteraction()) {
+                if($payment->getAdditionalInformation('customer_interaction')) {
                     $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                     $this->recurring->contract = "ONECLICK";
                 } else {
@@ -174,14 +174,14 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 if($paymentMethod == "oneclick") {
                     $recurringDetailReference = $payment->getAdditionalInformation("recurring_detail_reference");
 
-                    if($payment->getMethodInstance()->hasCustomerInteraction()) {
+                    if($payment->getAdditionalInformation('customer_interaction')) {
                         $this->shopperInteraction = "Ecommerce";
                     } else {
                         $this->shopperInteraction = "ContAuth";
                     }
 
                     // For recurring Ideal and Sofort needs to be converted to SEPA for this it is mandatory to set selectBrand to sepadirectdebit
-                    if(!$payment->getMethodInstance()->hasCustomerInteraction()) {
+                    if(!$payment->getAdditionalInformation('customer_interaction')) {
                         if($payment->getCcType() == "directEbanking" || $payment->getCcType() == "ideal") {
                             $this->selectedBrand = "sepadirectdebit";
                         }

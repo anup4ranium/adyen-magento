@@ -32,7 +32,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_infoBlockType = 'adyen/info_oneclick';
     protected $_paymentMethod = 'oneclick';
     protected $_canUseInternal = true; // not possible through backoffice interface
-    private $_customerInteraction;
+    protected $_customerInteraction;
 
 
     public function isAvailable($quote=null) {
@@ -130,6 +130,10 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
             $quote->setTotalsCollectedFlag(false);
             $quote->collectTotals();
         }
+
+        // get and set customer interaction needed for payment request
+        $this->hasCustomerInteraction();
+        $info->setAdditionalInformation('customer_interaction', $this->_customerInteraction);
 
         return $this;
     }
