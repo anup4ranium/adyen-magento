@@ -290,7 +290,7 @@ class Adyen_Payment_Model_Observer {
         $responseData = json_decode($results, true);
         if (! $responseData || !isset($responseData['paymentMethods'])) {
             Mage::throwException(Mage::helper('adyen')->__(
-                'Did not receive JSON, could not retrieve payment methods, received %s', $results
+                'Did not receive JSON, could not retrieve payment methods, received %s request was: %s', $results, print_r($requestParams, true)
             ));
         }
 
