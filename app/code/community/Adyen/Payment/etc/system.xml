@@ -433,7 +433,7 @@
                             <!--<show_in_store>1</show_in_store>-->
                             <sort_order>50</sort_order>
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
-                            <tooltip>
+                            <comment>
                                 <![CDATA[
                                 <p>
                                     <strong>ONECLICK</strong>: The shopper opts in to storing their card details for future use.
@@ -448,7 +448,7 @@
                                     the stored payment details regardless of whether the shopper is on your site or not.
                                 </p>
                                 ]]>
-                            </tooltip>
+                            </comment>
                             <fields>
                                 <recurringtypes translate="label">
                                     <label>Agreement Type</label>
