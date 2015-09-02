@@ -1815,7 +1815,7 @@
                 </adyen_pay_by_mail>
                 <!-- @Elv only -->
                 <adyen_elv translate="label" module="adyen">
-                    <label>ELV (Deprecate better use Adyen SEPA)</label>
+                    <label>ELV (Deprecated, better use Adyen SEPA)</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>410</sort_order>
                     <show_in_default>1</show_in_default>
