@@ -296,7 +296,7 @@
                 <create_pending_invoice>0</create_pending_invoice>
                 <recurringtypes>ONECLICK</recurringtypes>
                 <auto_capture_openinvoice>0</auto_capture_openinvoice>
-                <paypal_capture_mode>0</paypal_capture_mode>
+                <paypal_capture_mode>auto</paypal_capture_mode>
                 <send_email_bank_sepa_on_pending>0</send_email_bank_sepa_on_pending>
                 <title_renderer>title_image</title_renderer>
                 <ignore_refund_notification>0</ignore_refund_notification>
