@@ -88,7 +88,7 @@
                             <fields>
                                 <merchantAccount translate="label comment tooltip">
                                     <label>Merchant Account</label>
-                                    <tooltip><![CDATA[ You can find the merchantAccount by going into you Adyen account. If you are not sure what your merchant account is check out our Magento Quick Integration Guide]]></tooltip>
+                                    <tooltip><![CDATA[ Find this at the top of the screen in the Adyen Customer Area. TODO: EXPLAIN DIFFERENCE COPANY / MERCHANT ACCOUNT]]></tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/merchantAccount</config_path>
                                     <sort_order>10</sort_order>
@@ -109,7 +109,7 @@
                                 </demoMode>
                                 <notification_username translate="label">
                                     <label>Notification Username</label>
-                                    <tooltip>Should match your "notifications settings" in your Adyen account.</tooltip>
+                                    <tooltip>Set your own username and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => User Name.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/notification_username</config_path>
                                     <sort_order>40</sort_order>
@@ -119,7 +119,7 @@
                                 </notification_username>
                                 <notification_password translate="label">
                                     <label>Notification Password</label>
-                                    <tooltip>Should match your "notifications settings" in your Adyen account.</tooltip>
+                                    <tooltip>Set your own password and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => Password.</tooltip>
                                     <frontend_type>obscure</frontend_type>
                                     <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                                     <config_path>payment/adyen_abstract/notification_password</config_path>
@@ -129,8 +129,8 @@
                                     <show_in_store>0</show_in_store>
                                 </notification_password>
                                 <ws_username_test translate="label">
-                                    <label>Adyen ws username for Test</label>
-                                    <tooltip>Normally this will be ws@Company.YourCompanyCode</tooltip>
+                                    <label>Test: Web Service Username</label>
+                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_test</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>60</sort_order>
@@ -139,8 +139,8 @@
                                     <show_in_store>0</show_in_store>
                                 </ws_username_test>
                                 <ws_password_test translate="label">
-                                    <label>Adyen ws password for Test</label>
-                                    <tooltip>The password of the ws user for Test</tooltip>
+                                    <label>Test: Web Service Password</label>
+                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Click on your web service user and generate a new password. Copy and Paste the exact password here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_password_test</config_path>
                                     <frontend_type>obscure</frontend_type>
                                     <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
@@ -161,8 +161,8 @@
                                     <show_in_store></show_in_store>
                                 </ws_test_button>
                                 <ws_username_live translate="label">
-                                    <label>Adyen ws username for Live</label>
-                                    <tooltip>Normally this will be ws@Company.YourCompanyCode</tooltip>
+                                    <label>Live: Web Service Username</label>
+                                    <tooltip>Find this in your Live Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_live</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>90</sort_order>
@@ -171,8 +171,9 @@
                                     <show_in_store>0</show_in_store>
                                 </ws_username_live>
                                 <ws_password_live translate="label">
-                                    <label>Adyen ws password for Live</label>
-                                    <tooltip>The password of the ws user for Live</tooltip>
+                                    <label>Live: Web Service Password</label>
+                                    <label>Live: Web Service Password</label>
+                                    <tooltip>Find this in your Live Adyen Customer Area => Settings => Users => System. Click on your web service user and generate a new password. Copy and Paste the exact password here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_password_live</config_path>
                                     <frontend_type>obscure</frontend_type>
                                     <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
@@ -192,9 +193,9 @@
                                     <show_in_website>1</show_in_website>
                                 </ws_live_button>
                                 <capture_mode translate="label">
-                                    <label>Capture Mode</label>
+                                    <label>Capture Delay</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>If you are using "The manual capture in Adyen" set this to manual and you will get a chance to capture it by creating the invoice and select "capture online".If not sure select auto.Notice:iDEAL and Cash are always Auto Capture!</tooltip>
+                                    <tooltip>Immediate is the default. Set to manual if you want to perform the capture of funds manually later (only affects credit cards and a few alternative payment methods). You need to change this setting as well in Adyen Backoffice => Settings => Merchant Settings => Capture Delay. If you have selected a capture delay of a couple of days in Adyen of a couple of days keep it here on immediate</tooltip>
                                     <source_model>adyen/source_captureModes</source_model>
                                     <config_path>payment/adyen_abstract/capture_mode</config_path>
                                     <sort_order>120</sort_order>
@@ -203,8 +204,8 @@
                                     <show_in_store>0</show_in_store>
                                 </capture_mode>
                                 <order_status translate="label">
-                                    <label>New order status</label>
-                                    <tooltip>Select only status assigned to state new</tooltip>
+                                    <label>Order status: order creation</label>
+                                    <tooltip>Status given to newly created orders before payment result confirmation via server notifications from Adyen.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/order_status</config_path>
                                     <source_model>adminhtml/system_config_source_order_status_new</source_model>
@@ -214,8 +215,8 @@
                                     <show_in_store>0</show_in_store>
                                 </order_status>
                                 <payment_pre_authorized>
-                                    <label>Order status pre-authorised payment</label>
-                                    <tooltip>(optional)Only affecting manual work flow.Leave empty if you are not sure</tooltip>
+                                    <label>Order status: payment authorisation</label>
+                                    <tooltip>Status given to orders after authorisation confirmed by an AUTHORISATION notification from Adyen. Note: an authorisation status via the result URL does not yet trigger this status.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_pre_authorized</config_path>
                                     <source_model>adminhtml/system_config_source_order_status_newprocessing</source_model>
@@ -226,8 +227,8 @@
                                     <depends><capture_mode>manual</capture_mode></depends>
                                 </payment_pre_authorized>
                                 <payment_authorized translate="label">
-                                    <label>Order status authorised payment</label>
-                                    <tooltip>(optional)Select only status assigned to state processing.Leave empty if you are not sure</tooltip>
+                                    <label>Order status: payment confirmed</label>
+                                    <tooltip>Status given to orders after capture result is confirmed by an AUTHORISATION notification for a auto capture or CAPTURE notification for a manual capture from Adyen.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_authorized</config_path>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
@@ -237,8 +238,8 @@
                                     <show_in_store>0</show_in_store>
                                 </payment_authorized>
                                 <payment_cancelled translate="label">
-                                    <label>Order status cancelled payment</label>
-                                    <tooltip>Action to be attempted incase of failed notifications from Adyen.Notice orders with invoices can not be cancelled, will just get status change.</tooltip>
+                                    <label>Order status: order cancellation</label>
+                                    <tooltip>Status given to orders after order cancellation is confirmed by an CANCEL_OR_REFUND notification from Adyen. If orders are already invoiced, they cannot be cancelled, but will be refunded instead.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_cancelled</config_path>
                                     <source_model>adyen/source_cancelModes</source_model>
@@ -248,7 +249,7 @@
                                     <show_in_store>0</show_in_store>
                                 </payment_cancelled>
                                 <debug translate="label">
-                                    <label>Debug</label>
+                                    <label>Enable debug logging</label>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/debug</config_path>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -261,7 +262,7 @@
                         </adyen_required_settings>
 
                         <adyen_order_process type="group" translate="label comment tooltip">
-                            <label>Advanced: Magento Order Process</label>
+                            <label>Advanced: Magento Order Processing</label>
                             <frontend_type>text</frontend_type>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -269,85 +270,118 @@
                             <sort_order>30</sort_order>
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
+                                <paypal_capture_mode>
+                                    <label>Use manual-capture for PayPal</label>
+                                    <tooltip>Should be on auto-capture by default. If you have requested with Adyen Support for your Paypal integration to be on manual-capture, set this to manual-capture.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adyen/source_PayPalCaptureModes</source_model>
+                                    <config_path>payment/adyen_abstract/paypal_capture_mode</config_path>
+                                    <sort_order>10</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </paypal_capture_mode>
+                                <auto_capture_openinvoice>
+                                    <label>Use auto-capture for OpenInvoice payments</label>
+                                    <tooltip>Applicable for Klarna and Afterpay only. By default OpenInvoice is set to manual capture. If you want auto capture you need to contact magento@adyen.com so we can set this up for your account and then you can set this option to yes.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <config_path>payment/adyen_abstract/auto_capture_openinvoice</config_path>
+                                    <sort_order>20</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </auto_capture_openinvoice>
                                 <payment_authorized_virtual>
-                                    <label>Order status authorised payment for virtual products</label>
+                                    <label>Order status: payment capture (virtual products)</label>
                                     <tooltip>(optional)Select only status assigned to state complete. Leave empty to use the same as normal products</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_authorized_virtual</config_path>
                                     <source_model>adyen/source_status_complete</source_model>
-                                    <sort_order>41</sort_order>
+                                    <sort_order>30</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </payment_authorized_virtual>
                                 <refund_authorized translate="label">
-                                    <label>Refund authorise (refund success)</label>
-                                    <tooltip>(optional) leave empty if you are not sure</tooltip>
+                                    <label>Order status: Adyen Refunded</label>
+                                    <tooltip>Status given to order after a (partial) refund has been made on the order when the REFUND notification is received</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/refund_authorized</config_path>
                                     <source_model>adyen/source_status_refund</source_model>
-                                    <sort_order>70</sort_order>
+                                    <sort_order>40</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </refund_authorized>
                                 <pending_status>
-                                    <label>Pending order status</label>
-                                    <tooltip>By default pending notifications are not send. If you want these notifications to be received enable the BankTransfer Pending Notification and\or Direct-Debit Pending Notification in the Adyen Platform</tooltip>
+                                    <label>Order status: pending Bank Transfer/SEPA orders</label>
+                                    <tooltip>By default, Adyen does not inform your Magento store about pending payments. If you want these notifications to be received,  Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/pending_status</config_path>
                                     <source_model>adyen/source_status_pending</source_model>
-                                    <sort_order>80</sort_order>
+                                    <sort_order>50</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </pending_status>
+                                <send_email_bank_sepa_on_pending>
+                                    <label>Send order confirmation email for Bank Transfer/SEPA</label>
+                                    <tooltip>Send a confirmation mail after Bank Tranfer/SEPA is placed (not yet paid). If you want these notifications to be received,  Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <config_path>payment/adyen_abstract/send_email_bank_sepa_on_pending</config_path>
+                                    <sort_order>60</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </send_email_bank_sepa_on_pending>
+                                <create_pending_invoice translate="label">
+                                    <label>Create a pending invoice (only for manual capture)</label>
+                                    <tooltip>This will create a pending invoice if the AUTHORISATION notification is received.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <sort_order>70</sort_order>
+                                    <config_path>payment/adyen_abstract/create_pending_invoice</config_path>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>1</show_in_store>
+                                </create_pending_invoice>
                                 <capture_on_shipment>
-                                    <label>Capture on shipment</label>
+                                    <label>Order status: Capture on shipment</label>
                                     <frontend_type>select</frontend_type>
                                     <tooltip>If you enable this function it will do a capture request to adyen platform if you do a shipment</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/capture_on_shipment</config_path>
-                                    <sort_order>205</sort_order>
+                                    <sort_order>80</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </capture_on_shipment>
-                                <send_update_mail translate="label">
-                                    <label>Order update email</label>
-                                    <frontend_type>select</frontend_type>
-                                    <tooltip>Enable/Disable update mails</tooltip>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <config_path>payment/adyen_abstract/send_update_mail</config_path>
-                                    <sort_order>200</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                    <tooltip>When an order status is changed, should we send an email</tooltip>
-                                </send_update_mail>
                                 <send_invoice_update_mail translate="label">
-                                    <label>Invoice email</label>
+                                    <label>Invoice email (deprecated)</label>
                                     <frontend_type>select</frontend_type>
                                     <tooltip>Enable/Disable update mails</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/send_invoice_update_mail</config_path>
-                                    <sort_order>210</sort_order>
+                                    <sort_order>1000</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                     <tooltip>When an invoice is created, should we send an email</tooltip>
                                 </send_invoice_update_mail>
-                                <send_email_bank_sepa_on_pending>
-                                    <label>Send confirmation email for Banktransfer/SEPA</label>
-                                    <tooltip>Send a confirmation mail after banktranfer/SEPA is placed (not yet paid). Make sure that you have BankTransfer Pending Notification enabled in Adyen backoffice to do this contact magento@adyen.com</tooltip>
+                                <send_update_mail translate="label">
+                                    <label>Receive order status update email (deprecated)</label>
                                     <frontend_type>select</frontend_type>
+                                    <tooltip>Enable/Disable update mails for all order status changes to the shopper</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <config_path>payment/adyen_abstract/send_email_bank_sepa_on_pending</config_path>
-                                    <sort_order>120</sort_order>
+                                    <config_path>payment/adyen_abstract/send_update_mail</config_path>
+                                    <sort_order>1200</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                </send_email_bank_sepa_on_pending>
+                                    <tooltip>When an order status is changed, should we send an email</tooltip>
+                                </send_update_mail>
                             </fields>
                         </adyen_order_process>
                         <adyen_order_notifications type="group" translate="label comment tooltip">
@@ -360,8 +394,8 @@
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <notification_hmac>
-                                    <label>Notification Hmac Key</label>
-                                    <tooltip>This is not required. You can use this as extra security or if you do not want to use HTTP AUTHENTICATION you can leave notification username and password empty and only use this key. Key can be generated in the Adyen backoffice => Server Communication => Additional Settings</tooltip>
+                                    <label>Notification HMAC Key</label>
+                                    <tooltip>This is not required. You can use this as extra security or if you do not want or cannot use HTTP authentication.  If so, leave notification username and password above empty and only use this key. Key can be generated in the Adyen Customer Area => Server Communication => Standard Notification => Additional Settings => Generate new HMAC key</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/notification_hmac</config_path>
                                     <sort_order>77</sort_order>
@@ -369,39 +403,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </notification_hmac>
-                                <create_pending_invoice translate="label">
-                                    <label>Create a pending invoice</label>
-                                    <tooltip>This will create an pending invoice if the AUTHORISATION notification is received</tooltip>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <sort_order>90</sort_order>
-                                    <config_path>payment/adyen_abstract/create_pending_invoice</config_path>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                </create_pending_invoice>
-                                <auto_capture_openinvoice>
-                                    <label>Auto capture Openinvoice(AfterPay/Klarna) payment methods</label>
-                                    <tooltip>By default OpenInvoice is set to manual capture. If you want auto capture you need to contact magento@adyen.com so we can set this up for your account and then you can set this option to yes</tooltip>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <config_path>payment/adyen_abstract/auto_capture_openinvoice</config_path>
-                                    <sort_order>115</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </auto_capture_openinvoice>
-                                <paypal_capture_mode>
-                                    <label>Capture Mode for PayPal</label>
-                                    <tooltip>If you are using a different capture mode for PayPal setup in your Adyen account select here this capture modus</tooltip>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adyen/source_PayPalCaptureModes</source_model>
-                                    <config_path>payment/adyen_abstract/paypal_capture_mode</config_path>
-                                    <sort_order>118</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </paypal_capture_mode>
                                 <ignore_refund_notification>
                                     <label>Ignore refund notification</label>
                                     <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento that automatically create a credit memo. If you enable this setting this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
@@ -415,7 +416,7 @@
                                 </ignore_refund_notification>
                                 <update_notification_cronjob>
                                     <label>Update notification queue by cronjob (every 5 minutes)</label>
-                                    <tooltip>If you using API methods(CC, SEPA, ELV or Boleto) and your magento order processing is slow it could be that the notification is faster then magento saves the ordrer. The notification will then be saved in a queue. This is processed on default when next notification is received. If you want to update the notification queue every 5 minutes activate this and make sure cronjob of magento is called by your webserver</tooltip>
+                                    <tooltip>If you using API methods(CC, SEPA, ELV or Boleto) and your magento order processing is slow, it could be that the notification is faster then magento saves the order. The notification will then be saved in a queue. This is processed on default when next notification is received. If you want to update the notification queue every 5 minutes activate this and make sure cronjob of Magento is called by your webserver</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/update_notification_cronjob</config_path>
@@ -436,18 +437,18 @@
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <comment>
                                 <![CDATA[
-                                <p>
+                                    <p>
                                     <strong>ONECLICK</strong>: The shopper opts in to storing their card details for future use.
                                     The shopper is present for the subsequent transaction, for cards the security code (CVC/CVV) is required.
-                                </p>
-                                <p>
+                                    </p>
+                                    <p>
                                     <strong>RECURRING</strong>: Payment details are stored for future use. For cards, the security
                                     code (CVC/CVV) is not required for subsequent payments.
-                                </p>
-                                <p>
+                                    </p>
+                                    <p>
                                     <strong>ONECLICK, RECURRING</strong>: Payment details are stored for future use. This allows the use of
                                     the stored payment details regardless of whether the shopper is on your site or not.
-                                </p>
+                                    </p>
                                 ]]>
                             </comment>
                             <fields>
@@ -460,7 +461,7 @@
                                     <show_in_default>1</show_in_default>
                                     <!--<show_in_website>1</show_in_website>-->
                                     <!--<show_in_store>1</show_in_store>-->
-                                    <tooltip>When enabled users can save their Credit Cards and their SEPA authorizations</tooltip>
+                                    <tooltip>When enabled, users can save their Credit Cards and their SEPA authorizations. ONECLICK will require the input of the CVC for subsequent payments, while RECURRING does not.</tooltip>
                                 </recurringtypes>
                             </fields>
                         </adyen_billing_agreements>
@@ -474,8 +475,9 @@
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <payment_cancelled_redirect>
-                                    <label>Redirect to page after cancellation</label>
+                                    <label>Redirect destination after cancellation</label>
                                     <frontend_type>select</frontend_type>
+                                    <tooltip>Determines how shoppers get redirected after they cancel a payment.</tooltip>
                                     <source_model>adyen/source_cancelRedirect</source_model>
                                     <config_path>payment/adyen_abstract/payment_cancelled_redirect</config_path>
                                     <sort_order>10</sort_order>
@@ -484,8 +486,9 @@
                                     <show_in_store>0</show_in_store>
                                 </payment_cancelled_redirect>
                                 <title_renderer>
-                                    <label>Title renderer</label>
+                                    <label>Payment method render method</label>
                                     <frontend_type>select</frontend_type>
+                                    <tooltip>Determines whether the payment methods will be displayed with its logo or just the name.</tooltip>
                                     <source_model>adyen/source_rendermode</source_model>
                                     <config_path>payment/adyen_abstract/title_renderer</config_path>
                                     <sort_order>20</sort_order>
@@ -495,7 +498,7 @@
                                 </title_renderer>
                                 <shopperlocale translate="label">
                                     <label>Language locale (optional)</label>
-                                    <tooltip>Leave empty to let Magento decide (Ex: nl_NL)</tooltip>
+                                    <tooltip>This will override the default shopper locale of the Magento store. Leave empty to let Magento decide (Ex: nl_NL)</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/shopperlocale</config_path>
                                     <sort_order>180</sort_order>
@@ -504,8 +507,8 @@
                                     <show_in_store>1</show_in_store>
                                 </shopperlocale>
                                 <countryCode translate="label">
-                                    <label>Country Code ISO (optional)</label>
-                                    <tooltip>Leave empty to let Adyen decide on IP-address (Ex: NL)</tooltip>
+                                    <label>ISO Country Code (optional)</label>
+                                    <tooltip>This will override the shopper billing address country when determining what payment methods to display.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/countryCode</config_path>
                                     <sort_order>190</sort_order>
@@ -523,14 +526,15 @@
                             <show_in_store>1</show_in_store>
                             <sort_order>300</sort_order>
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
-                            <tooltip>
+                            <comment>
                                 <![CDATA[
-                                <p>
+                                    <p>
                                     Adyen's Risk analysis tool allows merchants to confgure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
-                                    If you want this to be turned on please contact magento@adyen.com
-                                </p>
+                                This process has always had two automatic outcomes, either accept or reject the payment. Now, Adyen's risk system can tell merchants when a transaction seems to be risky but without rejecting it, and requires to be manually reviewed in order to decide if it should be accepted or rejected.
+                                    If you want this to be turned on please contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>
+                                    </p>
                                 ]]>
-                            </tooltip>
+                            </comment>
                             <fields>
                                 <fraud_manual_review_status>
                                     <label>Manual Review Status</label>
@@ -604,27 +608,31 @@
                             <show_in_store>1</show_in_store>
                         </cctypes>
                         <cse_enabled translate="label">
-                            <label>Enable Client-Side Encryption</label>
+                            <label>Enable Client-Side Encryption (CSE)</label>
+                            <tooltip>Contact magento@adyen.com to enable CSE permission on your Adyen account. If you want this to be turned on on your live account please fill in the SAQ A form and send this to salessuport@adyen.com</tooltip>
+                            <comment><![CDATA[<a target="_blank" href="https://www.pcisecuritystandards.org/documents/PCI_DSS_v3-1_SAQ_A_rev1-1.docx">Click here to download the SAQ A form</a>]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>60</sort_order>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </cse_enabled>
                         <cse_publickey_test translate="label">
-                            <label>Client-Side Encryption Public Key For Test</label>
+                            <label>Enter CSE Public Key of Test Adyen Webservice User</label>
+                            <tooltip>Copy this from the Test Adyen Customer Area => Settings => Users => System => [webservice user]=> Client Encryption Public Key.</tooltip>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>70</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends><cse_enabled>1</cse_enabled></depends>
                         </cse_publickey_test>
                         <cse_publickey translate="label">
-                            <label>Client-Side Encryption Public Key For Live</label>
+                            <label>Enter CSE Public Key of Live Adyen Webservice User</label>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>71</sort_order>
+                            <tooltip>Copy this from the Live Adyen Customer Area => Settings => Users => System => [webservice user] => Client Encryption Public Key.</tooltip>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -795,8 +803,11 @@
                     </fields>
                 </adyen_cc>
                 <adyen_oneclick>
-                    <label>OneClick</label>
+                    <label>OneClick - Requires Adyen Credit Card</label>
                     <frontend_type>text</frontend_type>
+                    <comment><![CDATA[
+                                During checkout shoppers can choose to have their payment details remembered and stored for trusted websites in Adyen’s highly secure platform. Adyen takes care of this process for its customers. Shoppers can then select in the magento checkout the saved card and checkout with ‘one-click’.
+                            ]]></comment>
                     <sort_order>320</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -839,7 +850,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <tooltip>With ONECLICK the shopper needs to fill in security code for creditcards with recurring this is not needed. If you want to use RECURRING make sure you have Agreement Type set to RECURRING or ONECLICK,RECURRING</tooltip>
+                            <tooltip>With ONECLICK the shopper needs to fill in their security code for credit cards. For RECURRING, this is not needed. If you want to use RECURRING make sure you have Agreement Type set to RECURRING or ONECLICK,RECURRING</tooltip>
                         </recurring_payment_type>
                     </fields>
                 </adyen_oneclick>
@@ -881,7 +892,7 @@
                         </sort_order>
                         <skinCode translate="label">
                             <label>Skin Code</label>
-                            <tooltip>The skin code you want to use (You can find this in the admin are of your Adyen account)</tooltip>
+                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -889,8 +900,8 @@
                             <show_in_store>1</show_in_store>
                         </skinCode>
                         <secret_wordt translate="label">
-                            <label>HMAC Key for Test</label>
-                            <tooltip>Should match with the HMAC test key in the Adyen backoffice.</tooltip>
+                            <label>HMAC Key for Test Skin</label>
+                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -899,7 +910,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Should match with the HMAC live key in the Adyen backoffice.</tooltip>
+                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -939,7 +950,7 @@
                                 </disable_hpptypes>
                                 <payment_routines translate="label">
                                     <label>Payment Flow Selection</label>
-                                    <tooltip>Adyen provide you with 2 types of payment routines. Multi-page and Single Page</tooltip>
+                                    <tooltip>Adyen provide you with 2 types of payment routines. The Single-Page flow is dynamic and </tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_PaymentRoutines</source_model>
                                     <config_path>payment/adyen_hpp/payment_routines</config_path>
@@ -983,7 +994,7 @@
                                 </specificcountry>
                                 <fee translate="label">
                                     <label>Fee</label>
-                                    <comment>The Payment method name of the HPP payment can be found in Adyen backoffice. Go to Settings -> Payment Methods and here you see under the column name the name of the payment method</comment>
+                                    <comment>The Payment method name of the HPP payment can be found in Adyen backoffice. Go to Settings => Payment Methods and here you see under the column name the name of the payment method</comment>
                                     <frontend_model>adyen/adminhtml_system_config_hppPaymentMethodFee</frontend_model>
                                     <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                                     <config_path>payment/adyen_hpp/fee</config_path>
@@ -1152,7 +1163,7 @@
                             <validate>validate-number</validate>
                         </fee>
                         <different_address_disable>
-                            <label>Disable on Different Address</label>
+                            <label>Disable on if billing and delivery addresses differ</label>
                             <tooltip>If the delivery address and billing address in the checkout is not the same disable this payment method because Klarna will most likely reject it</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
