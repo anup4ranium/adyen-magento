@@ -610,7 +610,7 @@
                         </cctypes>
                         <cse_enabled translate="label">
                             <label>Enable Client-Side Encryption (CSE)</label>
-                            <tooltip>Contact magento@adyen.com to enable CSE permission on your Adyen account. If you want this to be turned on on your live account please fill in the SAQ A form and send this to salessuport@adyen.com</tooltip>
+                            <tooltip>Contact support@adyen.com to enable CSE permission on your Adyen account. If you want this to be turned on on your live account please fill in the SAQ-A form and send this to salessupport@adyen.com</tooltip>
                             <comment><![CDATA[<a target="_blank" href="https://www.pcisecuritystandards.org/documents/PCI_DSS_v3-1_SAQ_A_rev1-1.docx">Click here to download the SAQ A form</a>]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -640,7 +640,7 @@
                             <depends><cse_enabled>1</cse_enabled></depends>
                         </cse_publickey>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>90</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -649,7 +649,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>100</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -663,7 +663,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>101</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Determine the visibility of this payment method in the Frontend and/or Backend of Magento.</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -896,7 +896,7 @@
                         </skinCode>
                         <secret_wordt translate="label">
                             <label>HMAC Key for Test Skin</label>
-                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -905,7 +905,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -977,7 +977,7 @@
                                 </return_url_in_request>
                                 <fee translate="label">
                                     <label>Fee</label>
-                                    <comment>The Payment method name of the HPP payment can be found in Adyen backoffice. Go to Settings => Payment Methods and here you see under the column name the name of the payment method</comment>
+                                    <tooltip>If you want to charge an extra fee for certain payment methods, set that fee here. Do not set any extra fees in the skin in the Adyen Customer Area.</tooltip>
                                     <frontend_model>adyen/adminhtml_system_config_hppPaymentMethodFee</frontend_model>
                                     <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                                     <config_path>payment/adyen_hpp/fee</config_path>
@@ -1045,7 +1045,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>49</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1054,7 +1054,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1148,7 +1148,7 @@
                             <validate>validate-number</validate>
                         </fee>
                         <different_address_disable>
-                            <label>Disable on if billing and delivery addresses differ</label>
+                            <label>Disable on different billing and delivery addresses</label>
                             <tooltip>If the delivery address and billing address in the checkout is not the same disable this payment method because Klarna will most likely reject it</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -1168,7 +1168,7 @@
                             <show_in_store>1</show_in_store>
                         </failed_attempt_disable>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>49</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1177,7 +1177,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1246,7 +1246,7 @@
                             <show_in_store>1</show_in_store>
                         </flow>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1255,7 +1255,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from pecific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1362,7 +1362,7 @@
                             <show_in_store>0</show_in_store>
                         </order_overpaid_status>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1371,7 +1371,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1553,7 +1553,7 @@
                             <depends><ip_filter>1</ip_filter></depends>
                         </ip_filter_to>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1562,7 +1562,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>70</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1710,7 +1710,7 @@
                             <show_in_store>1</show_in_store>
                         </visible_type>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>90</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1719,7 +1719,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>100</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1852,7 +1852,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1861,7 +1861,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
