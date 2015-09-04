@@ -842,7 +842,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <recurring_payment_type translate="label">
-                            <label>Recurring Payment Type</label>
+                            <label>Agreement Type</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_recurringPaymentType</source_model>
                             <config_path>payment/adyen_oneclick/recurring_payment_type</config_path>
@@ -874,14 +874,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
-                        <title translate="label">
-                            <label>Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>
@@ -926,6 +918,15 @@
                             <show_in_store>1</show_in_store>
                             <sort_order>70</sort_order>
                             <fields>
+                                <title translate="label">
+                                    <label>Title</label>
+                                    <frontend_type>text</frontend_type>
+                                    <config_path>payment/adyen_hpp/title</config_path>
+                                    <sort_order>20</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>1</show_in_store>
+                                </title>
                                 <delivery_days translate="label">
                                     <label>Days for Delivery</label>
                                     <validate>validate-digits</validate>
@@ -971,27 +972,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </return_url_in_request>
-                                <allowspecific translate="label">
-                                    <label>Payment to applicable countries</label>
-                                    <frontend_type>allowspecific</frontend_type>
-                                    <sort_order>120</sort_order>
-                                    <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                                    <config_path>payment/adyen_hpp/allowspecific</config_path>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                </allowspecific>
-                                <specificcountry translate="label">
-                                    <label>Payment to Specific countries</label>
-                                    <frontend_type>multiselect</frontend_type>
-                                    <sort_order>130</sort_order>
-                                    <source_model>adminhtml/system_config_source_country</source_model>
-                                    <config_path>payment/adyen_hpp/specificcountry</config_path>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                    <depends><allowspecific>1</allowspecific></depends>
-                                </specificcountry>
                                 <fee translate="label">
                                     <label>Fee</label>
                                     <comment>The Payment method name of the HPP payment can be found in Adyen backoffice. Go to Settings => Payment Methods and here you see under the column name the name of the payment method</comment>
@@ -1442,7 +1422,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <recurringtypes translate="label">
-                            <label>Recurring Type</label>
+                            <label>Agreement Type</label>
                             <tooltip>You can set different value for POS because you have to have the permission of the customer</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_recurringType</source_model>
@@ -1463,7 +1443,7 @@
                         </add_receipt_order_lines>
                         <enable_scanner translate="label">
                             <label>Enable Scanner</label>
-                            <tooltip>If you enable this you have the possiblity to scan products with a hand scanner on the shopping cart page and this will automatically add products to the shopping cart based on the same SKU name</tooltip>
+                            <tooltip>If you enable this you have the possibility to scan products with a hand scanner on the shopping cart page and this will automatically add products to the shopping cart based on the same SKU name.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>35</sort_order>
@@ -1484,7 +1464,7 @@
                         </auto_submit_scanner>
                         <express_checkout>
                             <label>Express checkout</label>
-                            <tooltip>This will show a checkout buttton on the shopping cart to directly do a POS payment without going to the checkout steps. You must be logged into your magento account on the front-end to see the button</tooltip>
+                            <tooltip>This will show a checkout buttton on the shopping cart to directly do a POS payment without going to the checkout steps. You must be logged into your magento account on the front-end to see the button.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>37</sort_order>
