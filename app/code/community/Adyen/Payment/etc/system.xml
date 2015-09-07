@@ -151,7 +151,7 @@
                                 </ws_password_test>
                                 <ws_test_button translate="label">
                                     <label></label>
-                                    <button_label>Test Webserver Credentials for test</button_label>
+                                    <button_label>Test Web Service Credentials for test</button_label>
                                     <config_path>payment/adyen_abstract/ws_test_button</config_path>
                                     <modus>test</modus>
                                     <frontend_model>adyen/adminhtml_system_config_testWebserverConfiguration</frontend_model>
@@ -184,7 +184,7 @@
                                 </ws_password_live>
                                 <ws_live_button translate="label">
                                     <label></label>
-                                    <button_label>Test Webserver Credentials for live</button_label>
+                                    <button_label>Test Web Service Credentials for live</button_label>
                                     <config_path>payment/adyen_abstract/ws_live_button</config_path>
                                     <modus>live</modus>
                                     <frontend_model>adyen/adminhtml_system_config_testWebserverConfiguration</frontend_model>
@@ -338,7 +338,7 @@
                                 </send_email_bank_sepa_on_pending>
                                 <create_pending_invoice translate="label">
                                     <label>Create a pending invoice (only for manual capture)</label>
-                                    <tooltip>This will create a pending invoice if the AUTHORISATION notification is received.</tooltip>
+                                    <tooltip>This will create a pending invoice if the AUTHORISATION notification is received. Note: this will cause Magento to push all orders to Status:'Processing' once the invoice is created, ignoring all other settings. </tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>70</sort_order>
@@ -350,7 +350,7 @@
                                 <capture_on_shipment>
                                     <label>Order status: Capture on shipment</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>If you enable this function it will do a capture request to adyen platform if you do a shipment</tooltip>
+                                    <tooltip>If you enable this function it will do a capture request to Adyen if you do a shipment</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/capture_on_shipment</config_path>
                                     <sort_order>80</sort_order>
@@ -361,17 +361,16 @@
                                 <send_invoice_update_mail translate="label">
                                     <label>Invoice email (deprecated)</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>Enable/Disable update mails</tooltip>
+                                    <tooltip>Enable/Disable update mails to customers.</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/send_invoice_update_mail</config_path>
                                     <sort_order>1000</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                    <tooltip>When an invoice is created, should we send an email</tooltip>
                                 </send_invoice_update_mail>
                                 <send_update_mail translate="label">
-                                    <label>Receive order status update email (deprecated)</label>
+                                    <label>Customers receive order status update email (deprecated).</label>
                                     <frontend_type>select</frontend_type>
                                     <tooltip>Enable/Disable update mails for all order status changes to the shopper</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -380,7 +379,6 @@
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                    <tooltip>When an order status is changed, should we send an email</tooltip>
                                 </send_update_mail>
                             </fields>
                         </adyen_order_process>
@@ -405,7 +403,7 @@
                                 </notification_hmac>
                                 <ignore_refund_notification>
                                     <label>Ignore refund notification</label>
-                                    <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento that automatically create a credit memo. If you enable this setting this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
+                                    <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento which automatically creates a credit memo. If you set this setting to 'Yes', this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>230</sort_order>
@@ -466,7 +464,7 @@
                             </fields>
                         </adyen_billing_agreements>
                         <adyen_checkout_experience type="group" translate="label comment tooltip">
-                            <label>Advanced: Checkout experience</label>
+                            <label>Advanced: Checkout Experience</label>
                             <frontend_type>text</frontend_type>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -498,7 +496,7 @@
                                 </title_renderer>
                                 <shopperlocale translate="label">
                                     <label>Language locale (optional)</label>
-                                    <tooltip>This will override the default shopper locale of the Magento store. Leave empty to let Magento decide (Ex: nl_NL)</tooltip>
+                                    <tooltip>This will override the default shopper locale of the Magento store(e.g. nl_NL). Leave empty to let Magento decide </tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/shopperlocale</config_path>
                                     <sort_order>180</sort_order>
@@ -529,7 +527,7 @@
                             <comment>
                                 <![CDATA[
                                     <p>
-                                    Adyen's Risk analysis tool allows merchants to confgure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
+                                    Adyen's Risk analysis tool allows merchants to configure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
                                 This process has always had two automatic outcomes, either accept or reject the payment. Now, Adyen's risk system can tell merchants when a transaction seems to be risky but without rejecting it, and requires to be manually reviewed in order to decide if it should be accepted or rejected.
                                     If you want this to be turned on please contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>
                                     </p>
@@ -538,7 +536,7 @@
                             <fields>
                                 <fraud_manual_review_status>
                                     <label>Manual Review Status</label>
-                                    <tooltip>If you are using Manual Review and a payment match your case set here the status it should have in magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a seperate status please keep it on -- Please Select --</tooltip>
+                                    <tooltip>If you are using Manual Review and a payment match your case set here the status it should have in Magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a separate status please keep it on -- Please Select --</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_status_pending</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_status</config_path>
@@ -549,7 +547,7 @@
                                 </fraud_manual_review_status>
                                 <fraud_manual_review_accept_status>
                                     <label>Manual Review Accepted Status</label>
-                                    <tooltip>If you do not have an action defined when you accept a manual review you can define a status here. If you have already an action that will be executed or don't want a seperate status please keep it on -- Please Select --</tooltip>
+                                    <tooltip>If you do not have an action defined when you accept a manual review you can define a status here. If you already have an action that will be executed or don't want a separate status please keep it on -- Please Select --</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
@@ -620,8 +618,8 @@
                             <show_in_store>1</show_in_store>
                         </cse_enabled>
                         <cse_publickey_test translate="label">
-                            <label>Enter CSE Public Key of Test Adyen Webservice User</label>
-                            <tooltip>Copy this from the Test Adyen Customer Area => Settings => Users => System => [webservice user]=> Client Encryption Public Key.</tooltip>
+                            <label>Enter CSE Public Key of Test Adyen Web Service User</label>
+                            <tooltip>Copy this from the Test Adyen Customer Area => Settings => Users => System => [web service user]=> Client Encryption Public Key.</tooltip>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
@@ -630,9 +628,9 @@
                             <depends><cse_enabled>1</cse_enabled></depends>
                         </cse_publickey_test>
                         <cse_publickey translate="label">
-                            <label>Enter CSE Public Key of Live Adyen Webservice User</label>
+                            <label>Enter CSE Public Key of Live Adyen Web Service User</label>
                             <frontend_type>textarea</frontend_type>
-                            <tooltip>Copy this from the Live Adyen Customer Area => Settings => Users => System => [webservice user] => Client Encryption Public Key.</tooltip>
+                            <tooltip>Copy this from the Live Adyen Customer Area => Settings => Users => System => [web service user] => Client Encryption Public Key.</tooltip>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -895,8 +893,8 @@
                             <show_in_store>1</show_in_store>
                         </skinCode>
                         <secret_wordt translate="label">
-                            <label>HMAC Key for Test Skin</label>
-                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform</tooltip>
+                            <label>HMAC Key for Test</label>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -905,7 +903,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -931,9 +929,9 @@
                                     <show_in_store>1</show_in_store>
                                 </title>
                                 <delivery_days translate="label">
-                                    <label>Days for Delivery</label>
+                                    <label>Days to Delivery</label>
                                     <validate>validate-digits</validate>
-                                    <tooltip>How many days to be added to the current date for delivery. ONLY numbers allowed.</tooltip>
+                                    <tooltip>How many days to be added to the current date for delivery. ONLY whole numbers allowed.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_hpp/delivery_days</config_path>
                                     <sort_order>70</sort_order>
@@ -943,7 +941,7 @@
                                 </delivery_days>
                                 <disable_hpptypes translate="label">
                                     <label>Leave payment method selection on HPP</label>
-                                    <tooltip>If you say yes here, payment methods in the checkout won't be displayed and you will be redirected to the Adyen HPP to make the selection.</tooltip>
+                                    <tooltip>If you set this to 'Yes', payment methods in the checkout won't be displayed and you will be redirected to the Adyen HPP to make the selection.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_hpp/disable_hpptypes</config_path>
@@ -954,7 +952,7 @@
                                 </disable_hpptypes>
                                 <payment_routines translate="label">
                                     <label>Payment Flow Selection</label>
-                                    <tooltip>Adyen provide you with 2 types of payment routines. The Single-Page flow is dynamic and </tooltip>
+                                    <tooltip>Adyen provides you with 2 types of payment routines. The Single-Page flow is dynamic and contains card validation and animations powered by Javascript. The Multi-Page flow is static, but performs better on  older browsers.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_PaymentRoutines</source_model>
                                     <config_path>payment/adyen_hpp/payment_routines</config_path>
@@ -966,7 +964,7 @@
                                 </payment_routines>
                                 <return_url_in_request>
                                     <label>Return url in request</label>
-                                    <tooltip>If you have a multi webshop and you want to use one skin only, enable this option</tooltip>
+                                    <tooltip>Set to 'Yes' by default. Sending the return URL in the payment request allows a single skin to also be used by multiple store views. Set to 'No' if you want to manually set which URL the shopper redirects to under Test Adyen Customer => Skins => Edit => Result URLs.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_hpp/return_url_in_request</config_path>
@@ -1018,7 +1016,7 @@
                         </title>
                         <show_ideal_logos>
                             <label>Show iDEAL bank logos</label>
-                            <tooltip>Show iDEAL bank logos (radio buttons) instead of dropdown</tooltip>
+                            <tooltip>Show iDEAL bank logos (radio buttons) instead of in a dropdown list.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>30</sort_order>
@@ -1149,7 +1147,7 @@
                         </fee>
                         <different_address_disable>
                             <label>Disable on different billing and delivery addresses</label>
-                            <tooltip>If the delivery address and billing address in the checkout is not the same disable this payment method because Klarna will most likely reject it</tooltip>
+                            <tooltip>Klarna will probably reject payments which have differing billing and delivery addresses. Setting this to 'Yes' will disable this payment method when that is the case.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>39</sort_order>
@@ -1159,7 +1157,7 @@
                         </different_address_disable>
                         <failed_attempt_disable>
                             <label>Disable this payment method if first attempt is refused</label>
-                            <tooltip>If the first attempt is refused don't show this as an payment option for the current quote</tooltip>
+                            <tooltip>If the first attempt is refused, don't show this as an payment option for the current quote.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>45</sort_order>
@@ -1240,7 +1238,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_SepaFlow</source_model>
                             <sort_order>35</sort_order>
-                            <tooltip>If you are not sure just use the default => Sales</tooltip>
+                            <tooltip>If you are not sure just leave it at 'Sale’. If you want to enable 'Auth/Capt' for SEPA Direct Debit, please contact support@adyen.com</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1315,7 +1313,7 @@
                         </sort_order>
                         <delivery_days translate="label">
                             <label>Days for Delivery</label>
-                            <tooltip>How many days to be added to the current date for delivery. ONLY numbers allowed.</tooltip>
+                            <tooltip>How many days to be added to the current date for delivery. ONLY whole numbers allowed.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
