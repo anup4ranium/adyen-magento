@@ -546,7 +546,7 @@
                             <fields>
                                 <fraud_manual_review_status>
                                     <label>Manual Review Status</label>
-                                    <tooltip>This status will be triggered when Adyen communicates a fraud result type of 'AMBER' back in the notifications. If you do not have this set up or do not want a separate status, please keep it on the default (e.g.'— Please Select —').</tooltip>
+                                    <tooltip>This status will be triggered when Adyen notifies your Magento module that the payment has come under Manual Review. If you do not have this set up or do not want a separate status, please keep it on the default (e.g.'— Please Select —').</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_status_pending</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_status</config_path>
