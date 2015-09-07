@@ -130,7 +130,7 @@
                                 </notification_password>
                                 <ws_username_test translate="label">
                                     <label>Test: Web Service Username</label>
-                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
+                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyAccount. Copy and Paste the exact ws username here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_test</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>60</sort_order>
