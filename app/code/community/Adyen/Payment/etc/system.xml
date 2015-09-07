@@ -162,7 +162,7 @@
                                 </ws_test_button>
                                 <ws_username_live translate="label">
                                     <label>Live: Web Service Username</label>
-                                    <tooltip>This is only applicable if you have a Live account. Find this in your Live Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
+                                    <tooltip>This is only applicable if you have a Live account. Find this in your Live Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyAccount. Copy and Paste the exact ws username here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_live</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>90</sort_order>
