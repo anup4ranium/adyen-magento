@@ -19,7 +19,7 @@ You can create issues on our Magento Repository or if you have some specific pro
 <h2>Offical Releases</h2>
 [Click here to see and download the official releases of the Adyen Payment module](https://github.com/Adyen/magento/releases)
 
-<h2>Update script to 2.4.0 for Adyen OneClick users</h2>
+<h2>Update script for 2.4.0 for Adyen OneClick users</h2>
 In the new version of the module 2.4.0 the Recurring References are saved into the Billing Agreements of Magento.
 If you already running the Adyen plugin that has version 2.3.1 or lower you need to import the already saved card data into your Magento store if you want to show OneClick to your current shoppers.
 
