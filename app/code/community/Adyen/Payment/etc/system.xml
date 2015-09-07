@@ -119,7 +119,7 @@
                                 </notification_username>
                                 <notification_password translate="label">
                                     <label>Notification Password</label>
-                                    <tooltip>Set a ç and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => Password.</tooltip>
+                                    <tooltip>Set a password of your choice and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => Password.</tooltip>
                                     <frontend_type>obscure</frontend_type>
                                     <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                                     <config_path>payment/adyen_abstract/notification_password</config_path>
