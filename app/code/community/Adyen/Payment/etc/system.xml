@@ -228,7 +228,7 @@
                                 </payment_pre_authorized>
                                 <payment_authorized translate="label">
                                     <label>Order status: payment confirmed</label>
-                                    <tooltip>Status given to orders after capture result is confirmed by a AUTHORISATION notification for a auto capture or CAPTURE notification for a manual capture from Adyen.</tooltip>
+                                    <tooltip>Status given to orders after capture result is confirmed by an AUTHORISATION notification (if capture mode = immediate) or a CAPTURE notification (if capture mode = manual capture) from Adyen.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_authorized</config_path>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
