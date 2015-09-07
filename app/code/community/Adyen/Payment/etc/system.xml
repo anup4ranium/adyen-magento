@@ -195,7 +195,7 @@
                                 <capture_mode translate="label">
                                     <label>Capture Delay</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>Immediate is the default. Set to manual if you want to perform the capture of funds manually later (only affects credit cards and a few alternative payment methods). You need to change this setting as well in Adyen Backoffice => Settings => Merchant Settings => Capture Delay. If you have selected a capture delay of a couple of days in Adyen of a couple of days keep it here on immediate</tooltip>
+                                    <tooltip>Immediate is the default. Set to manual if you want to perform the capture of funds manually later (only affects credit cards and a few alternative payment methods). You need to change this setting as well in Adyen Backoffice => Settings => Merchant Settings => Capture Delay. If you have selected a capture delay of a couple of days in Adyen keep it here on immediate</tooltip>
                                     <source_model>adyen/source_captureModes</source_model>
                                     <config_path>payment/adyen_abstract/capture_mode</config_path>
                                     <sort_order>120</sort_order>
