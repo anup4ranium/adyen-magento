@@ -108,8 +108,8 @@
                                     <tooltip><![CDATA[ In the test mode you must use test cards. See section Documentation & Support for the link to the test cards]]></tooltip>
                                 </demoMode>
                                 <notification_username translate="label">
-                                    <label>Notification Username</label>
-                                    <tooltip>Set a username of your choice here and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => User Name.</tooltip>
+                                    <label>Notification User Name</label>
+                                    <tooltip>Set a user name of your choice here and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => User Name.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/notification_username</config_path>
                                     <sort_order>40</sort_order>
@@ -119,7 +119,7 @@
                                 </notification_username>
                                 <notification_password translate="label">
                                     <label>Notification Password</label>
-                                    <tooltip>Set a ç and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => Password.</tooltip>
+                                    <tooltip>Set a password of your choice and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => Password.</tooltip>
                                     <frontend_type>obscure</frontend_type>
                                     <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                                     <config_path>payment/adyen_abstract/notification_password</config_path>
@@ -129,8 +129,8 @@
                                     <show_in_store>0</show_in_store>
                                 </notification_password>
                                 <ws_username_test translate="label">
-                                    <label>Test: Web Service Username</label>
-                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
+                                    <label>Test: Web Service User Name</label>
+                                    <tooltip>Find this in your Test Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyAccount. Copy and Paste the exact ws user name here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_test</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>60</sort_order>
@@ -151,7 +151,7 @@
                                 </ws_password_test>
                                 <ws_test_button translate="label">
                                     <label></label>
-                                    <button_label>Test Webserver Credentials for test</button_label>
+                                    <button_label>Test Web Service Credentials for test</button_label>
                                     <config_path>payment/adyen_abstract/ws_test_button</config_path>
                                     <modus>test</modus>
                                     <frontend_model>adyen/adminhtml_system_config_testWebserverConfiguration</frontend_model>
@@ -161,8 +161,8 @@
                                     <show_in_store></show_in_store>
                                 </ws_test_button>
                                 <ws_username_live translate="label">
-                                    <label>Live: Web Service Username</label>
-                                    <tooltip>This is only applicable if you have a Live account. Find this in your Live Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyCode. Copy and Paste the exact ws username here.</tooltip>
+                                    <label>Live: Web Service User Name</label>
+                                    <tooltip>This is only applicable if you have a Live account. Find this in your Live Adyen Customer Area => Settings => Users => System. Normally this will be ws@Company.YourCompanyAccount. Copy and Paste the exact ws user name here.</tooltip>
                                     <config_path>payment/adyen_abstract/ws_username_live</config_path>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>90</sort_order>
@@ -184,7 +184,7 @@
                                 </ws_password_live>
                                 <ws_live_button translate="label">
                                     <label></label>
-                                    <button_label>Test Webserver Credentials for live</button_label>
+                                    <button_label>Test Web Service Credentials for live</button_label>
                                     <config_path>payment/adyen_abstract/ws_live_button</config_path>
                                     <modus>live</modus>
                                     <frontend_model>adyen/adminhtml_system_config_testWebserverConfiguration</frontend_model>
@@ -195,7 +195,7 @@
                                 <capture_mode translate="label">
                                     <label>Capture Delay</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>Immediate is the default. Set to manual if you want to perform the capture of funds manually later (only affects credit cards and a few alternative payment methods). You need to change this setting as well in Adyen Backoffice => Settings => Merchant Settings => Capture Delay. If you have selected a capture delay of a couple of days in Adyen of a couple of days keep it here on immediate</tooltip>
+                                    <tooltip>Immediate is the default. Set to manual if you want to perform the capture of funds manually later (only affects credit cards and a few alternative payment methods). You need to change this setting as well in Adyen Customer Area => Settings => Merchant Settings => Capture Delay. If you have selected a capture delay of a couple of days in Adyen keep it here on immediate</tooltip>
                                     <source_model>adyen/source_captureModes</source_model>
                                     <config_path>payment/adyen_abstract/capture_mode</config_path>
                                     <sort_order>120</sort_order>
@@ -228,7 +228,7 @@
                                 </payment_pre_authorized>
                                 <payment_authorized translate="label">
                                     <label>Order status: payment confirmed</label>
-                                    <tooltip>Status given to orders after capture result is confirmed by a AUTHORISATION notification for a auto capture or CAPTURE notification for a manual capture from Adyen.</tooltip>
+                                    <tooltip>Status given to orders after capture result is confirmed by an AUTHORISATION notification (if capture mode = immediate) or a CAPTURE notification (if capture mode = manual capture) from Adyen.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_authorized</config_path>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
@@ -271,8 +271,8 @@
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
                                 <paypal_capture_mode>
-                                    <label>Use manual-capture for PayPal</label>
-                                    <tooltip>Should be on 'No' by default. If you have requested with Adyen Support for your Paypal integration to be on manual-capture, set this to 'Yes'.</tooltip>
+                                    <label>Use manual capture for PayPal</label>
+                                    <tooltip>Should be on 'No' by default. If you have requested with Adyen Support for your PayPal integration to be on manual capture, set this to 'Yes'.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_PayPalCaptureModes</source_model>
                                     <config_path>payment/adyen_abstract/paypal_capture_mode</config_path>
@@ -283,7 +283,7 @@
                                 </paypal_capture_mode>
                                 <auto_capture_openinvoice>
                                     <label>Use auto-capture for OpenInvoice payments</label>
-                                    <tooltip>Applicable for Klarna and Afterpay only. By default OpenInvoice is set to manual capture. If you want auto capture you need to contact magento@adyen.com. After approval has been given, then you can set this option to 'Yes'.</tooltip>
+                                    <tooltip>Applicable for Klarna and AfterPay only. By default OpenInvoice is set to manual capture. If you want auto capture you need to contact magento@adyen.com. After approval has been given, then you can set this option to 'Yes'.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/auto_capture_openinvoice</config_path>
@@ -294,7 +294,7 @@
                                 </auto_capture_openinvoice>
                                 <payment_authorized_virtual>
                                     <label>Order status: payment capture (virtual products)</label>
-                                    <tooltip>(optional)Select only status assigned to state complete. Leave empty to use the same as normal products</tooltip>
+                                    <tooltip>(optional) Select only status assigned to state complete. Leave empty to use the same as normal products</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_authorized_virtual</config_path>
                                     <source_model>adyen/source_status_complete</source_model>
@@ -316,7 +316,7 @@
                                 </refund_authorized>
                                 <pending_status>
                                     <label>Order status: pending Bank Transfer/SEPA orders</label>
-                                    <tooltip>By default, Adyen does not inform your Magento store about pending payments. If you want these notifications to be received,  Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
+                                    <tooltip>By default, Adyen does not inform your Magento store about pending payments. If you want these notifications to be received, Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/pending_status</config_path>
                                     <source_model>adyen/source_status_pending</source_model>
@@ -327,7 +327,7 @@
                                 </pending_status>
                                 <send_email_bank_sepa_on_pending>
                                     <label>Send order confirmation email for Bank Transfer/SEPA</label>
-                                    <tooltip>Send a confirmation mail after Bank Tranfer/SEPA is placed (not yet paid). If you want these notifications to be received,  Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
+                                    <tooltip>Send a confirmation mail after Bank Tranfer/SEPA is placed (not yet paid). If you want these notifications to be received, Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/send_email_bank_sepa_on_pending</config_path>
@@ -338,7 +338,7 @@
                                 </send_email_bank_sepa_on_pending>
                                 <create_pending_invoice translate="label">
                                     <label>Create a pending invoice (only for manual capture)</label>
-                                    <tooltip>This will create a pending invoice if the AUTHORISATION notification is received.</tooltip>
+                                    <tooltip>This will create a pending invoice if the AUTHORISATION notification is received. Note: this will cause Magento to push all orders to Status:'Processing' once the invoice is created, ignoring all other settings.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>70</sort_order>
@@ -350,7 +350,7 @@
                                 <capture_on_shipment>
                                     <label>Order status: Capture on shipment</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>If you enable this function it will do a capture request to adyen platform if you do a shipment</tooltip>
+                                    <tooltip>If you enable this function it will do a capture request to Adyen if you do a shipment.</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/capture_on_shipment</config_path>
                                     <sort_order>80</sort_order>
@@ -361,26 +361,24 @@
                                 <send_invoice_update_mail translate="label">
                                     <label>Invoice email (deprecated)</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>Enable/Disable update mails</tooltip>
+                                    <tooltip>Enable/Disable update mails to customers.</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/send_invoice_update_mail</config_path>
                                     <sort_order>1000</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                    <tooltip>When an invoice is created, should we send an email</tooltip>
                                 </send_invoice_update_mail>
                                 <send_update_mail translate="label">
-                                    <label>Receive order status update email (deprecated)</label>
+                                    <label>Customers receive order status update email (deprecated).</label>
                                     <frontend_type>select</frontend_type>
-                                    <tooltip>Enable/Disable update mails for all order status changes to the shopper</tooltip>
+                                    <tooltip>Enable/Disable update mails for all order status changes to the shopper.</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/send_update_mail</config_path>
                                     <sort_order>1200</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                    <tooltip>When an order status is changed, should we send an email</tooltip>
                                 </send_update_mail>
                             </fields>
                         </adyen_order_process>
@@ -395,7 +393,7 @@
                             <fields>
                                 <notification_hmac>
                                     <label>Notification HMAC Key</label>
-                                    <tooltip>This is not required and should be left empty by default. You can use this as extra security, or if you do not want to use HTTP authentication. If the latter is the case, leave notification username and password in 'Required Settings' empty and only use this key. Key can be generated at Adyen Customer Area => Server Communication => Standard Notification => Additional Settings => Generate new HMAC key</tooltip>
+                                    <tooltip>This is not required and should be left empty by default. You can use this as extra security, or if you do not want to use HTTP authentication. If the latter is the case, leave notification user name and password in 'Required Settings' empty and only use this key. Key can be generated at Adyen Customer Area => Server Communication => Standard Notification => Additional Settings => Generate new HMAC key</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/notification_hmac</config_path>
                                     <sort_order>77</sort_order>
@@ -405,7 +403,7 @@
                                 </notification_hmac>
                                 <ignore_refund_notification>
                                     <label>Ignore refund notification</label>
-                                    <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento that automatically create a credit memo. If you enable this setting this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
+                                    <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento which automatically creates a credit memo. If you set this setting to 'Yes', this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>230</sort_order>
@@ -416,7 +414,7 @@
                                 </ignore_refund_notification>
                                 <update_notification_cronjob>
                                     <label>Update notification queue by cronjob (every 5 minutes)</label>
-                                    <tooltip>If you are using API methods(CC, SEPA, ELV or Boleto) and your magento order processing is slow, it could be that the notification is faster then magento saves the order. The notification will then be saved in a queue. This is processed on default when next notification is received. If you want to update the notification queue every 5 minutes activate this and make sure cronjob of Magento is called by your webserver</tooltip>
+                                    <tooltip>If you are using API methods(CC, SEPA, ELV or Boleto) and your Magento order processing is slow, it could be that the notification is faster then Magento saves the order. The notification will then be saved in a queue. This is processed on default when next notification is received. If you want to update the notification queue every 5 minutes activate this and make sure cronjob of Magento is called by your web server</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_abstract/update_notification_cronjob</config_path>
@@ -466,7 +464,7 @@
                             </fields>
                         </adyen_billing_agreements>
                         <adyen_checkout_experience type="group" translate="label comment tooltip">
-                            <label>Advanced: Checkout experience</label>
+                            <label>Advanced: Checkout Experience</label>
                             <frontend_type>text</frontend_type>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -498,7 +496,7 @@
                                 </title_renderer>
                                 <shopperlocale translate="label">
                                     <label>Language locale (optional)</label>
-                                    <tooltip>This will override the default shopper locale of the Magento store. Leave empty to let Magento decide (Ex: nl_NL)</tooltip>
+                                    <tooltip>This will override the default shopper locale of the Magento store (e.g. nl_NL). Leave empty to let Magento decide.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_abstract/shopperlocale</config_path>
                                     <sort_order>180</sort_order>
@@ -529,7 +527,7 @@
                             <comment>
                                 <![CDATA[
                                     <p>
-                                    Adyen's Risk analysis tool allows merchants to confgure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
+                                    Adyen's Risk analysis tool allows merchants to configure when a transaction should be rejected or accepted depending on certain characteristics of the payment.
                                 This process has always had two automatic outcomes, either accept or reject the payment. Now, Adyen's risk system can tell merchants when a transaction seems to be risky but without rejecting it, and requires to be manually reviewed in order to decide if it should be accepted or rejected.
                                     If you want this to be turned on please contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>
                                     </p>
@@ -538,7 +536,7 @@
                             <fields>
                                 <fraud_manual_review_status>
                                     <label>Manual Review Status</label>
-                                    <tooltip>If you are using Manual Review and a payment match your case set here the status it should have in magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a seperate status please keep it on -- Please Select --</tooltip>
+                                    <tooltip>If you are using Manual Review and a payment match your case set here the status it should have in Magento. It will then move to processing when you approve the payment on Adyen platform. If you don't have this or don't want a separate status please keep it on -- Please Select --</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_status_pending</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_status</config_path>
@@ -549,7 +547,7 @@
                                 </fraud_manual_review_status>
                                 <fraud_manual_review_accept_status>
                                     <label>Manual Review Accepted Status</label>
-                                    <tooltip>If you do not have an action defined when you accept a manual review you can define a status here. If you have already an action that will be executed or don't want a seperate status please keep it on -- Please Select --</tooltip>
+                                    <tooltip>If you do not have an action defined when you accept a manual review you can define a status here. If you already have an action that will be executed or don't want a separate status please keep it on -- Please Select --</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
@@ -592,6 +590,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+    			            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -609,7 +608,7 @@
                         </cctypes>
                         <cse_enabled translate="label">
                             <label>Enable Client-Side Encryption (CSE)</label>
-                            <tooltip>Contact magento@adyen.com to enable CSE permission on your Adyen account. If you want this to be turned on on your live account please fill in the SAQ A form and send this to salessuport@adyen.com</tooltip>
+                            <tooltip>Contact support@adyen.com to enable CSE permission on your Adyen account. If you want this to be turned on on your live account please fill in the SAQ-A form and send this to salessupport@adyen.com</tooltip>
                             <comment><![CDATA[<a target="_blank" href="https://www.pcisecuritystandards.org/documents/PCI_DSS_v3-1_SAQ_A_rev1-1.docx">Click here to download the SAQ A form</a>]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -619,8 +618,8 @@
                             <show_in_store>1</show_in_store>
                         </cse_enabled>
                         <cse_publickey_test translate="label">
-                            <label>Enter CSE Public Key of Test Adyen Webservice User</label>
-                            <tooltip>Copy this from the Test Adyen Customer Area => Settings => Users => System => [webservice user]=> Client Encryption Public Key.</tooltip>
+                            <label>Enter CSE Public Key of Test Adyen Web Service User</label>
+                            <tooltip>Copy this from the Test Adyen Customer Area => Settings => Users => System => [web service user]=> Client Encryption Public Key.</tooltip>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
@@ -629,9 +628,9 @@
                             <depends><cse_enabled>1</cse_enabled></depends>
                         </cse_publickey_test>
                         <cse_publickey translate="label">
-                            <label>Enter CSE Public Key of Live Adyen Webservice User</label>
+                            <label>Enter CSE Public Key of Live Adyen Web Service User</label>
                             <frontend_type>textarea</frontend_type>
-                            <tooltip>Copy this from the Live Adyen Customer Area => Settings => Users => System => [webservice user] => Client Encryption Public Key.</tooltip>
+                            <tooltip>Copy this from the Live Adyen Customer Area => Settings => Users => System => [web service user] => Client Encryption Public Key.</tooltip>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -639,7 +638,7 @@
                             <depends><cse_enabled>1</cse_enabled></depends>
                         </cse_publickey>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>90</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -648,7 +647,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>100</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -658,11 +657,11 @@
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>101</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Determine the visibility of this payment method in the frontend and/or backend of Magento.</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -685,7 +684,7 @@
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
-                                    <tooltip><![CDATA[Important you have to activate MOTO for your acocunt contact magento@adyen.com. For more information <a target="_blank" href="https://www.adyen.com/dam/documentation/manuals/MotoManual.pdf">check our MOTO manual</a>]]></tooltip>
+                                    <tooltip><![CDATA[Important you have to activate MOTO for your account contact magento@adyen.com. For more information <a target="_blank" href="https://www.adyen.com/dam/documentation/manuals/MotoManual.pdf">check our MOTO manual</a>]]></tooltip>
                                 </enable_moto>
                                 <enable_installments translate="label">
                                     <label>Enable Installments</label>
@@ -806,7 +805,7 @@
                     <label>OneClick - Requires Adyen Credit Card</label>
                     <frontend_type>text</frontend_type>
                     <comment><![CDATA[
-                                During checkout shoppers can choose to have their payment details remembered and stored for trusted websites in Adyen’s highly secure platform. Adyen takes care of this process for its customers. Shoppers can then select in the magento checkout the saved card and checkout with ‘one-click’.
+                                During checkout shoppers can choose to have their payment details remembered and stored for trusted websites in Adyen’s highly secure platform. Adyen takes care of this process for its customers. Shoppers can then select in the Magento checkout the saved card and checkout with ‘OneClick’.
                             ]]></comment>
                     <sort_order>320</sort_order>
                     <show_in_default>1</show_in_default>
@@ -823,7 +822,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <tooltip>One Click payments only work if you have Adyen CC enabled</tooltip>
+                            <tooltip>OneClick payments only work if you have Adyen Credit Card enabled</tooltip>
                         </active>
                         <title translate="label">
                             <label>Title</label>
@@ -835,6 +834,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -876,6 +876,7 @@
                         </active>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -892,8 +893,8 @@
                             <show_in_store>1</show_in_store>
                         </skinCode>
                         <secret_wordt translate="label">
-                            <label>HMAC Key for Test Skin</label>
-                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform</tooltip>
+                            <label>HMAC Key for Test</label>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -902,7 +903,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Copy and paste the skin code of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -928,9 +929,9 @@
                                     <show_in_store>1</show_in_store>
                                 </title>
                                 <delivery_days translate="label">
-                                    <label>Days for Delivery</label>
+                                    <label>Days to Delivery</label>
                                     <validate>validate-digits</validate>
-                                    <tooltip>How many days to be added to the current date for delivery. ONLY numbers allowed.</tooltip>
+                                    <tooltip>How many days to be added to the current date for delivery. ONLY whole numbers allowed.</tooltip>
                                     <frontend_type>text</frontend_type>
                                     <config_path>payment/adyen_hpp/delivery_days</config_path>
                                     <sort_order>70</sort_order>
@@ -940,7 +941,7 @@
                                 </delivery_days>
                                 <disable_hpptypes translate="label">
                                     <label>Leave payment method selection on HPP</label>
-                                    <tooltip>If you say yes here, payment methods in the checkout won't be displayed and you will be redirected to the Adyen HPP to make the selection.</tooltip>
+                                    <tooltip>If you set this to 'Yes', payment methods in the checkout won't be displayed and you will be redirected to the Adyen HPP to make the selection.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_hpp/disable_hpptypes</config_path>
@@ -951,7 +952,7 @@
                                 </disable_hpptypes>
                                 <payment_routines translate="label">
                                     <label>Payment Flow Selection</label>
-                                    <tooltip>Adyen provide you with 2 types of payment routines. The Single-Page flow is dynamic and </tooltip>
+                                    <tooltip>Adyen provides you with 2 types of payment routines. The Single-Page flow is dynamic and contains card validation and animations powered by JavaScript. The Multi-Page flow is static, but performs better on older browsers.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adyen/source_PaymentRoutines</source_model>
                                     <config_path>payment/adyen_hpp/payment_routines</config_path>
@@ -962,8 +963,8 @@
                                     <depends><disable_hpptypes>1</disable_hpptypes></depends>
                                 </payment_routines>
                                 <return_url_in_request>
-                                    <label>Return url in request</label>
-                                    <tooltip>If you have a multi webshop and you want to use one skin only, enable this option</tooltip>
+                                    <label>Return URL in request</label>
+                                    <tooltip>Set to 'Yes' by default. Sending the return URL in the payment request allows a single skin to also be used by multiple store views. Set to 'No' if you want to manually set which URL the shopper redirects to under Test Adyen Customer => Skins => Edit => Result URLs.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <config_path>payment/adyen_hpp/return_url_in_request</config_path>
@@ -974,7 +975,7 @@
                                 </return_url_in_request>
                                 <fee translate="label">
                                     <label>Fee</label>
-                                    <comment>The Payment method name of the HPP payment can be found in Adyen backoffice. Go to Settings => Payment Methods and here you see under the column name the name of the payment method</comment>
+                                    <tooltip>If you want to charge an extra fee for certain payment methods, set that fee here. Do not set any extra fees in the skin in the Adyen Customer Area.</tooltip>
                                     <frontend_model>adyen/adminhtml_system_config_hppPaymentMethodFee</frontend_model>
                                     <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                                     <config_path>payment/adyen_hpp/fee</config_path>
@@ -1015,7 +1016,7 @@
                         </title>
                         <show_ideal_logos>
                             <label>Show iDEAL bank logos</label>
-                            <tooltip>Show iDEAL bank logos (radio buttons) instead of dropdown</tooltip>
+                            <tooltip>Show iDEAL bank logos (radio buttons) instead of in a drop-down list.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>30</sort_order>
@@ -1034,6 +1035,7 @@
                         </fee>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1041,7 +1043,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>49</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1050,7 +1052,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1091,6 +1093,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1143,8 +1146,8 @@
                             <validate>validate-number</validate>
                         </fee>
                         <different_address_disable>
-                            <label>Disable on if billing and delivery addresses differ</label>
-                            <tooltip>If the delivery address and billing address in the checkout is not the same disable this payment method because Klarna will most likely reject it</tooltip>
+                            <label>Disable on different billing and delivery addresses</label>
+                            <tooltip>Klarna will probably reject payments which have differing billing and delivery addresses. Setting this to 'Yes' will disable this payment method when that is the case.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>39</sort_order>
@@ -1154,7 +1157,7 @@
                         </different_address_disable>
                         <failed_attempt_disable>
                             <label>Disable this payment method if first attempt is refused</label>
-                            <tooltip>If the first attempt is refused don't show this as an payment option for the current quote</tooltip>
+                            <tooltip>If the first attempt is refused, don't show this as an payment option for the current quote.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>45</sort_order>
@@ -1163,7 +1166,7 @@
                             <show_in_store>1</show_in_store>
                         </failed_attempt_disable>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>49</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1172,7 +1175,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1213,6 +1216,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1220,11 +1224,11 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <validate_iban>
-                            <label>Validate Iban</label>
+                            <label>Validate IBAN</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>30</sort_order>
-                            <tooltip>This is a basic validation on the Iban number.</tooltip>
+                            <tooltip>This is a basic validation on the IBAN number.</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1234,13 +1238,13 @@
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_SepaFlow</source_model>
                             <sort_order>35</sort_order>
-                            <tooltip>If you are not sure just use the default => Sales</tooltip>
+                            <tooltip>If you are not sure just leave it at 'Sale’. If you want to enable 'Auth/Capt' for SEPA Direct Debit, please contact support@adyen.com</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </flow>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1249,7 +1253,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from pecific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1259,11 +1263,11 @@
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>70</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Where do you want to show this payment method in the backend of Magento or in the frontend for the shoppers</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1300,6 +1304,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1308,7 +1313,7 @@
                         </sort_order>
                         <delivery_days translate="label">
                             <label>Days for Delivery</label>
-                            <tooltip>How many days to be added to the current date for delivery. ONLY numbers allowed.</tooltip>
+                            <tooltip>How many days to be added to the current date for delivery. Only whole numbers allowed.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1355,7 +1360,7 @@
                             <show_in_store>0</show_in_store>
                         </order_overpaid_status>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1364,7 +1369,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1374,11 +1379,11 @@
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>70</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Where do you want to show this payment method in the backend of Magento or in the frontend for the shoppers</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1415,6 +1420,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1464,7 +1470,7 @@
                         </auto_submit_scanner>
                         <express_checkout>
                             <label>Express checkout</label>
-                            <tooltip>This will show a checkout buttton on the shopping cart to directly do a POS payment without going to the checkout steps. You must be logged into your magento account on the front-end to see the button.</tooltip>
+                            <tooltip>This will show a checkout button on the shopping cart to directly do a POS payment without going to the checkout steps. You must be logged into your Magento account on the front-end to see the button.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>37</sort_order>
@@ -1485,7 +1491,7 @@
                         </express_checkout_redirect_connect>
                         <express_checkout_kiosk_mode>
                             <label>Kiosk mode</label>
-                            <tooltip>If you turn kiosk modus on it will not autocomplete the customers based on the filled in email address</tooltip>
+                            <tooltip>If you turn kiosk modus on it will not auto-complete the customers based on the filled in email address</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>45</sort_order>
@@ -1516,7 +1522,7 @@
                         </create_shipment>
                         <ip_filter>
                             <label>IP filter</label>
-                            <tooltip>Enable IP filter let's you define an IP range when this payment method is visable</tooltip>
+                            <tooltip>Enable IP filter let's you define an IP range when this payment method is visible</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>57</sort_order>
@@ -1545,7 +1551,7 @@
                             <depends><ip_filter>1</ip_filter></depends>
                         </ip_filter_to>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1554,7 +1560,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>70</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1594,6 +1600,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1612,7 +1619,7 @@
                         </create_shipment>
                         <cash_express_checkout>
                             <label>Cash Express checkout</label>
-                            <tooltip>This will show a checkout buttton on the shopping cart to directly do a Cash payment without going to the checkout steps. Make sure that you have Cash enabled on your skin and HPP payment method is enabled and correctly configured. You must be logged into your magento account on the front-end to see the button</tooltip>
+                            <tooltip>This will show a checkout button on the shopping cart to directly do a Cash payment without going to the checkout steps. Make sure that you have Cash enabled on your skin and HPP payment method is enabled and correctly configured. You must be logged into your Magento account on the front-end to see the button</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>39</sort_order>
@@ -1662,7 +1669,7 @@
                         </cash_drawer_printer_device_id>
                         <ip_filter>
                             <label>IP filter</label>
-                            <tooltip>Enable IP filter let's you define an IP range when this payment method is visable</tooltip>
+                            <tooltip>Enable IP filter let's you define an IP range when this payment method is visible</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>45</sort_order>
@@ -1691,17 +1698,17 @@
                             <depends><ip_filter>1</ip_filter></depends>
                         </ip_filter_to>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>80</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Where do you want to show this payment method in the backend of Magento or in the frontend for the shoppers</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </visible_type>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>90</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1710,7 +1717,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>100</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1750,6 +1757,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1767,7 +1775,7 @@
                         </session_validity>
                         <skin_code translate="label">
                             <label>Skin Code</label>
-                            <tooltip>The skin code you want to use levae this empty if you want to use the same as Adyen HPP settings</tooltip>
+                            <tooltip>The skin code you want to use leave this empty if you want to use the same as Adyen HPP settings</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1776,7 +1784,7 @@
                         </skin_code>
                         <secret_wordt translate="label">
                             <label>HMAC Key for Test</label>
-                            <tooltip>Should match with the HMAC test key in the Adyen backoffice. Fill this in if you are using a different skin then defined in Adyen HPP</tooltip>
+                            <tooltip>Should match with the HMAC test key in the Adyen Customer Area. Fill this in if you are using a different skin then defined in Adyen HPP</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1785,7 +1793,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Should match with the HMAC live key in the Adyen backoffice. Fill this in if you are using a different skin then defined in Adyen HPP</tooltip>
+                            <tooltip>Should match with the HMAC live key in the Adyen Customer Area. Fill this in if you are using a different skin then defined in Adyen HPP</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1793,11 +1801,11 @@
                             <show_in_store>1</show_in_store>
                         </secret_wordp>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>70</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Where do you want to show this payment method in the backend of Magento or in the frontend for the shoppers</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1834,6 +1842,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1841,7 +1850,7 @@
                             <show_in_store>1</show_in_store>
                         </sort_order>
                         <allowspecific translate="label">
-                            <label>Payment to applicable countries</label>
+                            <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>
                             <sort_order>50</sort_order>
                             <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
@@ -1850,7 +1859,7 @@
                             <show_in_store>1</show_in_store>
                         </allowspecific>
                         <specificcountry translate="label">
-                            <label>Payment to Specific countries</label>
+                            <label>Payment from specific countries</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>60</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1860,11 +1869,11 @@
                             <depends><allowspecific>1</allowspecific></depends>
                         </specificcountry>
                         <visible_type>
-                            <label>Visible in:</label>
+                            <label>Visible in</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adyen/source_VisibleType</source_model>
                             <sort_order>70</sort_order>
-                            <tooltip>Where do you want to show this payment method in the backend of magento or in the frontend for the shoppers</tooltip>
+                            <tooltip>Where do you want to show this payment method in the backend of Magento or in the frontend for the shoppers</tooltip>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
