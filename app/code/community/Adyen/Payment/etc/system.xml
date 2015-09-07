@@ -547,7 +547,7 @@
                                 </fraud_manual_review_status>
                                 <fraud_manual_review_accept_status>
                                     <label>Manual Review Accepted Status</label>
-                                    <tooltip>Only relevant if you do not have an action defined when you accept a manual review. This status will be trigger when a 'MANUAL_REVIEW_ACCEPT' notification is received from Adyen. If you have already asked Adyen to set an action for this (e.g. capture) or don't want a separate status for this, please keep it on the default (e.g.'— Please Select —')</tooltip>
+                                    <tooltip>Only relevant if you do not have an action defined when you accept a manual review. This status will be triggered when a 'MANUAL_REVIEW_ACCEPT' notification is received from Adyen. If you have already asked Adyen to set an action for this (e.g. capture) or don't want a separate status for this, please keep it on the default (e.g.'— Please Select —')</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_order_status_processing</source_model>
                                     <config_path>payment/adyen_abstract/fraud_manual_review_accept_status</config_path>
