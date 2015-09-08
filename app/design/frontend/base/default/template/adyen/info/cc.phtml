@@ -28,10 +28,7 @@
 <?php
 if ($_info = $this->getInfo()) {
 	if ($this->isCseEnabled()) {
-		echo "Adyen Credit Card";
-        if($this->hasInstallments()):
-            echo "<br />" . $this->__('Installments: %s',  $this->htmlEscape($this->getInfo()->getAdditionalInformation('number_of_installments')))."<br/>";
-        endif;
+		echo $this->htmlEscape($this->getMethod()->getTitle());
 	}
 	else {
 		echo $this->__('Name on the Card: %s', $this->htmlEscape($_info->getCcOwner()))."<br/>";
@@ -39,5 +36,9 @@ if ($_info = $this->getInfo()) {
 		echo $this->__('Credit Card Number: xxxx-%s', $this->htmlEscape($_info->getCcLast4()))."<br/>";
 		echo $this->__('Expiration Date: %s/%s', $this->htmlEscape($this->getCcExpMonth()), $this->htmlEscape($_info->getCcExpYear()));
 	}
+
+	if($this->hasInstallments()):
+		echo "<br />" . $this->__('Installments: %s',  $this->htmlEscape($this->getInfo()->getAdditionalInformation('number_of_installments')))."<br/>";
+	endif;
 }
 ?>
