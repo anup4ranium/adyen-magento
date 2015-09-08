@@ -57,16 +57,29 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         	$secretWord = $this->_getConfigData('secret_wordp', 'adyen_hpp');
         }
 
-        $sign = $response->getData('authResult') . $response->getData('pspReference') .
-                $response->getData('merchantReference') . $response->getData('skinCode') .
-                $response->getData('merchantReturnData');
+        // do not include the merchantSig in the merchantSig calculation
+        $result = $response->getData();
+        unset($result['merchantSig']);
 
-        $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
+        $signData = implode(":",array_map(array($this, 'escapeString'),array_merge(array_keys($result), array_values($result))));
+
+        $signMac = Zend_Crypt_Hmac::compute(pack("H*" , $secretWord), 'sha256', $signData);
         $localStringToHash = base64_encode(pack('H*', $signMac));
+
         if (strcmp($localStringToHash, $response->getData('merchantSig')) === 0) {
             return true;
         }
         return false;
+    }
+
+    /*
+   * @desc The character escape function is called from the array_map function in _signRequestParams
+   * $param $val
+   * return string
+   */
+    protected function escapeString($val)
+    {
+        return str_replace(':','\\:',str_replace('\\','\\\\',$val));
     }
 
     /**

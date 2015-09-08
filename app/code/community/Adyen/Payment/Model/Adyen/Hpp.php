@@ -230,26 +230,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $adyFields['deliveryAddressType'] = "";
             $adyFields['shopperType']         = "";
         }
-        //the data that needs to be signed is a concatenated string of the form data
-        $sign = $adyFields['paymentAmount'] .
-            $adyFields['currencyCode'] .
-            $adyFields['shipBeforeDate'] .
-            $adyFields['merchantReference'] .
-            $adyFields['skinCode'] .
-            $adyFields['merchantAccount'] .
-            $adyFields['sessionValidity'] .
-            $adyFields['shopperEmail'] .
-            $adyFields['shopperReference'] .
-            $adyFields['recurringContract'] .
-            $adyFields['blockedMethods'] .
-            $adyFields['merchantReturnData'] .
-            $adyFields['billingAddressType'] .
-            $adyFields['deliveryAddressType'] .
-            $adyFields['shopperType'];
-        //Generate HMAC encrypted merchant signature
-        $secretWord               = $this->_getSecretWord();
-        $signMac                  = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
-        $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
+
         // get extra fields
         $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $this->_order);
         //IDEAL
@@ -268,6 +249,24 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
             $adyFields['resURL'] = $url;
         }
+
+        $secretWord               = $this->_getSecretWord();
+
+        $brandCode        = $this->getInfoInstance()->getCcType();
+        if($brandCode) {
+            $adyFields['brandCode'] = $brandCode;
+        }
+
+
+        // Sort the array by key using SORT_STRING order
+        ksort($adyFields, SORT_STRING);
+
+        // Generate the signing data string
+        $signData = implode(":",array_map(array($this, 'escapeString'),array_merge(array_keys($adyFields), array_values($adyFields))));
+
+        $signMac = Zend_Crypt_Hmac::compute(pack("H*" , $secretWord), 'sha256', $signData);
+        $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
+
         // pos over hpp
 //         disable this because no one using this and it will always show POS payment method
 //         $terminalcode = 'redirect';
@@ -280,6 +279,15 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         return $adyFields;
     }
 
+    /*
+     * @desc The character escape function is called from the array_map function in _signRequestParams
+     * $param $val
+     * return string
+     */
+    protected function escapeString($val)
+    {
+        return str_replace(':','\\:',str_replace('\\','\\\\',$val));
+    }
 
     protected function _getSecretWord($options = null)
     {
@@ -312,7 +320,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                 } else {
                     $url = ($this->getHppOptionsDisabled())
                         ? 'https://test.adyen.com/hpp/select.shtml'
-                        : "https://test.adyen.com/hpp/details.shtml?brandCode=$brandCode";
+                        : "https://test.adyen.com/hpp/details.shtml";
                 }
                 break;
             default:
@@ -321,7 +329,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                 } else {
                     $url = ($this->getHppOptionsDisabled())
                         ? 'https://live.adyen.com/hpp/select.shtml'
-                        : "https://live.adyen.com/hpp/details.shtml?brandCode=$brandCode";
+                        : "https://live.adyen.com/hpp/details.shtml";
                 }
                 break;
         }

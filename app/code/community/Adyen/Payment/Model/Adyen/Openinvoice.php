@@ -205,10 +205,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['billingAddress.stateOrProvince'] .
             $adyFields['billingAddress.country']
         ;
-        //Generate HMAC encrypted merchant signature
-        $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
-        $adyFields['billingAddressSig'] = base64_encode(pack('H*', $signMac));
-
 
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
@@ -226,10 +222,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 $adyFields['deliveryAddress.stateOrProvince'] .
                 $adyFields['deliveryAddress.country']
             ;
-            //Generate HMAC encrypted merchant signature
-            $secretWord = $this->_getSecretWord();
-            $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
-            $adyFields['deliveryAddressSig'] = base64_encode(pack('H*', $signMac));
         }
 
 
@@ -387,23 +379,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $additional_data_sign['openinvoicedata.refundDescription'] = "Refund / Correction for ".$adyFields['merchantReference'];
         $additional_data_sign['openinvoicedata.numberOfLines'] = $count;
 
-        // add merchantsignature in additional signature
-        $additional_data_sign['merchantSig'] = $adyFields['merchantSig'];
-
-        // generate signature
-        ksort($additional_data_sign);
-
         // signature is first alphabatical keys seperate by : and then | and then the values seperate by :
         foreach($additional_data_sign as $key => $value) {
             // add to fields
             $adyFields[$key] = $value;
         }
-
-        $keys = implode(':',array_keys($additional_data_sign));
-        $values = implode(':',$additional_data_sign);
-        $sign_additional_data = trim($keys) . '|' . trim($values);
-        $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign_additional_data);
-        $adyFields['openinvoicedata.sig'] =  base64_encode(pack('H*', $signMac));
 
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
 

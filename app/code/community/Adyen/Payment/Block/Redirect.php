@@ -183,18 +183,16 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
                         </script>
                     </div>';
         } else {
-            $form = new Varien_Data_Form();
-            $form->setAction($payment->getFormUrl())
-                ->setId($payment->getCode())
-                ->setName($payment->getFormName())
-                ->setMethod('POST')
-                ->setUseContainer(true);
+
+            // do not use Magento form because this generate a form_key input field
+            $html .= '<form name="adyenForm" id="' . $payment->getCode() . '" action="' . $payment->getFormUrl() . '" method="post">';
+
             foreach ($payment->getFormFields() as $field => $value) {
-                $form->addField($field, 'hidden', array('name' => $field, 'value' => $value));
+                $html .= '<input type="hidden" name="' .htmlspecialchars($field,   ENT_COMPAT | ENT_HTML401 ,'UTF-8').
+                    '" value="' .htmlspecialchars($value, ENT_COMPAT | ENT_HTML401 ,'UTF-8') . '" />';
             }
 
-            $html.= $this->__(' ');
-            $html.= $form->toHtml();
+            $html .= '</form>';
 
             if($payment->getCode() == "adyen_hpp_c_cash" && $cashDrawer) {
 

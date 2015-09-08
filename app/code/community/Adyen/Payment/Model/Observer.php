@@ -388,8 +388,24 @@ class Adyen_Payment_Model_Observer {
             Mage::throwException(Mage::helper('adyen')->__('You forgot to fill in HMAC key for Test or Live'));
         }
 
-        $signMac = Zend_Crypt_Hmac::compute($hmacKey, 'sha1', implode('', $hmacFields));
+        // Sort the array by key using SORT_STRING order
+        ksort($fields, SORT_STRING);
+
+        // Generate the signing data string
+        $signData = implode(":",array_map(array($this, 'escapeString'),array_merge(array_keys($fields), array_values($fields))));
+
+        $signMac = Zend_Crypt_Hmac::compute(pack("H*" , $hmacKey), 'sha256', $signData);
         $fields['merchantSig'] = base64_encode(pack('H*', $signMac));
+    }
+
+    /*
+     * @desc The character escape function is called from the array_map function in _signRequestParams
+     * $param $val
+     * return string
+     */
+    protected function escapeString($val)
+    {
+        return str_replace(':','\\:',str_replace('\\','\\\\',$val));
     }
 
 
