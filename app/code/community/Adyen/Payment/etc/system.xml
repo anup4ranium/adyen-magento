@@ -450,13 +450,14 @@
                                     The shopper is present for the subsequent transaction, for cards the security code (CVC/CVV) is required.
                                     </p>
                                     <p>
-                                    <strong>RECURRING</strong>: Payment details are stored for future use. For cards, the security
+                                    <strong>RECURRING*</strong>: Payment details are stored for future use. For cards, the security
                                     code (CVC/CVV) is not required for subsequent payments.
                                     </p>
                                     <p>
-                                    <strong>ONECLICK, RECURRING</strong>: Payment details are stored for future use. This allows the use of
+                                    <strong>ONECLICK, RECURRING*</strong>: Payment details are stored for future use. This allows the use of
                                     the stored payment details regardless of whether the shopper is on your site or not.
                                     </p>
+                                    <p>* keep in mind you need the recurring permission enabled. You can contact magento@adyen.com to enable this for your account.
                                 ]]>
                             </comment>
                             <fields>
