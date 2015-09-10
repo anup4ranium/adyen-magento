@@ -163,12 +163,12 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 if($deliveryAddress)
                 {
                     $this->deliveryAddress = new Adyen_Payment_Model_Adyen_Data_DeliveryAddress();
-                    $this->deliveryAddress->street = $helper->getStreet($billingAddress)->getName();
-                    $this->deliveryAddress->houseNumberOrName = $helper->getStreet($billingAddress)->getHouseNumber();
-                    $this->deliveryAddress->city = $billingAddress->getCity();
-                    $this->deliveryAddress->postalCode = $billingAddress->getPostcode();
-                    $this->deliveryAddress->stateOrProvince = $billingAddress->getRegionCode();
-                    $this->deliveryAddress->country = $billingAddress->getCountryId();
+                    $this->deliveryAddress->street = $helper->getStreet($deliveryAddress)->getName();
+                    $this->deliveryAddress->houseNumberOrName = $helper->getStreet($deliveryAddress)->getHouseNumber();
+                    $this->deliveryAddress->city = $deliveryAddress->getCity();
+                    $this->deliveryAddress->postalCode = $deliveryAddress->getPostcode();
+                    $this->deliveryAddress->stateOrProvince = $deliveryAddress->getRegionCode();
+                    $this->deliveryAddress->country = $deliveryAddress->getCountryId();
                 }
 
                 if($paymentMethod == "oneclick") {
