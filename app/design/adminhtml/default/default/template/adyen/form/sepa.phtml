@@ -72,6 +72,18 @@ $_code=$this->getMethodCode();
     </li>
 </ul>
 
+<script type="text/javascript">
+    var $fields = $('payment_form_<?=$_code;?>').select('input', 'select', 'textarea');
+
+    $fields.each(function(field) {
+        field.value = localStorage.getItem(field.id);
+
+        field.observe('change', function() {
+            localStorage.setItem(field.id, field.value);
+        });
+    });
+</script>
+
 <div>
 <span id="ipayment-sepa-please-wait" style="display:none;" class="opc-please-wait">
     <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" class="v-middle" alt=""/> &nbsp; <?php echo $this->__('Submitting payment information...') ?> &nbsp;
