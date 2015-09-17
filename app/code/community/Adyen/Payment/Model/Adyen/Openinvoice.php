@@ -198,13 +198,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
         $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
         $adyFields['billingAddress.country'] = $billingAddress->getCountryId();
-        $sign = $adyFields['billingAddress.street'] .
-            $adyFields['billingAddress.houseNumberOrName'] .
-            $adyFields['billingAddress.city'] .
-            $adyFields['billingAddress.postalCode'] .
-            $adyFields['billingAddress.stateOrProvince'] .
-            $adyFields['billingAddress.country']
-        ;
 
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
@@ -215,13 +208,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
             $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
             $adyFields['deliveryAddress.country'] = $deliveryAddress->getCountryId();
-            $sign = $adyFields['deliveryAddress.street'] .
-                $adyFields['deliveryAddress.houseNumberOrName'] .
-                $adyFields['deliveryAddress.city'] .
-                $adyFields['deliveryAddress.postalCode'] .
-                $adyFields['deliveryAddress.stateOrProvince'] .
-                $adyFields['deliveryAddress.country']
-            ;
         }
 
 
@@ -288,9 +274,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
             $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
 
-            $shoppperSign = $adyFields['shopper.firstName'] . $adyFields['shopper.infix'] . $adyFields['shopper.lastName'] . $adyFields['shopper.gender'] . $adyFields['shopper.dateOfBirthDayOfMonth'] . $adyFields['shopper.dateOfBirthMonth'] . $adyFields['shopper.dateOfBirthYear'] . $adyFields['shopper.telephoneNumber'];
-            $shopperSignMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $shoppperSign);
-            $adyFields['shopperSig'] = base64_encode(pack('H*', $shopperSignMac));
         }
 
 
