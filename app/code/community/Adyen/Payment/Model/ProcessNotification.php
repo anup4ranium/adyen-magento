@@ -267,7 +267,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
             $modification = isset($additionalData['modification']) ? $additionalData['modification'] : null;
             if($modification && is_array($modification)) {
-                $this->_modificationResult = isset($valueArray['action']) ? trim($modification['action']) : "";
+                $this->_modificationResult = isset($modification['action']) ? trim($modification['action']) : "";
             }
             $additionalData2 = isset($additionalData['additionalData']) ? $additionalData['additionalData'] : null;
             if($additionalData2 && is_array($additionalData2)) {
