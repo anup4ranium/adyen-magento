@@ -474,8 +474,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setRefundAuthorized($order);
                     }
                 } else {
-                    $orderStatus = $this->_getConfigData('order_status', 'adyen_abstract', $order->getStoreId());
-
                     if ($order->isCanceled() || $order->getState() === Mage_Sales_Model_Order::STATE_HOLDED) {
                         $this->_debugData['_processNotification info'] = 'Order is already cancelled or holded so do nothing';
                     } else if ($order->canCancel() || $order->canHold()) {
