@@ -213,8 +213,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
 
                         // check if authorise3d was successful
                         if ($result == 'Authorised') {
-                            $order->setState(Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW, true,
-                                Mage::helper('adyen')->__('3D-secure validation was successful.'))->save();
+                            $order->addStatusHistoryComment(Mage::helper('adyen')->__('3D-secure validation was successful'))->save();
                             $this->_redirect('checkout/onepage/success');
                         }
                         else {
@@ -351,7 +350,7 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         } catch (Mage_Core_Exception $e) {
             Adyen_Payment_Exception::logException($e);
         }
-
+x
         $params = $this->getRequest()->getParams();
         if(isset($params['authResult']) && $params['authResult'] == Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED) {
             $session->addError($this->__('You have cancelled the order. Please try again'));
