@@ -265,6 +265,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 $this->_fraudManualReview = false;
             }
 
+            // modification.action is it for JSON
+            $modificationActionJson = isset($additionalData['modification.action']) ? $additionalData['modification.action'] : null;
+            if($modificationActionJson != "") {
+                $this->_modificationResult = $modificationActionJson;
+            }
+
+            // HTTP POST and SOAP have this in a array
             $modification = isset($additionalData['modification']) ? $additionalData['modification'] : null;
             if($modification && is_array($modification)) {
                 $this->_modificationResult = isset($modification['action']) ? trim($modification['action']) : "";
