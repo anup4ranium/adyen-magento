@@ -361,9 +361,22 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         }
         switch ($responseCode) {
             case "RedirectShopper":
-                $payment->setAdditionalInformation('paRequest', $response->paymentResult->paRequest);
-                $payment->setAdditionalInformation('md', $response->paymentResult->md);
-                $payment->setAdditionalInformation('issuerUrl', $response->paymentResult->issuerUrl);
+
+
+                $paRequest = $response->paymentResult->paRequest;
+                $md = $response->paymentResult->md;
+                $issuerUrl = $response->paymentResult->issuerUrl;
+
+                if(!empty($paRequest) && !empty($md) && !empty($issuerUrl)) {
+                    $payment->setAdditionalInformation('paRequest', $response->paymentResult->paRequest);
+                    $payment->setAdditionalInformation('md', $response->paymentResult->md);
+                    $payment->setAdditionalInformation('issuerUrl', $response->paymentResult->issuerUrl);
+                } else {
+                    // log exception
+                    $errorMsg = Mage::helper('adyen')->__('3D secure is not valid');
+                    Adyen_Payment_Exception::throwException($errorMsg);
+                }
+
                 Mage::getSingleton('customer/session')->setRedirectUrl("adyen/process/validate3d");
                 $this->_addStatusHistory($payment, $responseCode, $pspReference, $this->_getConfigData('order_status'));
                 break;

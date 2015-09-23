@@ -175,9 +175,11 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
     }
 
     public function validate3dAction() {
+
+        // get current order
+        $session = $this->_getCheckout();
+
         try {
-            // get current order
-            $session = $this->_getCheckout();
             $order = $this->_getOrder();
             $session->setAdyenQuoteId($session->getQuoteId());
             $session->setAdyenRealOrderId($session->getLastRealOrderId());
@@ -223,10 +225,9 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                         }
                     }
                     else {
-                        $this->_redirect('/');
-                        return $this;
+                        $errorMsg = Mage::helper('adyen')->__('3D secure validation error');
+                        Adyen_Payment_Exception::throwException($errorMsg);
                     }
-
                 }
 
                 // otherwise, redirect to the external URL
@@ -237,13 +238,14 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                         $this->getLayout()->createBlock($this->_redirectBlockType)->setOrder($order)->toHtml()
                     );
                 }
-
             }
             else {
-                $this->_redirect('/');
-                return $this;
+                // log exception
+                $errorMsg = Mage::helper('adyen')->__('3D secure went wrong');
+                Adyen_Payment_Exception::throwException($errorMsg);
             }
         } catch (Exception $e) {
+            Mage::logException($e);
             $session->addException($e, Mage::helper('adyen')->__($e->getMessage()));
             $this->cancel();
         }
