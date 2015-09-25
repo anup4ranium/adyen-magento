@@ -386,11 +386,11 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                             $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED because the saved card is removed. Please try an other payment method.');
                             break;
                         default:
-                            $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
+                            $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED.');
                             break;
                     }
                 } else {
-                    $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED by Adyen.');
+                    $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED.');
                 }
 
                 Adyen_Payment_Exception::throwException($errorMsg);
