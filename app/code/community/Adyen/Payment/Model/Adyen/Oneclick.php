@@ -166,6 +166,20 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
         return $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
     }
 
+
+    /**
+     * @return Adyen_Payment_Model_Billing_Agreement
+     */
+    public function getBillingAgreement()
+    {
+        $subscriptionReference = str_replace('adyen_oneclick_', '', $this->getCode());
+
+        return Mage::getModel('adyen/billing_agreement')->getCollection()
+            ->addFieldToFilter('reference_id', $subscriptionReference)
+            ->getFirstItem();
+    }
+
+
     /**
      * @param Adyen_Payment_Model_Billing_Agreement $billingAgreement
      * @param Mage_Sales_Model_Quote_Payment        $paymentInfo
