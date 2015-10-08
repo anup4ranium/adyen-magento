@@ -67,6 +67,7 @@ class Adyen_Payment_Model_Billing_Agreement_Observer
         $baCollection = Mage::getResourceModel('adyen/billing_agreement_collection');
         $baCollection->addFieldToFilter('customer_id', $customer->getId());
         $baCollection->addFieldToFilter('store_id', $store->getId());
+        $baCollection->addFieldToFilter('method_code', 'adyen_oneclick');
         $baCollection->addActiveFilter();
 
         foreach ($baCollection as $billingAgreement) {
