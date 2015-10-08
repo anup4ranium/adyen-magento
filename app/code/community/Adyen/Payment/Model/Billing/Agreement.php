@@ -111,7 +111,7 @@ class Adyen_Payment_Model_Billing_Agreement
     protected $_paymentMethodInstance = null;
 
     /**
-     * Retreive payment method instance
+     * Retrieve payment method instance
      *
      * @return Mage_Payment_Model_Method_Abstract
      */
@@ -122,6 +122,10 @@ class Adyen_Payment_Model_Billing_Agreement
             $referenceId = $this->getReferenceId();
             $methodInstanceName = $methodCode . "_" . $referenceId;
             $this->_paymentMethodInstance = Mage::helper('payment')->getMethodInstance($methodInstanceName);
+
+            if (! $this->_paymentMethodInstance) {
+                $this->_paymentMethodInstance = Mage::helper('payment')->getMethodInstance($this->getMethodCode());
+            }
         }
         if ($this->_paymentMethodInstance) {
             $this->_paymentMethodInstance->setStore($this->getStoreId());
