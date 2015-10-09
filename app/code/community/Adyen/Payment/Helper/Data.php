@@ -537,13 +537,6 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
     }
 
     /**
-     * @desc Returns the tax rate
-     * @param int $taxClass The tax class to get the rate for
-     * @return double The tax rate
-     */
-
-
-    /**
      * @desc Calculate the tax rate for tax class based on order details
      * @param $order
      * @param $taxClass
