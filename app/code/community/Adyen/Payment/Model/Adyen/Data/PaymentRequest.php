@@ -112,6 +112,10 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 } elseif($payment->getAdditionalInformation("store_cc") == "1") {
                     $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                     $this->recurring->contract = $recurringType;
+                } elseif($recurringType == "RECURRING") {
+                    // recurring permission is not needed from shopper so just save it as recurring
+                    $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                    $this->recurring->contract = "RECURRING";
                 }
             } else {
                 $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
