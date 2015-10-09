@@ -214,8 +214,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
 
             $customer = Mage::getModel('customer/customer')->load($adyFields['shopperReference']);
 
-            if($this->getCustomerAttributeText($customer, 'gender') != "") {
-                $adyFields['shopper.gender'] = strtoupper($this->getCustomerAttributeText($customer, 'gender'));
+            if($customer->getGender()) {
+                $adyFields['shopper.gender'] = $this->getGenderText($customer->getGender());
             } else {
                 // fix for OneStepCheckout (guest is not logged in but uses email that exists with account)
                 $_customer = Mage::getModel('customer/customer');
@@ -226,7 +226,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                     $payment = $order->getPayment();
                     $customerGender = $payment->getAdditionalInformation('customerGender');
                 }
-                $adyFields['shopper.gender'] = strtoupper($_customer->getResource()->getAttribute('gender')->getSource()->getOptionText($customerGender));
+                $adyFields['shopper.gender'] = $this->getGenderText($customerGender);
             }
 
             $adyFields['shopper.infix'] = $customer->getPrefix();
@@ -248,7 +248,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         } else {
             // checkout as guest use details from the order
             $_customer = Mage::getModel('customer/customer');
-            $adyFields['shopper.gender'] = strtoupper($_customer->getResource()->getAttribute('gender')->getSource()->getOptionText($order->getCustomerGender()));
+            $adyFields['shopper.gender'] = $this->getGenderText($order->getCustomerGender());
             $adyFields['shopper.infix'] = $order->getCustomerPrefix();
             $dob = $order->getCustomerDob();
             if (!empty($dob)) {
@@ -372,15 +372,15 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         return $adyFields;
     }
 
-    /**
-     * Get Attribute label
-     * @param type $customer
-     * @param type $code
-     * @return type
-     */
-    public function getCustomerAttributeText($customer, $code='gender') {
-        $helper = Mage::helper('adyen');
-        return $helper->htmlEscape($customer->getResource()->getAttribute($code)->getSource()->getOptionText($customer->getGender()));
+    protected function getGenderText($genderId)
+    {
+        $result = "";
+        if($genderId == '1') {
+            $result = 'MALE';
+        } elseif($genderId == '2') {
+            $result = 'FEMALE';
+        }
+        return $result;
     }
 
     /**
