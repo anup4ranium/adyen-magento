@@ -14,7 +14,7 @@
 "Shipment cost: %s %s <br />","Coût de livriaison: %s %s <br />"
 "System error, please try again later","Erreur système, merci de réessayer ultérieurement"
 "System error, please try again later: %s", "Erreur système, merci de réessayer ultérieurement: %s"
-"The payment is REFUSED by Adyen.", "Le paiement a été refusé."
+"The payment is REFUSED.", "Le paiement a été refusé."
 "You will be redirected to Adyen in a few seconds.", "Vous allez maintenant être redirigé dans quelques secondes."
 "Your payment failed, Please try again later","Votre paiement a échoué"
 "--Please Select--","--Merci de sélectionner--"
