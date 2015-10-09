@@ -290,6 +290,12 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $item->getName();
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($item->getPrice(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? $helper->formatAmount($item->getPriceInclTax(), $currency) - $helper->formatAmount($item->getPrice(), $currency):$helper->formatAmount($item->getTaxAmount(), $currency);
+
+            // Calculate vat percentage
+            if ($item->getTaxPercent() > 0) {
+                $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($item->getTaxPercent());
+            }
+
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
 
             if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
@@ -309,6 +315,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Total Discount');
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getDiscountAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
+            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
             if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
                 $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
@@ -326,7 +333,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $order->getShippingDescription();
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getShippingAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = $helper->formatAmount($order->getShippingTaxAmount(), $currency);
+
+            // Calculate vat percentage
+            $taxClass = Mage::getStoreConfig('tax/classes/shipping_tax_class', $order->getStoreId());
+            $taxRate = $helper->getTaxRate($order, $taxClass);
+            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
+
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+
             if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
                 $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
             } else {
@@ -340,7 +354,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Payment Fee');
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getPaymentFeeAmount(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
+            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+
             if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
                 $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
             } else {
