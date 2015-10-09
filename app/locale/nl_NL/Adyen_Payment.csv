@@ -14,7 +14,7 @@
 "Shipment cost: %s %s <br />","Verzendkosten: %s %s <br />"
 "System error, please try again later","Systeem error. Probeer het later nog eens."
 "System error, please try again later: %s", "Systeem error. Probeer het later nog eens: %s"
-"The payment is REFUSED by Adyen.", "Betaalmethode is AFGEWEZEN door Adyen."
+"The payment is REFUSED by Adyen.", "Betaalmethode is AFGEWEZEN."
 "The transaction is not permitted.", "De transactie is niet toegestaan"
 "Declined due to the Card Security Code(CVC) being incorrect. Please check your CVC code!", "De betaling is afgewezen in verband met een verkeerde Kaart verificatie nummer(CVC). Controleer of u de juiste CVC nummer hebt ingevoerd!"
 "The card is restricted.", "De kaart is niet geschikt."
