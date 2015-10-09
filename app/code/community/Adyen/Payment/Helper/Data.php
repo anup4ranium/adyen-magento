@@ -494,7 +494,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
     public function getStreet($address)
     {
         if (empty($address)) return false;
-        $street = self::formatStreet($address->getStreet());
+        $street = $this->formatStreet($address->getStreet());
         $streetName = $street['0'];
         unset($street['0']);
 //        $streetNr = implode('',$street);
@@ -509,7 +509,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param type $street
      * @return type $street
      */
-    static public function formatStreet($street)
+    protected function formatStreet($street)
     {
         if (count($street) != 1) {
             return $street;
