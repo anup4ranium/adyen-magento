@@ -143,7 +143,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
     /**
      * @desc Get url of Adyen payment
      * @return string
-     * @todo add brandCode here
      */
     public function getFormUrl() {
         $paymentRoutine = $this->_getConfigData('payment_routines', 'adyen_hpp');
@@ -154,14 +153,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://test.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = "https://test.adyen.com/hpp/details.shtml?brandCode=".$openinvoiceType;
+                    $url = 'https://test.adyen.com/hpp/details.shtml';
                 }
                 break;
             default:
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://live.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = "https://live.adyen.com/hpp/details.shtml?brandCode=".$openinvoiceType;
+                    $url = 'https://live.adyen.com/hpp/details.shtml';
                 }
                 break;
         }

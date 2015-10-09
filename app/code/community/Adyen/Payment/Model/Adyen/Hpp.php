@@ -252,11 +252,15 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
         $secretWord               = $this->_getSecretWord();
 
-        $brandCode        = $this->getInfoInstance()->getCcType();
-        if($brandCode) {
+        if ($this->_code == "adyen_openinvoice") {
+            $brandCode = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
             $adyFields['brandCode'] = $brandCode;
+        } else {
+            $brandCode        = $this->getInfoInstance()->getCcType();
+            if($brandCode) {
+                $adyFields['brandCode'] = $brandCode;
+            }
         }
-
 
         // Sort the array by key using SORT_STRING order
         ksort($adyFields, SORT_STRING);
@@ -276,6 +280,8 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 //         $signPOS = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $strsign);
 //         $adyFields['pos.sig'] = base64_encode(pack('H*', $signPOS));
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log', true);
+
+//        print_r($adyFields);die();
         return $adyFields;
     }
 
