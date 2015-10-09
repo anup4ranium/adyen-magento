@@ -119,8 +119,13 @@ class Adyen_Payment_Model_Billing_Agreement
     {
         if (is_null($this->_paymentMethodInstance)) {
             $methodCode = $this->getMethodCode();
-            $referenceId = $this->getReferenceId();
-            $methodInstanceName = $methodCode . "_" . $referenceId;
+            if ($this->getMethodCode() == 'adyen_oneclick') {
+                $referenceId = $this->getReferenceId();
+                $methodInstanceName = $methodCode . "_" . $referenceId;
+            }
+            else {
+                $methodInstanceName = $methodCode;
+            }
             $this->_paymentMethodInstance = Mage::helper('payment')->getMethodInstance($methodInstanceName);
         }
         if ($this->_paymentMethodInstance) {
