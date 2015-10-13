@@ -324,36 +324,50 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY
             || ($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE && $_paymentCode == "adyen_pos"))
         {
-            $paymentObj->setAdyenPspReference($this->_pspReference);
-            if($this->_klarnaReservationNumber != "") {
-                $paymentObj->setAdyenKlarnaNumber($this->_klarnaReservationNumber);
-            }
-            if(isset($ccLast4) && $ccLast4 != "") {
-                $paymentObj->setccLast4($ccLast4);
-            }
-            if(isset($avsResult) && $avsResult != "") {
-                $paymentObj->setAdyenAvsResult($avsResult);
-            }
-            if(isset($cvcResult) && $cvcResult != "") {
-                $paymentObj->setAdyenCvcResult($cvcResult);
-            }
-            if($this->_boletoPaidAmount != "") {
-                $paymentObj->setAdyenBoletoPaidAmount($this->_boletoPaidAmount);
-            }
-            if(isset($totalFraudScore) && $totalFraudScore != "") {
-                $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
-            }
-            if(isset($refusalReasonRaw) && $refusalReasonRaw != "") {
-                $paymentObj->setAdyenRefusalReasonRaw($refusalReasonRaw);
-            }
-            if(isset($acquirerReference) && $acquirerReference != "") {
-                $paymentObj->setAdyenAcquirerReference($acquirerReference);
-            }
-            if(isset($authCode) && $authCode != "") {
-                $paymentObj->setAdyenAuthCode($authCode);
+
+            // if current notification is authorisation : false and the  previous notification was authorisation : true do not update pspreference
+            if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0 || strcmp($this->_success, '') == 0) {
+                $previousAdyenEventCode = $order->getAdyenEventCode();
+                if ($previousAdyenEventCode != "AUTHORISATION : TRUE") {
+                    $this->_updateOrderPaymentWithAdyenAttributes();
+                }
+            } else {
+                $this->_updateOrderPaymentWithAdyenAttributes();
             }
         }
+    }
 
+    protected function _updateOrderPaymentWithAdyenAttributes($paymentObj)
+    {
+        $paymentObj->setAdyenPspReference($this->_pspReference);
+
+        if($this->_klarnaReservationNumber != "") {
+            $paymentObj->setAdyenKlarnaNumber($this->_klarnaReservationNumber);
+        }
+        if(isset($ccLast4) && $ccLast4 != "") {
+            $paymentObj->setccLast4($ccLast4);
+        }
+        if(isset($avsResult) && $avsResult != "") {
+            $paymentObj->setAdyenAvsResult($avsResult);
+        }
+        if(isset($cvcResult) && $cvcResult != "") {
+            $paymentObj->setAdyenCvcResult($cvcResult);
+        }
+        if($this->_boletoPaidAmount != "") {
+            $paymentObj->setAdyenBoletoPaidAmount($this->_boletoPaidAmount);
+        }
+        if(isset($totalFraudScore) && $totalFraudScore != "") {
+            $paymentObj->setAdyenTotalFraudScore($totalFraudScore);
+        }
+        if(isset($refusalReasonRaw) && $refusalReasonRaw != "") {
+            $paymentObj->setAdyenRefusalReasonRaw($refusalReasonRaw);
+        }
+        if(isset($acquirerReference) && $acquirerReference != "") {
+            $paymentObj->setAdyenAcquirerReference($acquirerReference);
+        }
+        if(isset($authCode) && $authCode != "") {
+            $paymentObj->setAdyenAuthCode($authCode);
+        }
     }
 
     /**
