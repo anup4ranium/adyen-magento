@@ -332,7 +332,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $this->_updateOrderPaymentWithAdyenAttributes($paymentObj);
                 }
             } else {
-                $this->_updateOrderPaymentWithAdyenAttributes();
+                $this->_updateOrderPaymentWithAdyenAttributes($paymentObj);
             }
         }
     }
