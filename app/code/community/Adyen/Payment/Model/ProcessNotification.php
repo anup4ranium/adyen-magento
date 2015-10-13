@@ -329,7 +329,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0 || strcmp($this->_success, '') == 0) {
                 $previousAdyenEventCode = $order->getAdyenEventCode();
                 if ($previousAdyenEventCode != "AUTHORISATION : TRUE") {
-                    $this->_updateOrderPaymentWithAdyenAttributes();
+                    $this->_updateOrderPaymentWithAdyenAttributes($paymentObj);
                 }
             } else {
                 $this->_updateOrderPaymentWithAdyenAttributes();
