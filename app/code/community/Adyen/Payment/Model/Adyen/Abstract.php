@@ -140,6 +140,17 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
         $order = $payment->getOrder();
 
+        /*
+         * ReserveOrderId for this quote so payment failed notification
+         * does not interfere with new successful orders
+         */
+        $incrementId = $order->getIncrementId();
+        $quoteId = $order->getQuoteId();
+        $quote = Mage::getModel('sales/quote')
+            ->load($quoteId)
+            ->setReserveOrderId($incrementId)
+            ->save();
+
         // by zero authentication payment is authorised when api responds is succesfull
         if($order->getGrandTotal() == 0) {
             $payment->setIsTransactionPending(false);
