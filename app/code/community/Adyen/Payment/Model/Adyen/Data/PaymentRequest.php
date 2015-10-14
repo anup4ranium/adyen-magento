@@ -132,7 +132,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         }
 
         if(isset($_SERVER['HTTP_USER_AGENT'])) {
-            $this->b->userAgent = $_SERVER['HTTP_USER_AGENT'];
+            $this->browserInfo->userAgent = $_SERVER['HTTP_USER_AGENT'];
         }
 
         switch ($paymentMethod) {
