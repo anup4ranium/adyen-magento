@@ -148,7 +148,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $quoteId = $order->getQuoteId();
         $quote = Mage::getModel('sales/quote')
             ->load($quoteId)
-            ->setReserveOrderId($incrementId)
+            ->setReservedOrderId($incrementId)
             ->save();
 
         // by zero authentication payment is authorised when api responds is succesfull
@@ -417,6 +417,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED.');
                 }
 
+                $this->resetReservedOrderId();
                 Adyen_Payment_Exception::throwException($errorMsg);
                 break;
             case "Authorised":
@@ -440,9 +441,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             case "Error":
                 $errorMsg = Mage::helper('adyen')->__('System error, please try again later');
                 Adyen_Payment_Exception::throwException($errorMsg);
+                $this->resetReservedOrderId();
                 break;
             default:
-                $this->writeLog("Unknown data type by Adyen");
+                $errorMsg = Mage::helper('adyen')->__('Unknown data type by Adyen');
+                Adyen_Payment_Exception::throwException($errorMsg);
+                $this->resetReservedOrderId();
                 break;
         }
 
@@ -457,6 +461,15 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             ->saveData()
         ;
         return $this;
+    }
+
+    /**
+     * @desc Reset the reservedOrderId so Adyen notification will not interfere with
+     * the next payment
+     */
+    protected function resetReservedOrderId()
+    {
+        Mage::getSingleton('checkout/session')->getQuote()->setReservedOrderId(null);
     }
 
     /**
