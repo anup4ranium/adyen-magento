@@ -1175,6 +1175,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </failed_attempt_disable>
+                        <ignore_second_address_field>
+                            <label>Ignore the second address line field</label>
+                            <tooltip>If you do not want to send the second line address field to Klarna set this setting to 'Yes'</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>47</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ignore_second_address_field>
                         <allowspecific translate="label">
                             <label>Payment from applicable countries</label>
                             <frontend_type>allowspecific</frontend_type>

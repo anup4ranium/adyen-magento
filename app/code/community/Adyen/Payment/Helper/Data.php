@@ -491,10 +491,10 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param type $address
      * @return Varien_Object
      */
-    public function getStreet($address)
+    public function getStreet($address, $klarna = false)
     {
         if (empty($address)) return false;
-        $street = $this->formatStreet($address->getStreet());
+        $street = $this->formatStreet($address->getStreet(), $klarna);
         $streetName = $street['0'];
         unset($street['0']);
 //        $streetNr = implode('',$street);
@@ -509,12 +509,24 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      * @param type $street
      * @return type $street
      */
-    protected function formatStreet($street)
+    protected function formatStreet($street, $klarna)
     {
-        if (count($street) != 1) {
+        $formatStreetOnMultiStreetLines = false;
+
+        /*
+         * If ignore second line steet is enabled for klarna only look at the first addressfield
+         * and try to substract housenumber
+         */
+        if($klarna) {
+            if($this->getConfigData('ignore_second_address_field','adyen_openinvoice')) {
+                $formatStreetOnMultiStreetLines = true;
+            }
+        }
+
+        if (!$formatStreetOnMultiStreetLines && count($street) != 1) {
             return $street;
         }
-//        preg_match('/((\s\d{0,10})|(\s\d{0,10}\w{1,3}))$/i', $street['0'], $houseNumber, PREG_OFFSET_CAPTURE);
+
         preg_match('/\s(\d+.*)$/i', $street['0'], $houseNumber, PREG_OFFSET_CAPTURE);
         if(!empty($houseNumber['0'])) {
             $_houseNumber = trim($houseNumber['0']['0']);
