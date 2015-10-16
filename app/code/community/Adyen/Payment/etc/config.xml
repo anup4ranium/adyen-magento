@@ -325,6 +325,7 @@
                 <group>adyen</group>
                 <title>Adyen iDEAL</title>
                 <show_ideal_logos>0</show_ideal_logos>
+                <autoselect_stored_ideal_bank>1</autoselect_stored_ideal_bank>
                 <sort_order>35</sort_order>
                 <allowspecific>1</allowspecific>
                 <specificcountry>NL</specificcountry>

@@ -52,9 +52,13 @@ class Adyen_Payment_Model_Adyen_Ideal
             );
         }
 
-        if (isset($issuers[$this->getInfoInstance()->getPoNumber()])) {
-            $issuers[$this->getInfoInstance()->getPoNumber()]['selected'] = true;
+        // check if auto select is turned on in the settings
+        if ($this->_getConfigData('autoselect_stored_ideal_bank', 'adyen_ideal')) {
+            if (isset($issuers[$this->getInfoInstance()->getPoNumber()])) {
+                $issuers[$this->getInfoInstance()->getPoNumber()]['selected'] = true;
+            }
         }
+
         ksort($issuers);
         return $issuers;
     }
