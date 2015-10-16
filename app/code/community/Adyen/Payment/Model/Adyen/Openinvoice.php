@@ -191,8 +191,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $billingAddress = $order->getBillingAddress();
         $adyFields['shopper.firstName'] = $billingAddress->getFirstname();
         $adyFields['shopper.lastName'] = $billingAddress->getLastname();
-        $adyFields['billingAddress.street'] = $helper->getStreet($billingAddress)->getName();
-        $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress)->getHouseNumber();
+        $adyFields['billingAddress.street'] = $helper->getStreet($billingAddress,true)->getName();
+        $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
         $adyFields['billingAddress.city'] = $billingAddress->getCity();
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
         $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
@@ -201,8 +201,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
         {
-            $adyFields['deliveryAddress.street'] = $helper->getStreet($deliveryAddress)->getName();
-            $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress)->getHouseNumber();
+            $adyFields['deliveryAddress.street'] = $helper->getStreet($deliveryAddress,true)->getName();
+            $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
             $adyFields['deliveryAddress.city'] = $deliveryAddress->getCity();
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
             $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
@@ -298,6 +298,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
 
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
 
+            // afterpay_default_nl ?
             if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
                 $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
             } else {
