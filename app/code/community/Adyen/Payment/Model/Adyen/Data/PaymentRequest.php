@@ -226,7 +226,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     } else {
                         if($paymentMethod == 'cc') {
                             // For CC encrypted data is needed if you use CSE
-                            Mage::throwException(
+                            Adyen_Payment_Exception::throwException(
                                 Mage::helper('adyen')->__('Missing the encrypted data value. Make sure the Client Side Encryption(CSE) script did encrypt the Credit Card details')
                             );
                         }
