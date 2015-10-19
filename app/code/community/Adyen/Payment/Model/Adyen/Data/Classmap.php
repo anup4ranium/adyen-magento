@@ -29,7 +29,7 @@ class Adyen_Payment_Model_Adyen_Data_Classmap extends Adyen_Payment_Model_Adyen_
 
     public $Amount;
     public $capture;
-    public $ModificationRequest;
-    public $ModificationResult;
+    public $modificationRequest;
+    public $modificationResult;
 
 }
