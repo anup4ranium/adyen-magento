@@ -224,7 +224,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         ) {
             $adyFields['billingAddressType']  = "1";
             $adyFields['deliveryAddressType'] = "1";
-            $adyFields['shopperType']         = "0";
+            $adyFields['shopperType']         = "";
         } else {
             $adyFields['billingAddressType']  = "";
             $adyFields['deliveryAddressType'] = "";
