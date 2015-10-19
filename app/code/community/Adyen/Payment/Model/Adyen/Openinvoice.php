@@ -318,9 +318,10 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? $helper->formatAmount($item->getPriceInclTax(), $currency) - $helper->formatAmount($item->getPrice(), $currency):$helper->formatAmount($item->getTaxAmount(), $currency);
 
             // Calculate vat percentage
-            if ($item->getTaxPercent() > 0) {
-                $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($item->getTaxPercent());
-            }
+            $id = $item->getProductId();
+            $product = $this->_loadProductById($id);
+            $taxRate = $helper->getTaxRate($order, $product->getTaxClassId());
+            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
 
             $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
 
@@ -424,6 +425,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
 
         return $adyFields;
+    }
+
+    protected function _loadProductById($id)
+    {
+        return Mage::getModel('catalog/product')->load($id);
     }
 
     protected function getGenderText($genderId)
