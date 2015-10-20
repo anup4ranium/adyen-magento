@@ -200,14 +200,6 @@
                     </adyen_payment_capture_invoice_on_shipment>
                 </observers>
             </sales_order_shipment_save_after>
-            <custom_quote_process>
-                <observers>
-                    <adyen_payment_reactivate_quote>
-                        <class>adyen/observer</class>
-                        <method>reactivateQuote</method>
-                    </adyen_payment_reactivate_quote>
-                </observers>
-            </custom_quote_process>
         </events>
     </global>
 
