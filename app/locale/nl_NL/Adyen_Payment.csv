@@ -63,3 +63,6 @@
 "Bank account holder name","Naam rekeninghouder",
 "IBAN","IBAN"
 "Invalid Iban number.","Ongeldig IBAN nummer"
+"POS Payment","POS Betaling"
+"Payment","Betalen"
+"If you stuck on this page please press the payment button","Om de bestelling te voltooien druk op 'Betalen'"

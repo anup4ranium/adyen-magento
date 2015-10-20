@@ -112,12 +112,12 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
             $html .= "<div id=\"pos-redirect-page\">
     					<div class=\"logo\"></div>
     					<div class=\"grey-header\">
-    						<h1>POS Payment</h1>
+    						<h1>{$this->__('POS Payment')}</h1>
     					</div>
     					<div class=\"amount-box\">".
                 $adyFields['paymentAmountGrandTotal'] .
-                "<a id=\"launchlink\" href=\"".$launchlink ."\" >Payment</a> ".
-                "<span id=\"adyen-redirect-text\">If you stuck on this page please press the payment button</span></div>";
+                "<a id=\"launchlink\" href=\"".$launchlink ."\" >{$this->__('Payment')}</a> ".
+                "<span id=\"adyen-redirect-text\">{$this->__('If you stuck on this page please press the payment button')}</span></div>";
 
             $html .= '<script type="text/javascript">
     				//<![CDATA[
