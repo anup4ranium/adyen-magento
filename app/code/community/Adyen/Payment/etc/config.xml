@@ -29,7 +29,7 @@
 <config>
     <modules>
         <Adyen_Payment>
-            <version>2.4.0</version>
+            <version>2.4.2</version>
         </Adyen_Payment>
     </modules>
     <global>
@@ -200,6 +200,14 @@
                     </adyen_payment_capture_invoice_on_shipment>
                 </observers>
             </sales_order_shipment_save_after>
+            <custom_quote_process>
+                <observers>
+                    <adyen_payment_reactivate_quote>
+                        <class>adyen/observer</class>
+                        <method>reactivateQuote</method>
+                    </adyen_payment_reactivate_quote>
+                </observers>
+            </custom_quote_process>
         </events>
     </global>
 
@@ -302,7 +310,6 @@
                 <ignore_refund_notification>0</ignore_refund_notification>
             </adyen_abstract>
             <adyen_hpp translate="title" module="adyen">
-                <customer_id backend_model="adminhtml/system_config_backend_encrypted"/>
                 <currency>EUR</currency>
                 <model>adyen/adyen_hpp</model>
                 <group>adyen</group>
