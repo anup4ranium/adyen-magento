@@ -57,9 +57,23 @@ class Adyen_Payment_Model_Authenticate extends Mage_Core_Model_Abstract {
         	$secretWord = $this->_getConfigData('secret_wordp', 'adyen_hpp');
         }
 
-        // do not include the merchantSig in the merchantSig calculation
-        $result = $response->getData();
+        // do it like this because $_GET is converting dot to underscore
+        $queryString = $_SERVER['QUERY_STRING'];
+        $result = array();
+        $pairs = explode("&", $queryString);
+
+        foreach ($pairs as $pair) {
+            $nv = explode("=", $pair);
+            $name = urldecode($nv[0]);
+            $value = urldecode($nv[1]);
+            $result[$name] = $value;
+        }
+
+        // do not use merchantSig in calculation
         unset($result['merchantSig']);
+
+        // Sort the array by key using SORT_STRING order
+        ksort($result, SORT_STRING);
 
         $signData = implode(":",array_map(array($this, 'escapeString'),array_merge(array_keys($result), array_values($result))));
 
