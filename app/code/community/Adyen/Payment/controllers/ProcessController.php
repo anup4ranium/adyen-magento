@@ -356,6 +356,8 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         $params = $this->getRequest()->getParams();
         if(isset($params['authResult']) && $params['authResult'] == Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED) {
             $session->addError($this->__('You have cancelled the order. Please try again'));
+        } elseif($order->getPayment()->getMethod() == "adyen_openinvoice") {
+            $session->addError($this->__('Your openinvoice payment failed'));
         } else {
             $session->addError($this->__('Your payment failed, Please try again later'));
         }
