@@ -17,6 +17,7 @@
 "The payment is REFUSED.", "El pago fue RECHAZADO."
 "You will be redirected to Adyen in a few seconds.", "Va a ser redireccionado al website de Adyen en unos segundos."
 "Your payment failed, Please try again later","Su pago falló"
+"Your openinvoice payment failed","Su pago falló"
 "--Please Select--","--Por favor seleccione--"
 "Account Number","Número de cuenta"
 "Account holder name","Nombre del titular de cuenta"

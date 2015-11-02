@@ -17,6 +17,7 @@
 "The payment is REFUSED.", "Die Bezahlung wurde zurückgewiesen."
 "You will be redirected to Adyen in a few seconds.", "In einigen Sekunden werden Sie zu Adyen weitergeleitet."
 "Your payment failed, Please try again later","Ihre Bezahlung ist fehlgeschlagen."
+"Your openinvoice payment failed","Ihre Bezahlung ist fehlgeschlagen."
 "--Please Select--","--Bitte auswählen--"
 "Account Number","Kontonummer"
 "Account holder name","Name des Kontoinhabers"
