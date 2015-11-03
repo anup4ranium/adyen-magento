@@ -185,7 +185,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // update order details
         $this->_updateAdyenAttributes($order, $params);
 
-        // check if success is true of false
+        // check if success is true of false or empty
         if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0 || strcmp($this->_success, '') == 0) {
             // Only cancel the order when it is in state pending, payment review or if the ORDER_CLOSED is failed (means split payment has not be successful)
             if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $order->getState() === Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
@@ -706,6 +706,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $status = (!empty($status)) ? $status : $order->getStatus();
         $order->addStatusHistoryComment(Mage::helper('adyen')->__('Adyen Refund Successfully completed'), $status);
         $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
+        /**
+         * save the order this is needed for older magento version so that status is not reverted to state NEW
+         */
+        $order->save();
     }
 
     /**
@@ -755,6 +759,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         if(!empty($status)) {
             $order->addStatusHistoryComment(Mage::helper('adyen')->__('Payment is pre authorised waiting for capture'), $status);
             $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
+            /**
+             * save the order this is needed for older magento version so that status is not reverted to state NEW
+             */
+            $order->save();
             $this->_debugData['_setPrePaymentAuthorized'] = 'Order status is changed to Pre-authorised status, status is ' . $status;
         } else {
             $this->_debugData['_setPrePaymentAuthorized'] = 'No pre-authorised status is used so ignore';
@@ -790,6 +798,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $status = $fraudManualReviewStatus;
                     $comment = "Adyen Payment is in Manual Review check the Adyen platform";
                     $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
+                    /**
+                     * save the order this is needed for older magento version so that status is not reverted to state NEW
+                     */
+                    $order->save();
                 }
             }
 
@@ -1005,6 +1017,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // create invoice for the capture notification if you are on manual capture
         if($createInvoice == true && $amount == $orderAmount) {
             $this->_debugData['_setPaymentAuthorized amount'] = 'amount notification:'.$amount . ' amount order:'.$orderAmount;
+            // FIXME: createInvoice calls _setPaymentAuthorized fix this because you do not want this here
             $this->_createInvoice($order);
         }
 
@@ -1067,6 +1080,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $status = (!empty($status)) ? $status : $order->getStatus();
         $order->addStatusHistoryComment(Mage::helper('adyen')->__($comment), $status);
         $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
+        /**
+         * save the order this is needed for older magento version so that status is not reverted to state NEW
+         */
+        $order->save();
         $this->_debugData['_setPaymentAuthorized end'] = 'Order status is changed to authorised status, status is ' . $status;
     }
 
@@ -1148,6 +1165,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $pendingStatus = $this->_getConfigData('pending_status', 'adyen_abstract', $order->getStoreId());
             if($pendingStatus != "") {
                 $order->addStatusHistoryComment($comment, $pendingStatus);
+                /**
+                 * save order needed for old magento version so that status is not reverted to state NEW
+                 */
+                $order->save();
+
                 $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $pendingStatus;
                 return;
             }
@@ -1159,6 +1181,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         {
             $manualReviewAcceptStatus = $this->_getFraudManualReviewAcceptStatus($order);
             $order->addStatusHistoryComment($comment, $manualReviewAcceptStatus);
+            /**
+             * save order needed for old magento version so that status is not reverted to state NEW
+             */
+            $order->save();
             $this->_debugData['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $manualReviewAcceptStatus;
             return;
         }
