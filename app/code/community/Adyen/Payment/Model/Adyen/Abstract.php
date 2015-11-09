@@ -440,14 +440,14 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 $this->_addStatusHistory($payment, $responseCode, $pspReference);
                 break;
             case "Error":
+                $this->resetReservedOrderId();
                 $errorMsg = Mage::helper('adyen')->__('System error, please try again later');
                 Adyen_Payment_Exception::throwException($errorMsg);
-                $this->resetReservedOrderId();
                 break;
             default:
+                $this->resetReservedOrderId();
                 $errorMsg = Mage::helper('adyen')->__('Unknown data type by Adyen');
                 Adyen_Payment_Exception::throwException($errorMsg);
-                $this->resetReservedOrderId();
                 break;
         }
 
