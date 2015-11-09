@@ -414,17 +414,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </ignore_refund_notification>
-                                <update_notification_cronjob>
-                                    <label>Update notification queue by cronjob (every 5 minutes)</label>
-                                    <tooltip>If you are using API methods(CC, SEPA, ELV or Boleto) and your Magento order processing is slow, it could be that the notification is faster then Magento saves the order. The notification will then be saved in a queue. This is processed on default when next notification is received. If you want to update the notification queue every 5 minutes activate this and make sure cronjob of Magento is called by your web server</tooltip>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <config_path>payment/adyen_abstract/update_notification_cronjob</config_path>
-                                    <sort_order>240</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>0</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </update_notification_cronjob>
                                 <multiple_merchants translate="label">
                                     <label>Allow multiple merchants</label>
                                     <tooltip><![CDATA[Allow notifications sent from other Adyen merchant accounts. Keep in mind that the Notification user name and password should be the same for all the merchant accounts]]></tooltip>

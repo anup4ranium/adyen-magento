@@ -87,28 +87,14 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $incrementId = $params->getData('merchantReference');
 
             if($incrementId) {
-                $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
-                if ($order->getId()) {
-                    // set StoreId for retrieving debug log setting
-                    $storeId = $order->getStoreId();
-
-                    $this->_updateOrder($order, $params);
-                } else {
-                    $this->_debugData['error'] = 'Order does not exists with increment_id: ' . $incrementId;
-                    $this->_addNotificationToQueue($params);
-                }
+                $this->_debugData['error'] = 'Add this notification with Order increment_id to queue: ' . $incrementId;
+                $this->_addNotificationToQueue($params);
             } else {
                 $this->_debugData['error'] = 'Empty merchantReference';
             }
         } else {
             $this->_debugData['processResponse info'] = 'Skipping duplicate notification';
         }
-
-        // update the queue if it is not processed by cronjob
-        if(!$this->_getConfigData('update_notification_cronjob')) {
-            $this->_updateNotProcessedNotifications();
-        }
-
         $this->_debug($storeId);
     }
 
@@ -1239,60 +1225,27 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $eventCode = trim($params->getData('eventCode'));
         $success = (trim($params->getData('success')) == 'true' || trim($params->getData('success')) == '1') ? true : false;
-        // only log the AUTHORISATION with Sucess true because with false the order will never be created in magento
-        if($eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $success == true) {
-            // pspreference is always numeric otherwise it is a test notification
+        $pspReference = $params->getData('pspReference');
+        if(is_numeric($pspReference)) {
+            $this->_debugData['AddNotificationToQueue Step1'] = 'Going to add notification to queue';
+
+            $incrementId = $params->getData('merchantReference');
             $pspReference = $params->getData('pspReference');
-            if(is_numeric($pspReference)) {
-                $this->_debugData['AddNotificationToQueue Step1'] = 'Going to add notification to queue';
+            $eventCode = $params->getData('eventCode');
 
-                $incrementId = $params->getData('merchantReference');
-                $pspReference = $params->getData('pspReference');
-                $eventCode = $params->getData('eventCode');
+            // add current request to the queue
+            $eventQueue = Mage::getModel('adyen/event_queue');
+            $eventQueue->setPspReference($pspReference);
+            $eventQueue->setAdyenEventCode($eventCode);
+            $eventQueue->setIncrementId($incrementId);
+            $eventQueue->setAttempt(1);
+            $eventQueue->setResponse(serialize($params));
+            $eventQueue->setCreatedAt(now());
+            $eventQueue->save();
+            $this->_debugData['AddNotificationToQueue Step2'] = 'Notification is added to the queue';
 
-                // check if already exists in the queue (sometimes Adyen Platform can send the same notification twice)
-                $eventResults = Mage::getModel('adyen/event_queue')->getCollection()
-                    ->addFieldToFilter('increment_id', $incrementId);
-                $eventResults->getSelect()->limit(1);
-
-                $eventQueue = null;
-                if($eventResults->getSize() > 0) {
-                    $eventQueue = current($eventResults->getItems());
-                }
-
-                if($eventQueue) {
-                    $this->_debugData['AddNotificationToQueue Step2'] = 'Notification already in the queue';
-                    $attempt = (int)$eventQueue->getAttempt();
-                    try{
-                        $eventQueue->setAttempt(++$attempt);
-                        $eventQueue->save();
-                        $this->_debugData['AddNotificationToQueue Step3'] = 'Updated the attempt of the Queue to ' . $eventQueue->getAttempt();
-                    } catch(Exception $e) {
-                        $this->_debugData['AddNotificationToQueue error'] = 'Could not update the notification to queue, reason: ' . $e->getMessage();
-                        Mage::logException($e);
-                    }
-                } else {
-                    try {
-                        // add current request to the queue
-                        $eventQueue = Mage::getModel('adyen/event_queue');
-                        $eventQueue->setPspReference($pspReference);
-                        $eventQueue->setAdyenEventCode($eventCode);
-                        $eventQueue->setIncrementId($incrementId);
-                        $eventQueue->setAttempt(1);
-                        $eventQueue->setResponse(serialize($params));
-                        $eventQueue->setCreatedAt(now());
-                        $eventQueue->save();
-                        $this->_debugData['AddNotificationToQueue Step2'] = 'Notification is added to the queue';
-                    } catch(Exception $e) {
-                        $this->_debugData['AddNotificationToQueue error'] = 'Could not save the notification to queue, reason: ' . $e->getMessage();
-                        Mage::logException($e);
-                    }
-                }
-            } else {
-                $this->_debugData['AddNotificationToQueue'] = 'Notification is a TEST Notification so do not add to queue';
-            }
         } else {
-            $this->_debugData['AddNotificationToQueue'] = 'Notification is not a AUTHORISATION Notification so do not add to queue';
+            $this->_debugData['AddNotificationToQueue'] = 'Notification is a TEST Notification so do not add to queue';
         }
     }
 
@@ -1319,47 +1272,51 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _updateNotProcessedNotifications() {
 
         $this->_debugData['UpdateNotProcessedEvents Step1'] = 'Going to update Notifications from the queue';
+
         // try to update old notifications that did not processed yet
         $collection = Mage::getModel('adyen/event_queue')->getCollection()
-            ->addFieldToFilter('attempt', array('lteq' => '4'));
+            ->addFieldToFilter('attempt', array('lteq' => '4'))
+            ->addFieldToFilter('created_at', array(
+                'from' => strtotime('-1 day', time()),
+                'to' => strtotime('-5 minutes', time()),
+                'datetime' => true))
+            ->addOrder('created_at', 'asc');
 
         if($collection->getSize() > 0) {
             foreach($collection as $event){
-                if($event->getAdyenEventCode() == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION) {
 
-                    $incrementId = $event->getIncrementId();
+                $incrementId = $event->getIncrementId();
 
-                    $this->_debugData['UpdateNotProcessedEvents Step2'] = 'Going to update notification with incrementId: ' . $incrementId;
+                $this->_debugData['UpdateNotProcessedEvents Step2'] = 'Going to update notification with incrementId: ' . $incrementId;
 
-                    $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
-                    if ($order->getId()) {
+                $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
+                if ($order->getId()) {
 
-                        $this->_debugData['UpdateNotProcessedEvents Step3'] = 'Order exists going to update it';
-                        // try to process it now
-                        $params = unserialize($event->getResponse());
+                    $this->_debugData['UpdateNotProcessedEvents Step3'] = 'Order exists going to update it';
+                    // try to process it now
+                    $params = unserialize($event->getResponse());
 
-                        $this->_debugData['UpdateNotProcessedEvents params'] = $params->debug();
+                    $this->_debugData['UpdateNotProcessedEvents params'] = $params->debug();
 
-                        $this->_updateOrder($order, $params);
+                    $this->_updateOrder($order, $params);
 
-                        // update event that it is processed
-                        try{
-                            // @codingStandardsIgnoreStart
-                            $event->delete();
-                            // @codingStandardsIgnoreEnd
-                            $this->_debugData['UpdateNotProcessedEvents Step4'] = 'Notification is processed and removed from the queue';
-                        } catch(Exception $e) {
-                            Mage::logException($e);
-                        }
-                    } else {
-                        // order still not exists save this attempt
-                        $currentAttempt = $event->getAttempt();
-                        $event->setAttempt(++$currentAttempt);
+                    // update event that it is processed
+                    try{
                         // @codingStandardsIgnoreStart
-                        $event->save();
+                        $event->delete();
                         // @codingStandardsIgnoreEnd
-                        $this->_debugData['UpdateNotProcessedEvents Step3'] = 'The Notification still does not exists updated attempt to ' . $event->getAttempt();
+                        $this->_debugData['UpdateNotProcessedEvents Step4'] = 'Notification is processed and removed from the queue';
+                    } catch(Exception $e) {
+                        Mage::logException($e);
                     }
+                } else {
+                    // order still not exists save this attempt
+                    $currentAttempt = $event->getAttempt();
+                    $event->setAttempt(++$currentAttempt);
+                    // @codingStandardsIgnoreStart
+                    $event->save();
+                    // @codingStandardsIgnoreEnd
+                    $this->_debugData['UpdateNotProcessedEvents Step3'] = 'The Notification still does not exists updated attempt to ' . $event->getAttempt();
                 }
             }
         } else {

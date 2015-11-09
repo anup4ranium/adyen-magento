@@ -589,7 +589,7 @@
         <jobs>
             <adyen>
                 <schedule>
-                    <cron_expr>*/5 * * * *</cron_expr>
+                    <cron_expr>*/1 * * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>adyen/cronjob::updateNotificationQueue</model>
