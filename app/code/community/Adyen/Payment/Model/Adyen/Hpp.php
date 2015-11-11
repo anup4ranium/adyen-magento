@@ -206,6 +206,12 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $adyFields['shopperEmail']    = $shopperEmail;
         // recurring
         $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
+
+        // Paypal does not allow ONECLICK,RECURRING will be fixed on adyen platform but this is the quickfix for now
+        if($this->getInfoInstance()->getMethod() == "adyen_hpp_paypal" && $recurringType == 'ONECLICK,RECURRING') {
+            $recurringType = "RECURRING";
+        }
+
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         //blocked methods
