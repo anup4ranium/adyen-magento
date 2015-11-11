@@ -16,6 +16,9 @@ But you can also request or suggest new features or code changes yourself!
 <h2>Support</h2>
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
 
+<h2>Subscription</h2>
+If you want to offer subscription to your shoppers see here our subscription module <a target="_blank" href="https://github.com/Adyen/adyen-magento-subscription">here</a>
+
 <h2>Offical Releases</h2>
 [Click here to see and download the official releases of the Adyen Payment module](https://github.com/Adyen/magento/releases)
 
