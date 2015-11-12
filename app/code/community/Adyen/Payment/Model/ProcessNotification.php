@@ -210,11 +210,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $this->_processNotification($order);
         }
 
-        // save event for duplication
-        $this->_storeNotification();
-
         // update the order with status/adyen event and comment history
         $order->save();
+
+        // save event for duplication
+        $this->_storeNotification();
 
         Mage::dispatchEvent('adyen_payment_process_notifications_after', array('order' => $order, 'adyen_response' => $params));
     }
@@ -1298,7 +1298,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
                     $this->_debugData['UpdateNotProcessedEvents params'] = $params->debug();
 
-                    $this->_updateOrder($order, $params);
+                    // check if notification is already processed
+                    if(!$this->_isDuplicate($params)) {
+                        $this->_updateOrder($order, $params);
+                    } else {
+                        // already processed so ignore this notification
+                        $this->_debugData['UpdateNotProcessedEvents duplicate']  = "This notification is already processed so ignore this one";
+                    }
 
                     // update event that it is processed
                     try{
