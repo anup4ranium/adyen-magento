@@ -1316,13 +1316,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         Mage::logException($e);
                     }
                 } else {
-                    // order still not exists save this attempt
-                    $currentAttempt = $event->getAttempt();
-                    $event->setAttempt(++$currentAttempt);
+                    // order does not exists remove this from the queue
                     // @codingStandardsIgnoreStart
-                    $event->save();
+                    $event->delete();
                     // @codingStandardsIgnoreEnd
-                    $this->_debugData['UpdateNotProcessedEvents Step3'] = 'The Notification still does not exists updated attempt to ' . $event->getAttempt();
+                    $this->_debugData['UpdateNotProcessedEvents Step3'] = 'The Notification still does not exists so it does not have an order remove the notification';
                 }
             }
         } else {
