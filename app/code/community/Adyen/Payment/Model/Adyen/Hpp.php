@@ -87,7 +87,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $config = Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
         if (empty($hppType) && empty($config)) {
             Mage::throwException(
-                Mage::helper('adyen')->__('Payment Method is complusory in order to process your payment')
+                Mage::helper('adyen')->__('Payment Method is compulsory in order to process your payment')
             );
         }
         return $this;
