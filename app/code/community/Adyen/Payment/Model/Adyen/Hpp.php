@@ -232,8 +232,9 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $adyFields['deliveryAddressType'] = "1";
             $adyFields['shopperType']         = "";
         } else {
-            $adyFields['billingAddressType']  = "";
-            $adyFields['deliveryAddressType'] = "";
+            // for other payment methods like creditcard don't show avs address field in skin
+            $adyFields['billingAddressType']  = "2";
+            $adyFields['deliveryAddressType'] = "2";
             $adyFields['shopperType']         = "";
         }
 
