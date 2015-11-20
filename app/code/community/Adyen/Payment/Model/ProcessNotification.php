@@ -897,6 +897,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
                 $invoice->save();
 
+                /*
+                 * Save the order otherwise in old magento versions our status is not updated the
+                 * processing status that it gets here because the invoice is created.
+                 */
+                $order->save();
                 $this->_debugData['_createInvoice done'] = 'Created invoice';
             } catch (Exception $e) {
                 $this->_debugData['_createInvoice error'] = 'Error saving invoice. The error message is: ' . $e->getMessage();
