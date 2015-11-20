@@ -143,6 +143,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
     /**
      * @desc Get url of Adyen payment
      * @return string
+     * @todo add brandCode here
      */
     public function getFormUrl() {
         $paymentRoutine = $this->_getConfigData('payment_routines', 'adyen_hpp');
@@ -153,14 +154,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://test.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = 'https://test.adyen.com/hpp/details.shtml';
+                    $url = "https://test.adyen.com/hpp/details.shtml?brandCode=".$openinvoiceType;
                 }
                 break;
             default:
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://live.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = 'https://live.adyen.com/hpp/details.shtml';
+                    $url = "https://live.adyen.com/hpp/details.shtml?brandCode=".$openinvoiceType;
                 }
                 break;
         }
@@ -202,6 +203,17 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
         $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
         $adyFields['billingAddress.country'] = $billingAddress->getCountryId();
+        $sign = $adyFields['billingAddress.street'] .
+            $adyFields['billingAddress.houseNumberOrName'] .
+            $adyFields['billingAddress.city'] .
+            $adyFields['billingAddress.postalCode'] .
+            $adyFields['billingAddress.stateOrProvince'] .
+            $adyFields['billingAddress.country']
+        ;
+        //Generate HMAC encrypted merchant signature
+        $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
+        $adyFields['billingAddressSig'] = base64_encode(pack('H*', $signMac));
+
 
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
@@ -212,6 +224,17 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
             $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
             $adyFields['deliveryAddress.country'] = $deliveryAddress->getCountryId();
+            $sign = $adyFields['deliveryAddress.street'] .
+                $adyFields['deliveryAddress.houseNumberOrName'] .
+                $adyFields['deliveryAddress.city'] .
+                $adyFields['deliveryAddress.postalCode'] .
+                $adyFields['deliveryAddress.stateOrProvince'] .
+                $adyFields['deliveryAddress.country']
+            ;
+            //Generate HMAC encrypted merchant signature
+            $secretWord = $this->_getSecretWord();
+            $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign);
+            $adyFields['deliveryAddressSig'] = base64_encode(pack('H*', $signMac));
         }
 
 
@@ -275,6 +298,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
             $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
 
+            $shoppperSign = $adyFields['shopper.firstName'] . $adyFields['shopper.infix'] . $adyFields['shopper.lastName'] . $adyFields['shopper.gender'] . $adyFields['shopper.dateOfBirthDayOfMonth'] . $adyFields['shopper.dateOfBirthMonth'] . $adyFields['shopper.dateOfBirthYear'] . $adyFields['shopper.telephoneNumber'];
+            $shopperSignMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $shoppperSign);
+            $adyFields['shopperSig'] = base64_encode(pack('H*', $shopperSignMac));
         }
 
 
@@ -381,11 +407,23 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $additional_data_sign['openinvoicedata.refundDescription'] = "Refund / Correction for ".$adyFields['merchantReference'];
         $additional_data_sign['openinvoicedata.numberOfLines'] = $count;
 
+        // add merchantsignature in additional signature
+        $additional_data_sign['merchantSig'] = $adyFields['merchantSig'];
+
+        // generate signature
+        ksort($additional_data_sign);
+
         // signature is first alphabatical keys seperate by : and then | and then the values seperate by :
         foreach($additional_data_sign as $key => $value) {
             // add to fields
             $adyFields[$key] = $value;
         }
+
+        $keys = implode(':',array_keys($additional_data_sign));
+        $values = implode(':',$additional_data_sign);
+        $sign_additional_data = trim($keys) . '|' . trim($values);
+        $signMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $sign_additional_data);
+        $adyFields['openinvoicedata.sig'] =  base64_encode(pack('H*', $signMac));
 
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
 
