@@ -13,6 +13,11 @@ But you can also request or suggest new features or code changes yourself!
 * <a target="_blank" href="https://vimeo.com/128983014">Click here to see the Point-of-Sale demo of the Adyen Payment module</a>
 * <a target="_blank" href="https://vimeo.com/135459940">Click here to see how to configure the configuration of the Point-of-Sale</a>
 
+<h2>Setup Cron</h2>
+For Adyen Payment Plug-in Version >= 2.5.0 it is needed to enable the Magento cron. Make sure that this is running every minute.
+We are using a cronjob to process the notifications. The cronjob will be executed every minute. It only executes the notifications that have been received at least 5 minutes ago. We have built in this 5 minutes so we are sure Magento has created the order and all save after events are executed.
+A handy tool to get inside into your cronjobs is AOE scheduler. You can download this tool through <a href="http://www.magentocommerce.com/magento-connect/aoe-scheduler.html" target="_blank">Magento Connect</a> or <a target="_blank" href="https://github.com/AOEpeople/Aoe_Scheduler/releases">GitHub</a>
+
 <h2>Support</h2>
 You can create issues on our Magento Repository or if you have some specific problems for your account you can contact <a href="mailto:magento@adyen.com">magento@adyen.com</a>  as well.
 
