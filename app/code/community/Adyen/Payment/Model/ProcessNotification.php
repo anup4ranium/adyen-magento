@@ -286,23 +286,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $this->_debugData['_updateAdyenAttributes'] = 'Updating the Adyen attributes of the order';
 
         $additionalData = $params->getData('additionalData');
-        if($additionalData && is_array($additionalData)) {
-            $avsResult = (isset($additionalData['avsResult'])) ? $additionalData['avsResult'] : "";
-            $cvcResult = (isset($additionalData['cvcResult'])) ? $additionalData['cvcResult'] : "";
-            $totalFraudScore = (isset($additionalData['totalFraudScore'])) ? $additionalData['totalFraudScore'] : "";
-            $ccLast4 = (isset($additionalData['cardSummary'])) ? $additionalData['cardSummary'] : "";
-            $refusalReasonRaw = (isset($additionalData['refusalReasonRaw'])) ? $additionalData['refusalReasonRaw'] : "";
-            $acquirerReference = (isset($additionalData['acquirerReference'])) ? $additionalData['acquirerReference'] : "";
-            $authCode = (isset($additionalData['authCode'])) ? $additionalData['authCode'] : "";
-        }
-
         $paymentObj = $order->getPayment();
         $_paymentCode = $this->_paymentMethodCode($order);
 
-        // if there is no server communication setup try to get last4 digits from reason field
-        if(!isset($ccLast4) || $ccLast4 == "") {
-            $ccLast4 = $this->_retrieveLast4DigitsFromReason($this->_reason);
-        }
         $paymentObj->setLastTransId($this->_merchantReference)
                    ->setCcType($this->_paymentMethod);
 
@@ -315,16 +301,31 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0 || strcmp($this->_success, '') == 0) {
                 $previousAdyenEventCode = $order->getAdyenEventCode();
                 if ($previousAdyenEventCode != "AUTHORISATION : TRUE") {
-                    $this->_updateOrderPaymentWithAdyenAttributes($paymentObj);
+                    $this->_updateOrderPaymentWithAdyenAttributes($paymentObj, $additionalData);
                 }
             } else {
-                $this->_updateOrderPaymentWithAdyenAttributes($paymentObj);
+                $this->_updateOrderPaymentWithAdyenAttributes($paymentObj, $additionalData);
             }
         }
     }
 
-    protected function _updateOrderPaymentWithAdyenAttributes($paymentObj)
+    protected function _updateOrderPaymentWithAdyenAttributes($paymentObj, $additionalData)
     {
+        if($additionalData && is_array($additionalData)) {
+            $avsResult = (isset($additionalData['avsResult'])) ? $additionalData['avsResult'] : "";
+            $cvcResult = (isset($additionalData['cvcResult'])) ? $additionalData['cvcResult'] : "";
+            $totalFraudScore = (isset($additionalData['totalFraudScore'])) ? $additionalData['totalFraudScore'] : "";
+            $ccLast4 = (isset($additionalData['cardSummary'])) ? $additionalData['cardSummary'] : "";
+            $refusalReasonRaw = (isset($additionalData['refusalReasonRaw'])) ? $additionalData['refusalReasonRaw'] : "";
+            $acquirerReference = (isset($additionalData['acquirerReference'])) ? $additionalData['acquirerReference'] : "";
+            $authCode = (isset($additionalData['authCode'])) ? $additionalData['authCode'] : "";
+        }
+
+        // if there is no server communication setup try to get last4 digits from reason field
+        if(!isset($ccLast4) || $ccLast4 == "") {
+            $ccLast4 = $this->_retrieveLast4DigitsFromReason($this->_reason);
+        }
+
         $paymentObj->setAdyenPspReference($this->_pspReference);
 
         if($this->_klarnaReservationNumber != "") {
