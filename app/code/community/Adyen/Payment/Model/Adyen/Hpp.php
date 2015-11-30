@@ -248,16 +248,16 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
         // get extra fields
         $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $this->_order);
-        //IDEAL
+
+        // For IDEAL add isuerId into request so bank selection is skipped
         if (strpos($this->getInfoInstance()->getCcType(), "ideal") !== false) {
             $bankData = $this->getInfoInstance()->getPoNumber();
             if (!empty($bankData)) {
                 $id                         = explode(DS, $bankData);
-                $adyFields['skipSelection'] = 'true';
-                $adyFields['brandCode']     = $this->getInfoInstance()->getCcType();
-                $adyFields['idealIssuerId'] = $id['0'];
+                $adyFields['issuerId'] = $id['0'];
             }
         }
+
         // if option to put Return Url in request from magento is enabled add this in the request
         $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp');
         if ($returnUrlInRequest) {
@@ -327,7 +327,6 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     /**
      * @desc Get url of Adyen payment
      * @return string
-     * @todo add brandCode here
      */
     public function getFormUrl()
     {
@@ -354,15 +353,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                 }
                 break;
         }
-        //IDEAL
-        $idealBankUrl = false;
-        $bankData     = $this->getInfoInstance()->getPoNumber();
-        if ($brandCode == 'ideal' && !empty($bankData)) {
-            $idealBankUrl = ($isConfigDemoMode == true)
-                ? 'https://test.adyen.com/hpp/redirectIdeal.shtml'
-                : 'https://live.adyen.com/hpp/redirectIdeal.shtml';
-        }
-        return (!empty($idealBankUrl)) ? $idealBankUrl : $url;
+        return $url;
     }
 
 
