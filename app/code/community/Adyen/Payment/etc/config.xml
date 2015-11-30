@@ -370,6 +370,7 @@
                 <gender_show>0</gender_show>
                 <dob_show>0</dob_show>
                 <telephone_show>0</telephone_show>
+                <shoppertype>1</shoppertype>
                 <different_address_disable>0</different_address_disable>
                 <sort_order>40</sort_order>
             </adyen_openinvoice>
