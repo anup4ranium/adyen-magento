@@ -33,6 +33,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_paymentMethod = 'oneclick';
     protected $_canUseInternal = true; // not possible through backoffice interface
     protected $_customerInteraction;
+    protected $_canUseForMultishipping = true;
 
 
     public function isAvailable($quote=null) {
