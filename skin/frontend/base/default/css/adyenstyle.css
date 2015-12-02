@@ -103,6 +103,7 @@
 .sp-methods #oneclick_payment_form_adyen_oneclick { padding-top:10px; }
 .sp-methods #oneclick_payment_form_adyen_oneclick .recurring-creditcards .recurring_type { float:left; vertical-align: middle; height:120px;}
 
+#payment_form_adyen_ideal label img { float:none; }
 
 .saved-cards ul li { margin-bottom:10px; }
 .saved-cards .btn-delete  {margin-top:10px;}
