@@ -591,7 +591,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      */
     protected function _uncancelOrder($order) {
 
-        if($order->isCanceled()) {
+        if($order->isCanceled() && $this->_getConfigData('uncancelorder', 'adyen_abstract')) {
 
             $this->_debugData['_uncancelOrder'] = 'Uncancel the order because could be that it is cancelled in a previous notification';
 

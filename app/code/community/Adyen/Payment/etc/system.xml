@@ -109,6 +109,16 @@
                                     <show_in_store>1</show_in_store>
                                     <tooltip><![CDATA[ In the test mode you must use test cards. See section Documentation & Support for the link to the test cards]]></tooltip>
                                 </demoMode>
+                                <uncancelorder translate="label">
+                                    <label>Enable Uncancel Order</label>
+                                    <frontend_type>select</frontend_type>
+                                    <config_path>payment/adyen_abstract/uncancelorder</config_path>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <sort_order>30</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>0</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </uncancelorder>
                                 <notification_username translate="label">
                                     <label>Notification User Name</label>
                                     <tooltip>Set a user name of your choice here and copy it over to Adyen Customer Area => Settings => Server Communication => Standard Notification => User Name.</tooltip>

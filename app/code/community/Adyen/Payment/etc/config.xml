@@ -288,6 +288,7 @@
                 <ws_password_live></ws_password_live>
                 <demoMode>Y</demoMode>
                 <debug>1</debug>
+                <uncancelorder>1</uncancelorder>
                 <order_status>pending</order_status>
                 <payment_authorized>processing</payment_authorized>
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
