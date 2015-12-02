@@ -307,7 +307,7 @@
                                 </payment_authorized_virtual>
                                 <refund_authorized translate="label">
                                     <label>Order status: Adyen Refunded</label>
-                                    <tooltip>Status given to order after a (partial) refund has been made on the order. This is triggered when the REFUND notification is received</tooltip>
+                                    <tooltip>Status given to order after a refund has been made on the order. This is triggered when the REFUND notification is received</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/refund_authorized</config_path>
                                     <source_model>adyen/source_status_refund</source_model>
@@ -316,6 +316,17 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </refund_authorized>
+                                <refund_partial_authorized translate="label">
+                                    <label>Order status: Adyen partial Refunded</label>
+                                    <tooltip>Status given to order after a partial refund has been made on the order. This is triggered when the REFUND notification is received. We advise to don't set this status and let Magento decide the status</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <config_path>payment/adyen_abstract/refund_partial_authorized</config_path>
+                                    <source_model>adminhtml/system_config_source_order_status_processing</source_model>
+                                    <sort_order>41</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>0</show_in_store>
+                                </refund_partial_authorized>
                                 <pending_status>
                                     <label>Order status: pending Bank Transfer/SEPA orders</label>
                                     <tooltip>By default, Adyen does not inform your Magento store about pending payments. If you want these notifications to be received, Go to Adyen Customer Area => Server Communication and add BankTransfer Pending Notification and Direct-Debit Pending Notification.</tooltip>

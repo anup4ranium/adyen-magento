@@ -139,8 +139,17 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      * @param $order
      * @param $params
      */
-    public function updateOrder($order, $params) {
+    public function updateOrder($order, $params)
+    {
+        $this->_debugData = array();
+
+        $this->_debugData['processPosResponse begin'] = 'Begin to process this specific notification from the queue';
+
         $this->_updateOrder($order, $params);
+
+        $this->_debugData['processPosResponse end'] = 'end of process notification';
+
+        return $this->_debugData;
     }
     /**
      * @param $order
@@ -177,22 +186,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if($order->getState() === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT || $order->getState() === Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
                 $this->_debugData['_updateOrder info'] = 'Going to cancel the order';
 
-                // if payment is API check, check if API result pspreference is the same as reference
+                // if payment is API check and if notification is an authorisation
                 if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION && $this->_getPaymentMethodType($order) == 'api') {
-                    if($this->_pspReference == $order->getPayment()->getAdyenPspReference()) {
-                        // don't cancel the order if previous state is authorisation with success=true
-                        if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
-                            // This has been disabled because in the case of Magento, no order
-                            // exists at the time an API (like CC) notification occurs. It is
-                            // however relevant for HPP methods
-                            //$this->_holdCancelOrder($order, false);
-                        } else {
-                            $order->setAdyenEventCode($previousAdyenEventCode); // do not update the adyenEventCode
-                            $this->_debugData['_updateOrder warning'] = 'order is not cancelled because previous notification was a authorisation that succeeded';
-                        }
-                    } else {
-                        $this->_debugData['_updateOrder warning'] = 'order is not cancelled because pspReference does not match with the order';
-                    }
+                    // don't cancel the order becasue order was successfull through api
+                    $this->_debugData['_updateOrder warning'] = 'order is not cancelled because api result was succesfull';
                 } else {
                     // don't cancel the order if previous state is authorisation with success=true
                     if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
@@ -689,7 +686,22 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _setRefundAuthorized($order)
     {
         $this->_debugData['_setRefundAuthorized'] = 'Status update to default status or refund_authorized status if this is set';
-        $status = $this->_getConfigData('refund_authorized', 'adyen_abstract', $order->getStoreId());
+
+
+        // check if it is a full or partial refund
+        $amount = $this->_value;
+        $currency = $order->getOrderCurrencyCode();
+        $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $currency);
+
+        if($amount == $orderAmount) {
+            $status = $this->_getConfigData('refund_authorized', 'adyen_abstract', $order->getStoreId());
+            $this->_debugData['_setRefundAuthorized full'] = 'This is a full refund. Status selected is:'.$status;
+        } else {
+            $status = $this->_getConfigData('refund_partial_authorized', 'adyen_abstract', $order->getStoreId());
+            $this->_debugData['_setRefundAuthorized partial'] = 'This is a partial refund. Status selected is:'.$status;
+        }
+
+        // if no status is selected don't change the status and use current status
         $status = (!empty($status)) ? $status : $order->getStatus();
         $order->addStatusHistoryComment(Mage::helper('adyen')->__('Adyen Refund Successfully completed'), $status);
         $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
