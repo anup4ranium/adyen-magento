@@ -212,6 +212,11 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $recurringType = "RECURRING";
         }
 
+        if ($customerId) {
+            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+            $customerId = $customer->getData('adyen_customer_ref') ?: $customerId;
+        }
+
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         //blocked methods
