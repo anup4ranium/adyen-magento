@@ -79,7 +79,13 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         // override amount because this amount uses the right currency
         $amount = $order->getGrandTotal();
+
         $customerId = $order->getCustomerId();
+        if ($customerId) {
+            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+            $customerId = $customer->getData('adyen_customer_ref') ?: $customerId;
+        }
+
         $realOrderId = $order->getRealOrderId();
 
         $this->reference = $incrementId;
