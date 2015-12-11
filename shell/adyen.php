@@ -110,7 +110,8 @@ class Adyen_Payments_Shell extends Mage_Shell_Abstract
 
 				$billingAgreementCollection = Mage::getResourceModel('adyen/billing_agreement_collection')
 					->addCustomerFilter($customerId)
-					->addStoreFilter($store);
+					->addStoreFilter($store)
+                    ->addFieldToFilter('method_code', ['like' => 'adyen_%']);
 
 				//Update the billing agreements
 				foreach ($recurringContracts as $recurringContract) {
