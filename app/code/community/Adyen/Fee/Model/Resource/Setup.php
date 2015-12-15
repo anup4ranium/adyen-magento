@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!--
+<?php
+
 /**
  * Adyen Payment Module
  *
@@ -25,19 +25,8 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
--->
-<config>
-    <modules>
-        <Adyen_Payment>
-            <active>true</active>
-            <codePool>community</codePool>
-        </Adyen_Payment>
-        <Adyen_Fee>
-            <active>true</active>
-            <codePool>community</codePool>
-            <depends>
-                <Adyen_Payment/>
-            </depends>
-        </Adyen_Fee>
-    </modules>
-</config>
+class Adyen_Fee_Model_Resource_Setup
+    extends Mage_Sales_Model_Resource_Setup
+{
+
+}

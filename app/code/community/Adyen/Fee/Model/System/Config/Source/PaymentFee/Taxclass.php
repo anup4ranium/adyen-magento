@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!--
+<?php
+
 /**
  * Adyen Payment Module
  *
@@ -25,19 +25,12 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
--->
-<config>
-    <modules>
-        <Adyen_Payment>
-            <active>true</active>
-            <codePool>community</codePool>
-        </Adyen_Payment>
-        <Adyen_Fee>
-            <active>true</active>
-            <codePool>community</codePool>
-            <depends>
-                <Adyen_Payment/>
-            </depends>
-        </Adyen_Fee>
-    </modules>
-</config>
+class Adyen_Fee_Model_System_Config_Source_PaymentFee_Taxclass
+{
+    public function toOptionArray()
+    {
+        $options = Mage::getModel('tax/class_source_product')->toOptionArray();
+        return $options;
+    }
+
+}

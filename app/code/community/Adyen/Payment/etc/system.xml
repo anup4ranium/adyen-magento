@@ -998,16 +998,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </return_url_in_request>
-                                <fee translate="label">
-                                    <label>Fee</label>
-                                    <tooltip>If you want to charge an extra fee for certain payment methods, set that fee here. Do not set any extra fees in the skin in the Adyen Customer Area.</tooltip>
-                                    <frontend_model>adyen/adminhtml_system_config_hppPaymentMethodFee</frontend_model>
-                                    <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
-                                    <config_path>payment/adyen_hpp/fee</config_path>
-                                    <sort_order>140</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <tooltip><![CDATA[]]></tooltip>
-                                </fee>
                             </fields>
                         </adyen_hpp_advanced>
                     </fields>
@@ -1032,15 +1022,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </show_ideal_logos>
-                        <fee translate="label">
-                            <label>Fee</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>38</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <validate>validate-number</validate>
-                        </fee>
                         <autoselect_stored_ideal_bank>
                             <label>Auto select Ideal bank</label>
                             <tooltip>If you have problems that the wrong ideal bank is selected turn this option off. This is a common problem in the onestepcheckout module</tooltip>
@@ -1135,15 +1116,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </shoppertype>
-                        <fee translate="label">
-                            <label>Fee</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>39</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <validate>validate-number</validate>
-                        </fee>
                         <different_address_disable>
                             <label>Disable on different billing and delivery addresses</label>
                             <tooltip>Klarna will probably reject payments which have differing billing and delivery addresses. Setting this to 'Yes' will disable this payment method when that is the case.</tooltip>

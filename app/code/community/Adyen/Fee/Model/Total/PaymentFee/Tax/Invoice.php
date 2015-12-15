@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!--
+<?php
+
 /**
  * Adyen Payment Module
  *
@@ -25,19 +25,12 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
--->
-<config>
-    <modules>
-        <Adyen_Payment>
-            <active>true</active>
-            <codePool>community</codePool>
-        </Adyen_Payment>
-        <Adyen_Fee>
-            <active>true</active>
-            <codePool>community</codePool>
-            <depends>
-                <Adyen_Payment/>
-            </depends>
-        </Adyen_Fee>
-    </modules>
-</config>
+class Adyen_Fee_Model_Total_PaymentFee_Tax_Invoice extends Mage_Sales_Model_Order_Invoice_Total_Abstract
+{
+    public function collect(Mage_Sales_Model_Order_Invoice $invoice)
+    {
+        $invoice->setGrandTotal($invoice->getGrandTotal()+$invoice->getPaymentFeeTax());
+        $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal()+$invoice->getBasePaymentFeeTax());
+        return $this;
+    }
+}
