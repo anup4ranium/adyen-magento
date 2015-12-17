@@ -96,7 +96,9 @@ class Adyen_Payment_Model_Billing_Agreement
     public function getCustomerReference()
     {
         if (! $this->hasData('customer_reference')) {
-            $customerReference = $this->getCustomer()->getData('adyen_customer_ref') ?: $this->getCustomerId();
+            $customerReference = $this->getCustomer()->getData('adyen_customer_ref')
+                ?: $this->getCustomer()->getData('increment_id')
+                ?:  $this->getCustomerId();
             $this->setData('customer_reference', $customerReference);
         }
 

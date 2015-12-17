@@ -83,7 +83,9 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $customerId = $order->getCustomerId();
         if ($customerId) {
             $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-            $customerId = $customer->getData('adyen_customer_ref') ?: $customerId;
+            $customerId = $customer->getData('adyen_customer_ref')
+                ?: $customer->getData('increment_id')
+                ?: $customerId;
         }
 
         $realOrderId = $order->getRealOrderId();
