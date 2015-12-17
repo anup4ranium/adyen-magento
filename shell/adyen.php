@@ -94,16 +94,19 @@ class Adyen_Payments_Shell extends Mage_Shell_Abstract
 
 			$select = $customerCollection->getSelect();
 			$select->reset(Varien_Db_Select::COLUMNS);
-			$select->columns('e.entity_id');
+			$select->columns(['e.entity_id','e.increment_id']);
 			$customerCollection->joinAttribute(
 				'adyen_customer_ref',
 				'customer/adyen_customer_ref',
 				'entity_id', null, 'left'
 			);
 
-			$customerReferences = $customerCollection->getConnection()->fetchPairs($select);
-			foreach ($customerReferences as $customerId => $adyenCustomerRef) {
-				$customerReference = $adyenCustomerRef ?: $customerId;
+			$customerReferences = $customerCollection->getConnection()->fetchAssoc($select);
+			foreach ($customerReferences as $customerId => $customerData) {
+
+				$customerReference = $customerData['adyen_customer_ref']
+						?: $customerData['increment_id']
+						?: $customerId;
 
 				$recurringContracts = $api->listRecurringContracts($customerReference, $store);
                 echo sprintf("Found %s recurring contracts for customer %s (ref. %s)\n", count($recurringContracts), $customerId, $customerReference);
