@@ -175,13 +175,14 @@ class Adyen_Fee_Helper_Data extends Mage_Payment_Helper_Data
         $quote = $shippingAddress->getQuote();
         $store = $quote->getStore();
         $fee = $this->getPaymentFeeAmount($quote, $store);
+
         if ($fee) {
+            $config = Mage::getSingleton('adyen_fee/tax_config');
             $custTaxClassId = $quote->getCustomerTaxClassId();
             $taxCalculationModel = Mage::getSingleton('tax/calculation');
             $request = $taxCalculationModel->getRateRequest($shippingAddress, $quote->getBillingAddress(), $custTaxClassId, $store);
-            $paymentTaxClass = $this->getTaxClass($store);
+            $paymentTaxClass = $config->getPaymentFeeTaxClass($store);
             $rate = $taxCalculationModel->getRate($request->setProductClassId($paymentTaxClass));
-            $config = Mage::getSingleton('adyen_fee/tax_config');
             if ($rate) {
                 $paymentTax = $taxCalculationModel->calcTaxAmount($fee, $rate, $config->paymentFeePriceIncludesTax($store), true);
             }
