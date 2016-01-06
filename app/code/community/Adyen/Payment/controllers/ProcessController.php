@@ -152,22 +152,15 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                 return $this;
             }
 
-            //redirect to adyen
-            if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) === 0 ||
-                (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_NEW) === 0)) {
-                $this->getResponse()->setBody(
-                    $this->getLayout()
-                        ->createBlock($this->_redirectBlockType)
-                        ->setOrder($order)
-                        ->toHtml()
-                );
-                $session->unsQuoteId();
-            }
-            //continue shopping
-            else {
-                $this->_redirect('/');
-                return $this;
-            }
+            // redirect to payment page
+            $this->getResponse()->setBody(
+                $this->getLayout()
+                    ->createBlock($this->_redirectBlockType)
+                    ->setOrder($order)
+                    ->toHtml()
+            );
+            $session->unsQuoteId();
+
         } catch (Exception $e) {
             $session->addException($e, Mage::helper('adyen')->__($e->getMessage()));
             $this->cancel();
