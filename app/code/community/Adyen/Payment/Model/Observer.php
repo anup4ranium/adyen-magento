@@ -56,6 +56,9 @@ class Adyen_Payment_Model_Observer {
     {
         Varien_Profiler::start(__CLASS__.'::'.__FUNCTION__);
 
+        // by default disable adyen_ideal only if IDeal is in directoryLookup result show this payment method
+        $store->setConfig('payment/adyen_ideal/active', 0);
+
         if(!Mage::getStoreConfigFlag('payment/adyen_hpp/disable_hpptypes', $store)) {
             $sortOrder = Mage::getStoreConfig('payment/adyen_hpp/sort_order', $store);
             foreach ($this->_fetchHppMethods($store) as $methodCode => $methodData) {
@@ -64,8 +67,6 @@ class Adyen_Payment_Model_Observer {
             }
 
             $store->setConfig('payment/adyen_hpp/active', 0);
-        } else {
-            $store->setConfig('payment/adyen_ideal/active', 0);
         }
 
         Varien_Profiler::stop(__CLASS__.'::'.__FUNCTION__);
@@ -80,8 +81,9 @@ class Adyen_Payment_Model_Observer {
         $methodNewCode = 'adyen_hpp_'.$methodCode;
 
         if ($methodCode == 'ideal') {
-            unset($methodData['title']);
             $methodNewCode = 'adyen_ideal';
+            // enable adyen Ideal
+            $store->setConfig('payment/adyen_ideal/active', 1);
         } else {
             $methodData = $methodData + Mage::getStoreConfig('payment/adyen_hpp', $store);
             $methodData['model'] = 'adyen/adyen_hpp';
