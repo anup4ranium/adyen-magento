@@ -197,7 +197,13 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
 
         $adyFields['shopper.lastName'] = $billingAddress->getLastname();
         $adyFields['billingAddress.street'] = $helper->getStreet($billingAddress,true)->getName();
-        $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
+
+        if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
+            $adyFields['billingAddress.houseNumberOrName'] = "NA";
+        } else {
+            $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
+        }
+
         $adyFields['billingAddress.city'] = $billingAddress->getCity();
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
         $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
@@ -207,7 +213,12 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         if($deliveryAddress != null)
         {
             $adyFields['deliveryAddress.street'] = $helper->getStreet($deliveryAddress,true)->getName();
-            $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
+            if($helper->getStreet($deliveryAddress,true)->getHouseNumber() == "") {
+                $adyFields['deliveryAddress.houseNumberOrName'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
+            }
+
             $adyFields['deliveryAddress.city'] = $deliveryAddress->getCity();
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
             $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
