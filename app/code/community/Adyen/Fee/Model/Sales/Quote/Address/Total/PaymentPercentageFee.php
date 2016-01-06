@@ -33,6 +33,10 @@ class Adyen_Fee_Model_Sales_Quote_Address_Total_PaymentPercentageFee extends Mag
     {
         parent::collect($address);
 
+        // reset totals by default (needed for onestepcheckout module)
+        $address->setPaymentPercentageFee(0);
+        $address->setBasePaymentPercentageFee(0);
+
         // Makes sure you only use the address type shipping
         $items = $this->_getAddressItems($address);
         if (!count($items)) {
