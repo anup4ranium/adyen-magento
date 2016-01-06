@@ -145,6 +145,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $this->_debugData['processPosResponse begin'] = 'Begin to process this specific notification from the queue';
 
+        $this->_debugData['params'] = $params;
+
         $this->_updateOrder($order, $params);
 
         $this->_debugData['processPosResponse end'] = 'end of process notification';
@@ -454,7 +456,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 if($_paymentCode != "adyen_pos") {
                     // ignore capture if you are on auto capture (this could be called if manual review is enabled and you have a capture delay)
                     if (!$this->_isAutoCapture($order)) {
-                        $this->_setPaymentAuthorized($order, false, true);
+                        $this->_setPaymentAuthorized($order, false, true, true);
                     }
                 } else {
 
@@ -723,7 +725,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $fraudManualReviewStatus = $this->_getFraudManualReviewStatus($order);
 
-
         // If manual review is active and a seperate status is used then ignore the pre authorized status
         if($this->_fraudManualReview != true || $fraudManualReviewStatus == "") {
             $this->_setPrePaymentAuthorized($order);
@@ -908,14 +909,21 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $invoice->register()->pay();
                 }
 
-                $invoice->save();
+
+                // set the state to pending because otherwise magento will automatically set it to processing when you save the order
+                $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
 
                 /*
                  * Save the order otherwise in old magento versions our status is not updated the
                  * processing status that it gets here because the invoice is created.
                  */
-                $order->save();
-                $this->_debugData['_createInvoice done'] = 'Created invoice';
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder());
+
+                $transactionSave->save();
+
+                $this->_debugData['_createInvoice done'] = 'Created invoice status is: ' . $order->getStatus() . ' state is:' . $order->getState();
             } catch (Exception $e) {
                 $this->_debugData['_createInvoice error'] = 'Error saving invoice. The error message is: ' . $e->getMessage();
                 Mage::logException($e);
@@ -1009,7 +1017,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     /**
      * @param $order
      */
-    protected function _setPaymentAuthorized($order, $manualReviewComment = true, $createInvoice = false)
+    protected function _setPaymentAuthorized($order, $manualReviewComment = true, $createInvoice = false, $captureNotification = false)
     {
         $this->_debugData['_setPaymentAuthorized start'] = 'Set order to authorised';
 
@@ -1021,14 +1029,31 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // create invoice for the capture notification if you are on manual capture
         if($createInvoice == true && $amount == $orderAmount) {
             $this->_debugData['_setPaymentAuthorized amount'] = 'amount notification:'.$amount . ' amount order:'.$orderAmount;
-            // FIXME: createInvoice calls _setPaymentAuthorized fix this because you do not want this here
+            // call createInvoice (this flow can be improved
             $this->_createInvoice($order);
         }
 
-        // if you have capture on shipment enabled don't set update the status of the payment
+        $autoCapture = $this->_isAutoCapture($order);
+        $createPendingInvoice = (bool) $this->_getConfigData('create_pending_invoice', 'adyen_abstract', $order->getStoreId());
         $captureOnShipment = $this->_getConfigData('capture_on_shipment', 'adyen_abstract', $order->getStoreId());
-        if(!$captureOnShipment) {
+
+        /**
+         * - if create pending invoice is not set just update the status
+         * - if create pending invoice is set and the payment method is auto capture update the order
+         * - if create pending invoice is set and payment method is manual capture but the notificaiton is a capture notification update the order
+         */
+        if($captureOnShipment && !$autoCapture) {
+            // if capture on shipment is enabled and it is a manual capture payment method do not update the order
+        } else if(!$createPendingInvoice ||
+            ($createPendingInvoice && $autoCapture) ||
+            ($createPendingInvoice && !$autoCapture && $captureNotification))
+        {
             $status = $this->_getConfigData('payment_authorized', 'adyen_abstract', $order->getStoreId());
+
+            $this->_debugData['_setPaymentAuthorized selected status'] = 'The status that is selected is:' . $status;
+
+            // set the state to processing
+            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
         }
 
         // virtual order can have different status
@@ -1037,6 +1062,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $virtual_status = $this->_getConfigData('payment_authorized_virtual');
             if($virtual_status != "") {
                 $status = $virtual_status;
+
+                // set the state to complete
+                $order->setState(Mage_Sales_Model_Order::STATE_COMPLETE);
+
             }
         }
 
@@ -1088,7 +1117,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
          * save the order this is needed for older magento version so that status is not reverted to state NEW
          */
         $order->save();
-        $this->_debugData['_setPaymentAuthorized end'] = 'Order status is changed to authorised status, status is ' . $status;
+        $this->_debugData['_setPaymentAuthorized end'] = 'Order status is changed to authorised status, status is ' . $status . ' and state is: ' . $order->getState();
     }
 
     /**
