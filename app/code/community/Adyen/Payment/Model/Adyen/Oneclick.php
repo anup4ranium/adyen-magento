@@ -33,6 +33,7 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     protected $_paymentMethod = 'oneclick';
     protected $_canUseInternal = true; // not possible through backoffice interface
     protected $_customerInteraction;
+    protected $_canUseForMultishipping = true;
 
 
     public function isAvailable($quote=null) {
@@ -165,6 +166,20 @@ class Adyen_Payment_Model_Adyen_Oneclick extends Adyen_Payment_Model_Adyen_Cc {
     {
         return $this->_getConfigData('recurring_payment_type', 'adyen_oneclick');
     }
+
+
+    /**
+     * @return Adyen_Payment_Model_Billing_Agreement
+     */
+    public function getBillingAgreement()
+    {
+        $subscriptionReference = str_replace('adyen_oneclick_', '', $this->getCode());
+
+        return Mage::getModel('adyen/billing_agreement')->getCollection()
+            ->addFieldToFilter('reference_id', $subscriptionReference)
+            ->getFirstItem();
+    }
+
 
     /**
      * @param Adyen_Payment_Model_Billing_Agreement $billingAgreement

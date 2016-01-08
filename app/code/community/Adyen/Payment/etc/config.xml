@@ -29,7 +29,7 @@
 <config>
     <modules>
         <Adyen_Payment>
-            <version>2.4.2</version>
+            <version>2.5.0</version>
         </Adyen_Payment>
     </modules>
     <global>
@@ -288,6 +288,7 @@
                 <ws_password_live></ws_password_live>
                 <demoMode>Y</demoMode>
                 <debug>1</debug>
+                <uncancelorder>1</uncancelorder>
                 <order_status>pending</order_status>
                 <payment_authorized>processing</payment_authorized>
                 <payment_authorized_virtual>complete</payment_authorized_virtual>
@@ -324,6 +325,7 @@
                 <group>adyen</group>
                 <title>Adyen iDEAL</title>
                 <show_ideal_logos>0</show_ideal_logos>
+                <autoselect_stored_ideal_bank>1</autoselect_stored_ideal_bank>
                 <sort_order>35</sort_order>
                 <allowspecific>1</allowspecific>
                 <specificcountry>NL</specificcountry>
@@ -369,6 +371,7 @@
                 <gender_show>0</gender_show>
                 <dob_show>0</dob_show>
                 <telephone_show>0</telephone_show>
+                <shoppertype>1</shoppertype>
                 <different_address_disable>0</different_address_disable>
                 <sort_order>40</sort_order>
             </adyen_openinvoice>
@@ -586,14 +589,14 @@
     </default>
     <crontab>
         <jobs>
-            <adyen>
+            <adyen_payment_process_notification_queue>
                 <schedule>
-                    <cron_expr>*/5 * * * *</cron_expr>
+                    <cron_expr>*/1 * * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>adyen/cronjob::updateNotificationQueue</model>
                 </run>
-            </adyen>
+            </adyen_payment_process_notification_queue>
         </jobs>
     </crontab>
 </config>

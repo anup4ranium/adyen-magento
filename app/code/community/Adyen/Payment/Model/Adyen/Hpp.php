@@ -45,7 +45,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     protected $_paymentMethodType = 'hpp';
 
     public function getPaymentMethodType() {
-        return $this->$_paymentMethodType;
+        return $this->_paymentMethodType;
     }
 
     /**
@@ -87,7 +87,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $config = Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
         if (empty($hppType) && empty($config)) {
             Mage::throwException(
-                Mage::helper('adyen')->__('Payment Method is complusory in order to process your payment')
+                Mage::helper('adyen')->__('Payment Method is compulsory in order to process your payment')
             );
         }
         return $this;
@@ -206,6 +206,19 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $adyFields['shopperEmail']    = $shopperEmail;
         // recurring
         $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
+
+        // Paypal does not allow ONECLICK,RECURRING will be fixed on adyen platform but this is the quickfix for now
+        if($this->getInfoInstance()->getMethod() == "adyen_hpp_paypal" && $recurringType == 'ONECLICK,RECURRING') {
+            $recurringType = "RECURRING";
+        }
+
+        if ($customerId) {
+            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+            $customerId = $customer->getData('adyen_customer_ref')
+                ?: $customer->getData('increment_id')
+                ?: $customerId;
+        }
+
         $adyFields['recurringContract'] = $recurringType;
         $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
         //blocked methods
@@ -224,10 +237,19 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         ) {
             $adyFields['billingAddressType']  = "1";
             $adyFields['deliveryAddressType'] = "1";
-            $adyFields['shopperType']         = "";
+
+            // get shopperType setting
+            $shopperType = $this->_getConfigData("shoppertype", "adyen_openinvoice");
+            if($shopperType == '1') {
+                $adyFields['shopperType']         = "";
+            } else {
+                $adyFields['shopperType']         = "1";
+            }
+
         } else {
-            $adyFields['billingAddressType']  = "";
-            $adyFields['deliveryAddressType'] = "";
+            // for other payment methods like creditcard don't show avs address field in skin
+            $adyFields['billingAddressType']  = "2";
+            $adyFields['deliveryAddressType'] = "2";
             $adyFields['shopperType']         = "";
         }
         //the data that needs to be signed is a concatenated string of the form data
@@ -252,16 +274,16 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
         // get extra fields
         $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $this->_order);
-        //IDEAL
+
+        // For IDEAL add isuerId into request so bank selection is skipped
         if (strpos($this->getInfoInstance()->getCcType(), "ideal") !== false) {
             $bankData = $this->getInfoInstance()->getPoNumber();
             if (!empty($bankData)) {
                 $id                         = explode(DS, $bankData);
-                $adyFields['skipSelection'] = 'true';
-                $adyFields['brandCode']     = $this->getInfoInstance()->getCcType();
-                $adyFields['idealIssuerId'] = $id['0'];
+                $adyFields['issuerId'] = $id['0'];
             }
         }
+
         // if option to put Return Url in request from magento is enabled add this in the request
         $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp');
         if ($returnUrlInRequest) {
@@ -298,7 +320,6 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     /**
      * @desc Get url of Adyen payment
      * @return string
-     * @todo add brandCode here
      */
     public function getFormUrl()
     {
@@ -325,15 +346,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                 }
                 break;
         }
-        //IDEAL
-        $idealBankUrl = false;
-        $bankData     = $this->getInfoInstance()->getPoNumber();
-        if ($brandCode == 'ideal' && !empty($bankData)) {
-            $idealBankUrl = ($isConfigDemoMode == true)
-                ? 'https://test.adyen.com/hpp/redirectIdeal.shtml'
-                : 'https://live.adyen.com/hpp/redirectIdeal.shtml';
-        }
-        return (!empty($idealBankUrl)) ? $idealBankUrl : $url;
+        return $url;
     }
 
 

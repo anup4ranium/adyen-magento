@@ -67,16 +67,14 @@ class Adyen_Payment_Model_Billing_Agreement_Observer
         $baCollection = Mage::getResourceModel('adyen/billing_agreement_collection');
         $baCollection->addFieldToFilter('customer_id', $customer->getId());
         $baCollection->addFieldToFilter('store_id', $store->getId());
+        $baCollection->addFieldToFilter('method_code', 'adyen_oneclick');
         $baCollection->addActiveFilter();
 
         foreach ($baCollection as $billingAgreement) {
-
-            // Only show payment methods that are enabled by the merchant
-            $agreementData = json_decode($billingAgreement->agreement_data, true);
-            $recurringPaymentType = Mage::getStoreConfig('payment/adyen_oneclick/recurring_payment_type', $store);
-
-            $this->_createPaymentMethodFromBA($billingAgreement, $store);
-
+            // only create payment method when label is set
+            if($billingAgreement->getAgreementLabel() != null) {
+                $this->_createPaymentMethodFromBA($billingAgreement, $store);
+            }
         }
 
         Varien_Profiler::stop(__CLASS__.'::'.__FUNCTION__);

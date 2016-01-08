@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -18,18 +17,17 @@
  * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
  * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-/**
- * @category   Payment Gateway
- * @package    Adyen_Payment
- * @author     Adyen
- * @property   Adyen B.V
- * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
- */
-class Adyen_Payment_Model_Adyen_Data_Classmap extends Adyen_Payment_Model_Adyen_Data_Abstract {
 
-    public $amount;
-    public $capture;
-    public $modificationRequest;
-    public $modificationResult;
+class Adyen_Payment_Model_System_Config_Backend_Trim extends Mage_Core_Model_Config_Data
+{
+
+    /**
+     * Trim data before save
+     */
+    protected function _beforeSave()
+    {
+        $value = trim($this->getValue());
+        $this->setValue($value);
+    }
 
 }

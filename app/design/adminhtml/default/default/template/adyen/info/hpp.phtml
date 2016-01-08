@@ -50,6 +50,9 @@
             <?php echo $this->__('Bank: %s', $this->htmlEscape($label)) ?><br/>
         <?php endif; ?>            
     <?php endif; ?>
+    <?php if($this->htmlEscape($this->getInfo()->getAdyenTotalFraudScore()) != ""): ?>
+        <?php echo Mage::helper('adyen')->__('Total fraud score: %s', $this->htmlEscape($this->getInfo()->getAdyenTotalFraudScore())) ?><br/>
+    <?php endif; ?>
     <?php if($_info->getAdyenKlarnaNumber() != null && $_info->getAdyenKlarnaNumber() != ""): ?>
         <?php echo Mage::helper('adyen')->__('Klarna reservation number: %s', $this->htmlEscape($_info->getAdyenKlarnaNumber())) ?> <br/>
     <?php endif; ?>

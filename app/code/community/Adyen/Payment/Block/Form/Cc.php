@@ -97,12 +97,21 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     }
 
     /**
-     * Alway's return true for creditcard verification otherwise api call to adyen won't work
+     * If MOTO for backend orders is turned on don't show CVC field in backend order creation
      *
      * @return boolean
      */
     public function hasVerification()
     {
+
+        // if backend order and moto payments is turned on don't show cvc
+        if(Mage::app()->getStore()->isAdmin() && $this->getMethod()->getCode() == "adyen_cc") {
+            $store = Mage::getSingleton('adminhtml/session_quote')->getStore();
+            if(Mage::getStoreConfigFlag('payment/adyen_cc/enable_moto', $store)) {
+                return false;
+            }
+        }
+
     	return true;
     }
 

@@ -66,11 +66,25 @@ $_code=$this->getMethodCode();
 
     <li>
         <div class="input-box">
-            <input class="required-entry" type="checkbox" name="payment[accept_sepa]" id="<?php echo $_code ?>_accept_sepa" />
-            <label for="<?php echo $_code ?>_accept_sepa"><?php echo $this->__('I agree that the above amount will be debited from my bank account.') ?></label>
+            <label for="<?php echo $_code ?>_accept_sepa">
+                <input class="required-entry" type="checkbox" value="1" name="payment[accept_sepa]" id="<?php echo $_code ?>_accept_sepa" />
+                <?php echo $this->__('I agree that the above amount will be debited from my bank account.') ?>
+            </label>
         </div>
     </li>
 </ul>
+
+<script type="text/javascript">
+    var $fields = $('payment_form_<?=$_code;?>').select('input[type=text]', 'select', 'textarea');
+
+    $fields.each(function(field) {
+        field.value = localStorage.getItem(field.id);
+
+        field.observe('change', function() {
+            localStorage.setItem(field.id, field.value);
+        });
+    });
+</script>
 
 <div>
 <span id="ipayment-sepa-please-wait" style="display:none;" class="opc-please-wait">

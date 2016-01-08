@@ -24,21 +24,28 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-?>
-<?php
-if ($_info = $this->getInfo()) {
-	if ($this->isCseEnabled()) {
-		echo $this->htmlEscape($this->getMethod()->getTitle());
-	}
-	else {
-		echo $this->__('Name on the Card: %s', $this->htmlEscape($_info->getCcOwner()))."<br/>";
-		echo $this->__('Credit Card Type: %s', $this->htmlEscape($this->getCcTypeName()))."<br/>";
-		echo $this->__('Credit Card Number: xxxx-%s', $this->htmlEscape($_info->getCcLast4()))."<br/>";
-		echo $this->__('Expiration Date: %s/%s', $this->htmlEscape($this->getCcExpMonth()), $this->htmlEscape($_info->getCcExpYear()));
-	}
 
-	if($this->hasInstallments()):
-		echo "<br />" . $this->__('Installments: %s',  $this->htmlEscape($this->getInfo()->getAdditionalInformation('number_of_installments')))."<br/>";
-	endif;
+
+/*
+ * clear the field payment/adyen_hpp/allowspecific because this is not a setting anymore
+ */
+
+$notificationPath = "payment/adyen_hpp/allowspecific";
+updateConfigValue($notificationPath);
+
+
+function updateConfigValue($path) {
+    try {
+        $collection = Mage::getModel('core/config_data')->getCollection()
+            ->addFieldToFilter('path', array('like' => $path ));
+
+        if ($collection->count() > 0) {
+            foreach ($collection as $coreConfig) {
+                $coreConfig->setValue('0')->save();
+            }
+        }
+    } catch (Exception $e) {
+        Mage::log($e->getMessage(), Zend_Log::ERR);
+    }
 }
-?>
+

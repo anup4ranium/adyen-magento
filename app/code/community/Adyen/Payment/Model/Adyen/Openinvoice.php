@@ -191,9 +191,20 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
 
         $billingAddress = $order->getBillingAddress();
         $adyFields['shopper.firstName'] = $billingAddress->getFirstname();
+
+        if($billingAddress->getMiddlename() != "") {
+            $adyFields['shopper.infix'] = $billingAddress->getMiddlename();
+        }
+
         $adyFields['shopper.lastName'] = $billingAddress->getLastname();
         $adyFields['billingAddress.street'] = $helper->getStreet($billingAddress,true)->getName();
-        $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
+
+        if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
+            $adyFields['billingAddress.houseNumberOrName'] = "NA";
+        } else {
+            $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
+        }
+
         $adyFields['billingAddress.city'] = $billingAddress->getCity();
         $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
         $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
@@ -214,7 +225,12 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         if($deliveryAddress != null)
         {
             $adyFields['deliveryAddress.street'] = $helper->getStreet($deliveryAddress,true)->getName();
-            $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
+            if($helper->getStreet($deliveryAddress,true)->getHouseNumber() == "") {
+                $adyFields['deliveryAddress.houseNumberOrName'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
+            }
+
             $adyFields['deliveryAddress.city'] = $deliveryAddress->getCity();
             $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
             $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
@@ -252,7 +268,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 $adyFields['shopper.gender'] = $this->getGenderText($customerGender);
             }
 
-            $adyFields['shopper.infix'] = $customer->getPrefix();
             $dob = $customer->getDob();
 
             if (!empty($dob)) {
@@ -272,7 +287,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             // checkout as guest use details from the order
             $_customer = Mage::getModel('customer/customer');
             $adyFields['shopper.gender'] = $this->getGenderText($order->getCustomerGender());
-            $adyFields['shopper.infix'] = $order->getCustomerPrefix();
             $dob = $order->getCustomerDob();
             if (!empty($dob)) {
                 $adyFields['shopper.dateOfBirthDayOfMonth'] = $this->getDate($dob, 'd');
@@ -291,7 +305,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         if($order->getPayment()->getMethod() == "adyen_openinvoice" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "klarna" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default" ) {
             // initialize values if they are empty
             $adyFields['shopper.gender'] = (isset($adyFields['shopper.gender'])) ? $adyFields['shopper.gender'] : "";
-            $adyFields['shopper.infix'] = (isset($adyFields['shopper.infix'])) ? $adyFields['shopper.infix'] : "";
             $adyFields['shopper.dateOfBirthDayOfMonth'] = (isset($adyFields['shopper.dateOfBirthDayOfMonth'])) ? $adyFields['shopper.dateOfBirthDayOfMonth'] : "";
             $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
             $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
