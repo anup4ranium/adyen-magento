@@ -69,3 +69,7 @@
 "There are no saved cards for this account.", "Não há cartas guardadas para essa conta."
 "This is a new Customer", "Este é um novo cliente"
 "You will be redirected to Adyen app when you place an order.", "Você será redirecionado ao app da Ayen quando realizar a compra."
+"Boleto PDf: <a target="_blank" href="%s" title="Boleto PDF">Download</a>", "Boleto PDf: <a target="_blank" href="%s" title="Boleto PDF">Download</a>"
+"Firstname: %s", "primeiro nome: %s"
+"Lastname: %s'", "Sobrenome: %s"
+"Social Security Number", "Número da Segurança Social"
