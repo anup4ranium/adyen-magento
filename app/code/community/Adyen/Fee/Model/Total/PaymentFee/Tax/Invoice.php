@@ -29,8 +29,8 @@ class Adyen_Fee_Model_Total_PaymentFee_Tax_Invoice extends Mage_Sales_Model_Orde
 {
     public function collect(Mage_Sales_Model_Order_Invoice $invoice)
     {
-        $invoice->setGrandTotal($invoice->getGrandTotal()+$invoice->getPaymentFeeTax());
-        $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal()+$invoice->getBasePaymentFeeTax());
+        $invoice->setTaxAmount($invoice->getTaxAmount()+$invoice->getPaymentFeeTax());
+        $invoice->setBaseTaxAmount($invoice->getBaseTaxAmount()+$invoice->getBasePaymentFeeTax());
         return $this;
     }
 }
