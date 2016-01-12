@@ -31,10 +31,11 @@
  */
 
 $notificationPath = "payment/adyen_hpp/allowspecific";
-updateConfigValue($notificationPath);
+updateConfigValueNotificationPath($notificationPath);
 
 
-function updateConfigValue($path) {
+// needs to be unique function name otherwise clean install will fail
+function updateConfigValueNotificationPath($path) {
     try {
         $collection = Mage::getModel('core/config_data')->getCollection()
             ->addFieldToFilter('path', array('like' => $path ));
