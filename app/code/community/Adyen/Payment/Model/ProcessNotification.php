@@ -201,7 +201,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $this->_debugData[$this->_count]['_updateOrder warning'] = 'order is not cancelled because api result was succesfull';
                 } else {
                     // don't cancel the order if previous state is authorisation with success=true
-                    if($previousAdyenEventCode != "AUTHORISATION : TRUE") {
+                    // Split payments can fail if the second payment has failed the first payment is refund/cancelled as well so if it is a split payment that failed cancel the order as well
+                    if($previousAdyenEventCode != "AUTHORISATION : TRUE" || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_ORDER_CLOSED) {
                         $this->_holdCancelOrder($order, false);
                     } else {
                         $order->setAdyenEventCode($previousAdyenEventCode); // do not update the adyenEventCode
