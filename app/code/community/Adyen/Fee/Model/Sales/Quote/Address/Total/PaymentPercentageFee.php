@@ -48,7 +48,7 @@ class Adyen_Fee_Model_Sales_Quote_Address_Total_PaymentPercentageFee extends Mag
         $paymentMethod = $quote->getPayment()->getMethod();
         $percentageFee = $adyenFeeHelper->getHppPaymentMethodPercentageFee($paymentMethod);
 
-        if(!$percentageFee > 0) {
+        if(!$percentageFee) {
             return $this;
         }
 

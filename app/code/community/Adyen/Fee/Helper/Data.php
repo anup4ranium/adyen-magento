@@ -136,7 +136,7 @@ class Adyen_Fee_Helper_Data extends Mage_Payment_Helper_Data
 
             foreach($paymentFees as $paymentFee) {
                 if(isset($paymentFee['code']) && $paymentFee['code'] == $paymentMethod) {
-                    if(isset($paymentFee['percentage']) && $paymentFee['percentage'] > 0) {
+                    if(isset($paymentFee['percentage']) && $paymentFee['percentage']) {
                         return $paymentFee['percentage'];
                     }
                 }
