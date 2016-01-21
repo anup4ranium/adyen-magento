@@ -767,6 +767,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         if(!empty($status)) {
             $order->addStatusHistoryComment(Mage::helper('adyen')->__('Payment is pre authorised waiting for capture'), $status);
             $order->sendOrderUpdateEmail((bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId()));
+            // update the state to pending_payment
+            $order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
+
             /**
              * save the order this is needed for older magento version so that status is not reverted to state NEW
              */
@@ -786,11 +789,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $payment = $order->getPayment()->getMethodInstance();
 
         $_mail = (bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId());
-
-        //Set order state to new because with order state payment_review it is not possible to create an invoice
-        if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW) == 0) {
-            $order->setState(Mage_Sales_Model_Order::STATE_NEW);
-        }
 
         //capture mode
         if (!$this->_isAutoCapture($order)) {
@@ -886,6 +884,11 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     protected function _createInvoice($order)
     {
         $this->_debugData[$this->_count]['_createInvoice'] = 'Creating invoice for order';
+
+        //Set order state to new because with order state payment_review it is not possible to create an invoice
+        if (strcmp($order->getState(), Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW) == 0) {
+            $order->setState(Mage_Sales_Model_Order::STATE_NEW);
+        }
 
         if ($order->canInvoice()) {
 
