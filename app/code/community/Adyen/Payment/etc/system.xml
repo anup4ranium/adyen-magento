@@ -227,7 +227,6 @@
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                    <depends><capture_mode>manual</capture_mode></depends>
                                 </payment_pre_authorized>
                                 <payment_authorized translate="label">
                                     <label>Order status: payment confirmed</label>

@@ -116,7 +116,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $order = $payment->getOrder();
         $pspReference = Mage::getModel('adyen/event')->getOriginalPspReference($order->getIncrementId());
 
-        // if amound is a full refund send a refund/cancelled request so if it is not captured yet it will cancel the order
+        // if amount is a full refund send a refund/cancelled request so if it is not captured yet it will cancel the order
         $grandTotal = $order->getGrandTotal();
 
         if($grandTotal == $amount) {

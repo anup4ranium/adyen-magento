@@ -383,7 +383,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
     public function initialize($paymentAction, $stateObject)
     {
-        $state = Mage_Sales_Model_Order::STATE_NEW;
+        $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT;
         $stateObject->setState($state);
         $stateObject->setStatus($this->_getConfigData('order_status'));
     }
