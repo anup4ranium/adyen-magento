@@ -587,7 +587,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 $order->addRelatedObject($comment);
                 break;
             default:
-                $order->getPayment()->getMethodInstance()->writeLog('notification event not supported!');
+                $this->_debugData[$this->_count]['_processNotification info'] = sprintf('This notification event: %s is not supported so will be ignored', $this->_eventCode);
                 break;
         }
     }
@@ -965,34 +965,47 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
         $isBankTransfer = $this->_isBankTransfer($this->_paymentMethod);
 
-        // if you are using authcap the payment method is manual. There will be a capture send to indicate if payment is succesfull
-        if($_paymentCode == "adyen_sepa" && $sepaFlow == "authcap") {
-            return false;
-        }
-
-        // payment method ideal, cash adyen_boleto or adyen_pos has direct capture
-        if (strcmp($this->_paymentMethod, 'ideal') === 0 || strcmp($this->_paymentMethod, 'c_cash' ) === 0 || $_paymentCode == "adyen_pos" || $isBankTransfer == true || ($_paymentCode == "adyen_sepa" && $sepaFlow != "authcap") || $_paymentCode == "adyen_boleto") {
+        /**
+         * Payment method IDeal, Cash, adyen_pos and adyen_boleto are always auto capture
+         * For sepadirectdebit in sale modues is always auto capture but in auth/cap modus it will follow the overall capture modus
+         */
+        if (strcmp($this->_paymentMethod, 'ideal') === 0 ||
+            strcmp($this->_paymentMethod, 'c_cash' ) === 0 ||
+            $_paymentCode == "adyen_pos" ||
+            $isBankTransfer == true ||
+            (($_paymentCode == "adyen_sepa" || ($_paymentCode == "adyen_oneclick" && strcmp($this->_paymentMethod, 'sepadirectdebit') === 0)) && $sepaFlow != "authcap") ||
+            $_paymentCode == "adyen_boleto")
+        {
+            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture because payment method does not allow manual capture';
             return true;
         }
         // if auto capture mode for openinvoice is turned on then use auto capture
         if ($captureModeOpenInvoice == true && (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0)) {
+            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture';
             return true;
         }
+
+        // by default openinvoice payment methods are manual capture
+        if (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0) {
+            return false;
+        }
+
         // if PayPal capture modues is different from the default use this one
         if(strcmp($this->_paymentMethod, 'paypal' ) === 0 && $captureModePayPal != "") {
             if(strcmp($captureModePayPal, 'auto') === 0 ) {
+                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to auto capture';
                 return true;
             } elseif(strcmp($captureModePayPal, 'manual') === 0 ) {
+                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to manual capture';
                 return false;
             }
         }
         if (strcmp($captureMode, 'manual') === 0) {
+            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is manual capture';
             return false;
         }
-        //online capture after delivery, use Magento backend to online invoice (if the option auto capture mode for openinvoice is not set)
-        if (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0) {
-            return false;
-        }
+
+        $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is immediate capture';
         return true;
     }
 
