@@ -105,10 +105,6 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             ++$count;
         }
 
-        $comment = "<a target=\"_blank\" href=\"" . $url . "\">Generated payment url</a>";
-        $status = $this->_getConfigData('order_status');
-
-        $payment->getOrder()->addStatusHistoryComment($comment, $status);
         $payment->setAdditionalInformation('payment_url', $url);
 
         // send out email to shopper
