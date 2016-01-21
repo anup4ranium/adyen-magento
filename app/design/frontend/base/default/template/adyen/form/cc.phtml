@@ -118,7 +118,7 @@ $_code = $this->getMethodCode();
     <?php endif; ?>
 
     <script type="text/javascript">
-        var group_types = [];
+        var group_types = array();
         <?php foreach ($this->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
         group_types.push("<?php echo $_typeCode; ?>");
         <?php endforeach ?>
