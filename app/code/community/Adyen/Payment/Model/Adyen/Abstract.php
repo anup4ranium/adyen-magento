@@ -269,34 +269,42 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $requestData = Mage::getModel('adyen/adyen_data_modificationRequest')
             ->create($payment, $amount, $merchantAccount, $pspReference);
 
-        switch ($request) {
-            case "authorise":
-                $requestData = Mage::getModel('adyen/adyen_data_paymentRequest')
-                    ->create($payment, $amount, $this->_paymentMethod, $merchantAccount,$recurringType, $recurringPaymentType, $enableMoto);
+        try {
+            switch ($request) {
+                case "authorise":
+                    $requestData = Mage::getModel('adyen/adyen_data_paymentRequest')
+                        ->create($payment, $amount, $this->_paymentMethod, $merchantAccount, $recurringType, $recurringPaymentType, $enableMoto);
 
-                $response = $this->_service->authorise(array('paymentRequest' => $requestData));
-                break;
-            case "authorise3d":
-                $requestData = Mage::getModel('adyen/adyen_data_paymentRequest3d')
-                    ->create($payment, $merchantAccount);
+                    $response = $this->_service->authorise(array('paymentRequest' => $requestData));
+                    break;
+                case "authorise3d":
+                    $requestData = Mage::getModel('adyen/adyen_data_paymentRequest3d')
+                        ->create($payment, $merchantAccount);
 
-                $response = $this->_service->authorise3d(array('paymentRequest3d' => $requestData));
-                break;
-            case "capture":
-                $response = $this->_service->capture(array(
-                    'modificationRequest' => $requestData,
-                    'modificationResult' => $modificationResult));
-                break;
-            case "refund":
-                $response = $this->_service->refund(array(
-                    'modificationRequest' => $requestData,
-                    'modificationResult' => $modificationResult));
-                break;
-            case "cancel_or_refund":
-                $response = $this->_service->cancelorrefund(array(
-                    'modificationRequest' => $requestData,
-                    'modificationResult' => $modificationResult));
-                break;
+                    $response = $this->_service->authorise3d(array('paymentRequest3d' => $requestData));
+                    break;
+                case "capture":
+                    $response = $this->_service->capture(array(
+                        'modificationRequest' => $requestData,
+                        'modificationResult' => $modificationResult));
+                    break;
+                case "refund":
+                    $response = $this->_service->refund(array(
+                        'modificationRequest' => $requestData,
+                        'modificationResult' => $modificationResult));
+                    break;
+                case "cancel_or_refund":
+                    $response = $this->_service->cancelorrefund(array(
+                        'modificationRequest' => $requestData,
+                        'modificationResult' => $modificationResult));
+                    break;
+            }
+        } catch (SoapFault $e) {
+            if (isset($response)) {
+                Mage::getResourceModel('adyen/adyen_debug')->assignData($response);
+                $this->_debugAdyen();
+            }
+            throw $e;
         }
 
 
