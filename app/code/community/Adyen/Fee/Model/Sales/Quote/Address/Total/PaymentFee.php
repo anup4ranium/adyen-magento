@@ -39,6 +39,10 @@ class Adyen_Fee_Model_Sales_Quote_Address_Total_PaymentFee extends Mage_Sales_Mo
             return $this;
         }
 
+        // reset totals by default (needed for some external checkout modules)
+        $address->setPaymentFeeAmount(0);
+        $address->setBasePaymentFeeAmount(0);
+
         $adyenFeeHelper = Mage::helper('adyen_fee');
         $this->_setAmount(0);
         $this->_setBaseAmount(0);

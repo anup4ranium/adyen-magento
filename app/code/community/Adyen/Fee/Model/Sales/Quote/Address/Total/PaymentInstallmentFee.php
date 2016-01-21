@@ -37,9 +37,20 @@ class Adyen_Fee_Model_Sales_Quote_Address_Total_PaymentInstallmentFee extends Ma
     {
         parent::collect($address);
 
+        // Makes sure you only use the address type shipping
+        $items = $this->_getAddressItems($address);
+        if (!count($items)) {
+            return $this;
+        }
+
+        // reset totals by default (needed for some external checkout modules)
+        $address->setPaymentInstallmentFeeAmount(0);
+        $address->setBasePaymentInstallmentFeeAmount(0);
+
         $quote = $address->getQuote();
 
         if ($address->getAllItems()) {
+
             $currentAmount = $address->getPaymentInstallmentFeeAmount();
             $payment = $quote->getPayment();
 
