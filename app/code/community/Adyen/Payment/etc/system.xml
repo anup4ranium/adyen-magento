@@ -382,17 +382,17 @@
                                     <show_in_website>0</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </uncancelorder>
-                                <autorefundoncreditmemo translate="label">
+                                <autorefundoncancel translate="label">
                                     <label>Automatic refund when raising a credit memo</label>
                                     <tooltip>Enable/Disable automatic refund when a credit memo is created</tooltip>
                                     <frontend_type>select</frontend_type>
-                                    <config_path>payment/adyen_abstract/autorefundoncreditmemo</config_path>
+                                    <config_path>payment/adyen_abstract/autorefundoncancel</config_path>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>100</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>0</show_in_website>
                                     <show_in_store>0</show_in_store>
-                                </autorefundoncreditmemo>
+                                </autorefundoncancel>
                                 <send_invoice_update_mail translate="label">
                                     <label>Invoice email (deprecated)</label>
                                     <frontend_type>select</frontend_type>
