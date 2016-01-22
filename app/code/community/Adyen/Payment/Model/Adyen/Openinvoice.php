@@ -34,6 +34,11 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
     protected $_paymentMethod = 'openinvoice';
 
 
+    /**
+     * @param Mage_Sales_Model_Quote $quote
+     * @param int|null $checksBitMask
+     * @return bool
+     */
     public function isApplicableToQuote($quote, $checksBitMask)
     {
 
@@ -51,24 +56,28 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         if($this->_getConfigData('different_address_disable', 'adyen_openinvoice')) {
 
             // get billing and shipping information
-            $billing = $quote->getBillingAddress()->getData();
-            $shipping = $quote->getShippingAddress()->getData();
+            $billing = $quote->getBillingAddress();
+            $shipping = $quote->getShippingAddress();
 
-            // check if the following items are different: street, city, postcode, region, countryid
-            if(isset($billing['street']) && isset($billing['city']) && $billing['postcode'] && isset($billing['region']) && isset($billing['country_id'])) {
-                $billingAddress = array($billing['street'], $billing['city'], $billing['postcode'], $billing['region'],$billing['country_id']);
-            } else {
-                $billingAddress = array();
-            }
-            if(isset($shipping['street']) && isset($shipping['city']) && $shipping['postcode'] && isset($shipping['region']) && isset($shipping['country_id'])) {
-                $shippingAddress = array($shipping['street'], $shipping['city'], $shipping['postcode'], $shipping['region'],$shipping['country_id']);
-            } else {
-                $shippingAddress = array();
-            }
+            // check if the following items are different: street, city, postcode, region, countryId
+            $billingAddress = array(
+                $billing->getStreetFull(),
+                $billing->getCity(),
+                $billing->getPostcode(),
+                $billing->getRegion(),
+                $billing->getCountryId(),
+            );
+
+            $shippingAddress = array(
+                $shipping->getStreetFull(),
+                $shipping->getCity(),
+                $shipping->getPostcode(),
+                $shipping->getRegion(),
+                $shipping->getCountryId(),
+            );
 
             // if the result are not the same don't show the payment method open invoice
-            $diff = array_diff($billingAddress,$shippingAddress);
-            if(is_array($diff) && !empty($diff)) {
+            if($billingAddress !== $shippingAddress) {
                 return false;
             }
         }
@@ -308,6 +317,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['shopper.dateOfBirthDayOfMonth'] = (isset($adyFields['shopper.dateOfBirthDayOfMonth'])) ? $adyFields['shopper.dateOfBirthDayOfMonth'] : "";
             $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
             $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
+            $adyFields['shopper.infix'] = (isset($adyFields['shopper.infix'])) ? $adyFields['shopper.infix'] : "";
 
             $shoppperSign = $adyFields['shopper.firstName'] . $adyFields['shopper.infix'] . $adyFields['shopper.lastName'] . $adyFields['shopper.gender'] . $adyFields['shopper.dateOfBirthDayOfMonth'] . $adyFields['shopper.dateOfBirthMonth'] . $adyFields['shopper.dateOfBirthYear'] . $adyFields['shopper.telephoneNumber'];
             $shopperSignMac = Zend_Crypt_Hmac::compute($secretWord, 'sha1', $shoppperSign);
