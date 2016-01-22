@@ -1238,6 +1238,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         {
             $manualReviewAcceptStatus = $this->_getFraudManualReviewAcceptStatus($order);
             $order->addStatusHistoryComment($comment, $manualReviewAcceptStatus);
+            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
             /**
              * save order needed for old magento version so that status is not reverted to state NEW
              */
