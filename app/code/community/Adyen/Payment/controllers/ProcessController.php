@@ -212,6 +212,11 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                                 Mage::helper('adyen')->__('3D-secure validation was successful'),
                                 $order->getStatus()
                             )->save();
+
+                            $session->unsAdyenRealOrderId();
+                            $session->setQuoteId($session->getAdyenQuoteId(true));
+                            $session->getQuote()->setIsActive(false)->save();
+
                             $this->_redirect('checkout/onepage/success');
                         }
                         else {
