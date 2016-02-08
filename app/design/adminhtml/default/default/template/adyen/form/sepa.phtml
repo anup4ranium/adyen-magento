@@ -78,10 +78,13 @@ $_code=$this->getMethodCode();
     var $fields = $('payment_form_<?=$_code;?>').select('input[type=text]', 'select', 'textarea');
 
     $fields.each(function(field) {
-        field.value = localStorage.getItem(field.id);
+        var quoteId = '<?=$this->getQuoteId()?>';
+        var quoteItemIds = quoteId + field.id;
+
+        field.value = localStorage.getItem(quoteItemIds);
 
         field.observe('change', function() {
-            localStorage.setItem(field.id, field.value);
+            localStorage.setItem(quoteItemIds, field.value);
         });
     });
 </script>

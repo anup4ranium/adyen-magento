@@ -115,4 +115,22 @@ class Adyen_Payment_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     	return true;
     }
 
+    /**
+     * @return Mage_Sales_Model_Quote|null
+     */
+    protected function _getQuote()
+    {
+        if (Mage::app()->getStore()->isAdmin()) {
+            return Mage::getSingleton('adminhtml/session_quote')->getQuote();
+        }
+
+        return Mage::helper('checkout/cart')->getQuote();
+    }
+
+    public function getQuoteId()
+    {
+        $quote = $this->_getQuote();
+        return $quote->getId();
+    }
+
 }
