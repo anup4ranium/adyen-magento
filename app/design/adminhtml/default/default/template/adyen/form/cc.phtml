@@ -132,7 +132,9 @@
         }
         var cse_initialize = function() {
             $('payment_form_<?=$_code;?>').select('input', 'select', 'textarea').each(function(field) {
-                field.value = localStorage.getItem(field.id);
+                var quoteId = '<?=$this->getQuoteId()?>';
+                var quoteItemIds = quoteId + field.id;
+                field.value = localStorage.getItem(quoteItemIds);
             });
 
             if (typeof adyen === 'undefined') {
@@ -157,7 +159,10 @@
 
         $('payment_form_<?=$_code;?>').select('input', 'select', 'textarea').each(function(field) {
             field.observe('change', function() {
-                localStorage.setItem(field.id, field.value);
+                // get quoteid
+                var quoteId = '<?=$this->getQuoteId()?>';
+                var quoteItemIds = quoteId + field.id;
+                localStorage.setItem(quoteItemIds, field.value);
             });
         });
 
