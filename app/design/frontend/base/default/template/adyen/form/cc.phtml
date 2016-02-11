@@ -293,17 +293,21 @@ $_code = $this->getMethodCode();
     <?php if ($this->isCseEnabled()): ?>
     <input type="hidden" id="<?php echo $_code ?>_encrypted_form_expiry_generationtime" value="<?php echo date("c"); ?>" data-encrypted-name="generationtime" />
     <script type="text/javascript">
-        var cse_form = $('payment_form_<?php echo $_code ?>');
+
+        // get closest form element
+        var element = $('payment_form_<?php echo $_code ?>');
+        var form = $(element).closest('form');
         var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
         var cse_options = {
-            name:  'payment[encrypted_data]',
-            force: true
+            name:  'payment[encrypted_data]'
         };
 
         var cseUpdate = function() {
             try {
                 if (payment.currentMethod && payment.currentMethod == '<?php echo $_code ?>') {
-                    adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options);
+                    var cseForm = adyen.encrypt.createEncryptedForm(form, cse_key, cse_options);
+                    // encrypt data directly because submit button is not always on the page
+                    cseForm.createEncryptedField(cseForm.encrypt());
                 }
             } catch (e) {
                 if (typeof console == "object") {

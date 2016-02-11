@@ -107,10 +107,10 @@
 </ul>
 <?php if ($this->isCseEnabled()): ?>
     <input type="hidden" id="<?php echo $_code ?>_encrypted_form_expiry_generationtime" value="<?php echo date("c"); ?>" data-encrypted-name="generationtime" />
-    <input type="hidden" id="adyen-cse-form" />
     <script type="text/javascript">
         //<![CDATA[
-        var cse_form = document.getElementById('adyen-cse-form').form;
+        var element = $('payment_form_<?php echo $_code ?>');
+        var cse_form = $(element).closest('form');
         var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
         var cse_options = {
             name:  'payment[encrypted_data]',
@@ -120,7 +120,13 @@
 
             if (order.paymentMethod && order.paymentMethod == '<?php echo $_code ?>') {
                 try {
-                    adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options);
+
+                    // do not validate because it could be that CVC field does not exists (because MOTO this is not needed)
+                    //cse_options.enableValidations = false;
+
+                    var cseForm = adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options);
+                    // encrypt data directly because submit button is not always on the page
+                    cseForm.createEncryptedField(cseForm.encrypt());
                 } catch (e) {
                     var encryptionFailed = true;
                 }
