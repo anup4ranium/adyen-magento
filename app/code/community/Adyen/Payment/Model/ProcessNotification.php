@@ -296,13 +296,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         $paymentObj = $order->getPayment();
         $_paymentCode = $this->_paymentMethodCode($order);
 
-        $paymentObj->setLastTransId($this->_merchantReference)
-                   ->setCcType($this->_paymentMethod);
-
         if ($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION
             || $this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY
             || ($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE && $_paymentCode == "adyen_pos"))
         {
+
+            $paymentObj->setLastTransId($this->_merchantReference)
+                ->setCcType($this->_paymentMethod);
 
             // if current notification is authorisation : false and the  previous notification was authorisation : true do not update pspreference
             if (strcmp($this->_success, 'false') == 0 || strcmp($this->_success, '0') == 0 || strcmp($this->_success, '') == 0) {
