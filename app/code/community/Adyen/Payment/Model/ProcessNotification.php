@@ -625,7 +625,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $item->setHiddenTaxCanceled(0);
                     $item->save();
                 }
-            } catch(Excpetion $e) {
+            } catch(Exception $e) {
                 $this->_debugData[$this->_count]['_uncancelOrder'] = 'Failed to cancel orderlines exception: ' . $e->getMessage();
 
             }
