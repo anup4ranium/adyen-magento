@@ -64,9 +64,16 @@ class Adyen_Payment_Model_Billing_Agreement_Observer
             return $this;
         }
 
+        // Get the setting Share Customer Accounts if storeId needs to be in filter
+        $custAccountShareWebsiteLevel = Mage::getStoreConfig(Mage_Customer_Model_Config_Share::XML_PATH_CUSTOMER_ACCOUNT_SHARE, $store);
+
         $baCollection = Mage::getResourceModel('adyen/billing_agreement_collection');
         $baCollection->addFieldToFilter('customer_id', $customer->getId());
-        $baCollection->addFieldToFilter('store_id', $store->getId());
+
+        if($custAccountShareWebsiteLevel) {
+            $baCollection->addFieldToFilter('store_id', $store->getId());
+        }
+
         $baCollection->addFieldToFilter('method_code', 'adyen_oneclick');
         $baCollection->addActiveFilter();
 
