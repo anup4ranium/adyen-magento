@@ -241,16 +241,25 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             // get shopperType setting
             $shopperType = $this->_getConfigData("shoppertype", "adyen_openinvoice");
             if($shopperType == '1') {
-                $adyFields['shopperType']         = "";
+                $adyFields['shopperType'] = "";
             } else {
-                $adyFields['shopperType']         = "1";
+                $adyFields['shopperType'] = "1";
             }
 
         } else {
             // for other payment methods like creditcard don't show avs address field in skin
-            $adyFields['billingAddressType']  = "2";
-            $adyFields['deliveryAddressType'] = "2";
-            $adyFields['shopperType']         = "";
+            $adyFields['billingAddressType'] = "2";
+
+            // Only set DeliveryAddressType to hidden and in request if there is a shipping address otherwise keep it empty
+            $deliveryAddress = $order->getShippingAddress();
+            if($deliveryAddress != null)
+            {
+                $adyFields['deliveryAddressType'] = "2";
+            } else {
+                $adyFields['deliveryAddressType'] = "";
+            }
+
+            $adyFields['shopperType'] = "";
         }
         //the data that needs to be signed is a concatenated string of the form data
         $sign = $adyFields['paymentAmount'] .
