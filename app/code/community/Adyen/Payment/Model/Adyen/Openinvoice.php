@@ -153,14 +153,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://test.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = 'https://test.adyen.com/hpp/details.shtml';
+                    $url = 'https://test.adyen.com/hpp/skipDetails.shtml';
                 }
                 break;
             default:
                 if ($paymentRoutine == 'single' && empty($openinvoiceType)) {
                     $url = 'https://live.adyen.com/hpp/pay.shtml';
                 } else {
-                    $url = 'https://live.adyen.com/hpp/details.shtml';
+                    $url = 'https://live.adyen.com/hpp/skipDetails.shtml';
                 }
                 break;
         }
