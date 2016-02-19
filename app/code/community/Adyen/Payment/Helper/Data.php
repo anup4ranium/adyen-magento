@@ -544,8 +544,8 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
      */
     public function getMinorUnitTaxPercent($taxPercent)
     {
-        $taxPercent = (int)$taxPercent;
-        return $taxPercent * 100;
+        $taxPercent = $taxPercent * 100;
+        return (int)$taxPercent;
     }
 
     /**
