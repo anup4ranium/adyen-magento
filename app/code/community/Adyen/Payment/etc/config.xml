@@ -29,7 +29,7 @@
 <config>
     <modules>
         <Adyen_Payment>
-            <version>2.5.1</version>
+            <version>2.5.2</version>
         </Adyen_Payment>
     </modules>
     <global>
@@ -200,6 +200,46 @@
                     </adyen_payment_capture_invoice_on_shipment>
                 </observers>
             </sales_order_shipment_save_after>
+            <custom_quote_process>
+                <observers>
+                    <adyen_payment_reactivate_quote>
+                        <class>adyen/observer</class>
+                        <method>reactivateQuote</method>
+                    </adyen_payment_reactivate_quote>
+                </observers>
+            </custom_quote_process>
+            <!--<controller_front_init_before>-->
+            <!--<observers>-->
+            <!--<adyen_payment_load_classes>-->
+            <!--<class>adyen/observer</class>-->
+            <!--<method>controllerFrontInitBefore</method>-->
+            <!--</adyen_payment_load_classes>-->
+            <!--</observers>-->
+            <!--</controller_front_init_before>-->
+            <core_collection_abstract_load_before>
+                <observers>
+                    <adyen_payment_autoloader>
+                        <class>adyen/observer</class>
+                        <method>addAutoloader</method>
+                    </adyen_payment_autoloader>
+                </observers>
+            </core_collection_abstract_load_before>
+            <resource_get_tablename>
+                <observers>
+                    <adyen_payment_autoloader>
+                        <class>adyen/observer</class>
+                        <method>addAutoloader</method>
+                    </adyen_payment_autoloader>
+                </observers>
+            </resource_get_tablename>
+            <add_spl_autoloader>
+                <observers>
+                    <adyen_payment_autoloader>
+                        <class>adyen/observer</class>
+                        <method>addAutoloader</method>
+                    </adyen_payment_autoloader>
+                </observers>
+            </add_spl_autoloader>
         </events>
     </global>
 
