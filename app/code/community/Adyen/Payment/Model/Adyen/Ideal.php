@@ -47,7 +47,7 @@ class Adyen_Payment_Model_Adyen_Ideal
             return $issuers;
         }
         foreach ($issuerData as $issuer) {
-            $issuers[$issuer['issuerId'].'/'.$issuer['name']] = array(
+            $issuers[$issuer['issuerId']] = array(
                 'label' => $issuer['name']
             );
         }

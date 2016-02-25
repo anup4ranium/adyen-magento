@@ -78,11 +78,22 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $hppType = str_replace('adyen_hpp_', '', $info->getData('method'));
         $hppType = str_replace('adyen_ideal', 'ideal', $hppType);
 
+        // set hpp type
+        $info->setCcType($hppType);
+
         $hppTypeLabel =  Mage::getStoreConfig('payment/'.$info->getData('method').'/title');
         $info->setAdditionalInformation('hpp_type_label', $hppTypeLabel);
 
-        $info->setCcType($hppType)
-             ->setPoNumber($data->getData('adyen_ideal_type'));
+        // set bankId and label
+        $selectedBankId = $data->getData('adyen_ideal_type');
+        if($selectedBankId) {
+            $issuers = $this->getInfoInstance()->getMethodInstance()->getIssuers();
+            if(!empty($issuers)) {
+                $info->setAdditionalInformation('hpp_type_bank_label', $issuers[$selectedBankId]['label']);
+            }
+            $info->setPoNumber($selectedBankId);
+        }
+
         /* @note misused field */
         $config = Mage::getStoreConfig("payment/adyen_hpp/disable_hpptypes");
         if (empty($hppType) && empty($config)) {
@@ -267,11 +278,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
         // For IDEAL add isuerId into request so bank selection is skipped
         if (strpos($this->getInfoInstance()->getCcType(), "ideal") !== false) {
-            $bankData = $this->getInfoInstance()->getPoNumber();
-            if (!empty($bankData)) {
-                $id                         = explode(DS, $bankData);
-                $adyFields['issuerId'] = $id['0'];
-            }
+            $adyFields['issuerId'] = $this->getInfoInstance()->getPoNumber();
         }
 
         // if option to put Return Url in request from magento is enabled add this in the request
