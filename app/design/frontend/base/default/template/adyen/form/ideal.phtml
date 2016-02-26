@@ -40,11 +40,11 @@
                     <?php echo $this->__('Choose Your Bank') ?>
                 </label>
             </li>
-            <?php foreach ($this->getIssuers() as $_issueId => $_issuerData): ?>
+            <?php foreach ($this->getIssuers() as $_issuerId => $_issuerData): ?>
                 <li>
-                    <label class="adyen-ideal-image-label" for="adyen_ideal_type_<?php echo $_issueId ?>">
-                        <input type="radio" id="adyen_ideal_type_<?php echo $_issueId ?>"
-                            name="payment[adyen_ideal_type]" value="<?php echo $_issueId ?>"
+                    <label class="adyen-ideal-image-label" for="adyen_ideal_type_<?php echo $_issuerId ?>">
+                        <input type="radio" id="adyen_ideal_type_<?php echo $_issuerId ?>"
+                            name="payment[adyen_ideal_type]" value="<?php echo $_issuerId ?>"
                             <?php if (isset($_issuerData['selected'])): ?>checked<?php endif; ?> />
                         <img src="<?php echo $this->getIssuerImageUrl($_issuerData); ?>"
                              alt="<?php echo $_issuerData['label'] ?>" />
