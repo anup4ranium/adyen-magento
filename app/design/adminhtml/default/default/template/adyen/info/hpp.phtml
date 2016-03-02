@@ -46,7 +46,7 @@
             <?php
             // for older versions < 2.5.2
             $id = explode(DS, $bankData);
-            $label = $id['1'];
+            $label = isset($id['1']) ? $id['1'] : "";
 
             // older versions > 2.5.2
             if($label == "") {
