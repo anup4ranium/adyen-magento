@@ -110,7 +110,7 @@
     <script type="text/javascript">
         //<![CDATA[
         var element = $('payment_form_<?php echo $_code ?>');
-        var cse_form = $(element).closest('form');
+        var cse_form =  element.match('form') ? element : element.up('form');
         var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
         var cse_options = {
             name:  'payment[encrypted_data]',
@@ -120,10 +120,6 @@
 
             if (order.paymentMethod && order.paymentMethod == '<?php echo $_code ?>') {
                 try {
-
-                    // do not validate because it could be that CVC field does not exists (because MOTO this is not needed)
-                    //cse_options.enableValidations = false;
-
                     var cseForm = adyen.encrypt.createEncryptedForm(cse_form, cse_key, cse_options);
                     // encrypt data directly because submit button is not always on the page
                     cseForm.createEncryptedField(cseForm.encrypt());
@@ -146,7 +142,7 @@
             if (typeof adyen === 'undefined') {
                 js = document.createElement("script");
                 js.type = "text/javascript";
-                js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt.js";
+                js.src = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>adyen/payment/adyen.encrypt_0_1_16.js";
                 document.body.appendChild(js);
             }
 

@@ -121,7 +121,7 @@
                     try {
                         if (order.paymentMethod && order.paymentMethod == '<?php echo $_code ?>') {
                             var elementOneClick = $('payment_form_<?php echo $_code ?>');
-                            var cse_form_oneclick = $(elementOneClick).closest('form');
+                            var cse_form_oneclick =  elementOneClick.match('form') ? elementOneClick : elementOneClick.up('form');
 
                             // add this field to option
                             cse_options_oneclick.fieldNameAttribute = "data-encrypted-name-oneclick-<?php echo $_code ?>";
@@ -147,8 +147,17 @@
                     if (typeof adyen === 'undefined') {
                         var script = document.createElement("script");
                         script.type = "text/javascript";
-                        script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt.js'); ?>";
+                        script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt_0_1_16.js'); ?>";
                         document.body.appendChild(script);
+                    }
+
+                    // if the browser does not support forach method implement it
+                    if (!Array.prototype.forEach) {
+                        Array.prototype.forEach = function(fn, scope) {
+                            for(var i = 0, len = this.length; i < len; ++i) {
+                                fn.call(scope, this[i], i, this);
+                            }
+                        }
                     }
 
                     var fields = $$('#payment_form_<?php echo $_code ?> input, #payment_form_<?php echo $_code ?> textarea, #payment_form_<?php echo $_code ?> select');
