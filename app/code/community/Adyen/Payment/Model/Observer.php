@@ -37,6 +37,9 @@ class Adyen_Payment_Model_Observer {
             $store = Mage::app()->getStore();
         }
 
+        // by default disable adyen_ideal only if IDeal is in directoryLookup result show this payment method
+        $store->setConfig('payment/adyen_ideal/active', 0);
+
         if (Mage::getStoreConfigFlag('payment/adyen_hpp/active', $store)) {
             try {
                 $this->_addHppMethodsToConfig($store);
@@ -55,9 +58,6 @@ class Adyen_Payment_Model_Observer {
     protected function _addHppMethodsToConfig(Mage_Core_Model_Store $store)
     {
         Varien_Profiler::start(__CLASS__.'::'.__FUNCTION__);
-
-        // by default disable adyen_ideal only if IDeal is in directoryLookup result show this payment method
-        $store->setConfig('payment/adyen_ideal/active', 0);
 
         if(!Mage::getStoreConfigFlag('payment/adyen_hpp/disable_hpptypes', $store)) {
             $sortOrder = Mage::getStoreConfig('payment/adyen_hpp/sort_order', $store);
@@ -458,7 +458,7 @@ class Adyen_Payment_Model_Observer {
 
         /** @var Mage_Sales_Model_Order $order */
         $order = $payment->getOrder();
-        
+
         $autoRefund = $adyenHelper->getConfigData('autorefundoncancel', 'adyen_abstract', $order->getStoreId());
 
         if($this->isPaymentMethodAdyen($order) && $autoRefund) {
