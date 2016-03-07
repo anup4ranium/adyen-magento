@@ -134,6 +134,13 @@ class Adyen_Payment_Model_ValidateResultUrl extends Mage_Core_Model_Abstract {
         switch ($authResult) {
 
             case Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISED:
+                // do nothing wait for the notification
+                $this->_debugData['Step4'] = 'Add AUTHORISED to adyen event code, further wait for the notification';
+
+                $order->setAdyenEventCode($authResult);
+                $order->save();
+
+                break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING:
                 // do nothing wait for the notification
                 $this->_debugData['Step4'] = 'Do nothing wait for the notification';
