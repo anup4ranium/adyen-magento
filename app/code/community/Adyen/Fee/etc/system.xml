@@ -42,6 +42,8 @@
                                     <config_path>payment/adyen_hpp/fee</config_path>
                                     <sort_order>140</sort_order>
                                     <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>1</show_in_store>
                                     <tooltip><![CDATA[]]></tooltip>
                                 </fee>
                             </fields>
