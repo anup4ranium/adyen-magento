@@ -189,13 +189,14 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $secretWord = $this->_getSecretWord();
 
         $billingAddress = $order->getBillingAddress();
-        $adyFields['shopper.firstName'] = $billingAddress->getFirstname();
+        $adyFields['shopper.firstName'] = tim($billingAddress->getFirstname());
 
-        if($billingAddress->getMiddlename() != "") {
-            $adyFields['shopper.infix'] = $billingAddress->getMiddlename();
+        $middleName = trim($billingAddress->getMiddlename());
+        if($middleName != "") {
+            $adyFields['shopper.infix'] = $middleName;
         }
 
-        $adyFields['shopper.lastName'] = $billingAddress->getLastname();
+        $adyFields['shopper.lastName'] = trim($billingAddress->getLastname());
         $adyFields['billingAddress.street'] = $helper->getStreet($billingAddress,true)->getName();
 
         if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
@@ -204,10 +205,10 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['billingAddress.houseNumberOrName'] = $helper->getStreet($billingAddress,true)->getHouseNumber();
         }
 
-        $adyFields['billingAddress.city'] = $billingAddress->getCity();
-        $adyFields['billingAddress.postalCode'] = $billingAddress->getPostcode();
-        $adyFields['billingAddress.stateOrProvince'] = $billingAddress->getRegionCode();
-        $adyFields['billingAddress.country'] = $billingAddress->getCountryId();
+        $adyFields['billingAddress.city'] = trim($billingAddress->getCity());
+        $adyFields['billingAddress.postalCode'] = trim($billingAddress->getPostcode());
+        $adyFields['billingAddress.stateOrProvince'] = trim($billingAddress->getRegionCode());
+        $adyFields['billingAddress.country'] = trim($billingAddress->getCountryId());
 
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
@@ -219,10 +220,10 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
                 $adyFields['deliveryAddress.houseNumberOrName'] = $helper->getStreet($deliveryAddress,true)->getHouseNumber();
             }
 
-            $adyFields['deliveryAddress.city'] = $deliveryAddress->getCity();
-            $adyFields['deliveryAddress.postalCode'] = $deliveryAddress->getPostcode();
-            $adyFields['deliveryAddress.stateOrProvince'] = $deliveryAddress->getRegionCode();
-            $adyFields['deliveryAddress.country'] = $deliveryAddress->getCountryId();
+            $adyFields['deliveryAddress.city'] = trim($deliveryAddress->getCity());
+            $adyFields['deliveryAddress.postalCode'] = trim($deliveryAddress->getPostcode());
+            $adyFields['deliveryAddress.stateOrProvince'] = trim($deliveryAddress->getRegionCode());
+            $adyFields['deliveryAddress.country'] = trim($deliveryAddress->getCountryId());
         }
 
 
@@ -274,7 +275,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         // for sweden add here your socialSecurityNumber
         // $adyFields['shopper.socialSecurityNumber'] = "Result of your custom input field";
 
-        $adyFields['shopper.telephoneNumber'] = $billingAddress->getTelephone();
+        $adyFields['shopper.telephoneNumber'] = trim($billingAddress->getTelephone());
 
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
 
@@ -287,7 +288,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
 
         }
-
 
         $count = 0;
         $currency = $order->getOrderCurrencyCode();
@@ -318,8 +318,6 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             } else {
                 $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
             }
-
-
         }
 
         //discount cost
