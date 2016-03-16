@@ -189,7 +189,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         $secretWord = $this->_getSecretWord();
 
         $billingAddress = $order->getBillingAddress();
-        $adyFields['shopper.firstName'] = tim($billingAddress->getFirstname());
+        $adyFields['shopper.firstName'] = trim($billingAddress->getFirstname());
 
         $middleName = trim($billingAddress->getMiddlename());
         if($middleName != "") {
