@@ -243,6 +243,15 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
             else {
                 // log exception
                 $errorMsg = Mage::helper('adyen')->__('3D secure went wrong');
+
+                if($order) {
+                    $errorMsg .= " for orderId: " . $order->getId();
+                }
+
+                if($adyenStatus) {
+                    $errorMsg .= " adyenStatus is: " . $adyenStatus;
+                }
+
                 Adyen_Payment_Exception::throwException($errorMsg);
             }
         } catch (Exception $e) {
@@ -270,6 +279,13 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                 $session->getQuote()->setIsActive(false)->save();
                 $this->_redirect('checkout/onepage/success');
             } else {
+
+                // todo check if authorisation : true notification is in the queue
+                // if this is the case do not cancel transaction
+                // or if the notificaiton is already processed
+                // For PAYPAL this was an issue maybe we can raise focal so this can not happen
+                // anymore and change in code is not needed.
+
                 $this->cancel();
             }
         } catch(Exception $e) {
