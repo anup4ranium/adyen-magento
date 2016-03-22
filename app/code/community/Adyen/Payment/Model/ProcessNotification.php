@@ -326,7 +326,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $refusalReasonRaw = (isset($additionalData['refusalReasonRaw'])) ? $additionalData['refusalReasonRaw'] : "";
             $acquirerReference = (isset($additionalData['acquirerReference'])) ? $additionalData['acquirerReference'] : "";
             $authCode = (isset($additionalData['authCode'])) ? $additionalData['authCode'] : "";
-            $cardBin = (isset($additionalData['cardBin'])) ? $additionalData['cardBin'] : "";
         }
 
         // if there is no server communication setup try to get last4 digits from reason field
@@ -362,9 +361,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
         if(isset($authCode) && $authCode != "") {
             $paymentObj->setAdyenAuthCode($authCode);
-        }
-        if(isset($cardBin) && $cardBin != "") {
-            $paymentObj->setAdyenCardBin($cardBin);
         }
     }
 
