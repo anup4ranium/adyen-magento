@@ -272,7 +272,6 @@
                 <enable_scanner>0</enable_scanner>
                 <submit_scanner>0</submit_scanner>
                 <express_checkout>0</express_checkout>
-                <express_checkout_redirect_connect>1</express_checkout_redirect_connect>
                 <express_checkout_kiosk_mode>0</express_checkout_kiosk_mode>
                 <express_checkout_recurring>1</express_checkout_recurring>
                 <create_shipment>0</create_shipment>

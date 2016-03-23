@@ -121,61 +121,14 @@ class Adyen_Payment_Block_Redirect extends Mage_Core_Block_Abstract {
 
             $html .= '<script type="text/javascript">
     				//<![CDATA[
-    				function checkStatus() {
-	    				$.ajax({
-						    url: "'. $this->getUrl('adyen/process/getOrderStatus', array('_secure'=>true)) . '",
-						    type: "POST",
-						    data: "merchantReference='.$adyFields['merchantReference'] .'",
-						    asynchronous: false,
-						    success: function(data) {
-						    	if(data == "true") {
-						    		// redirect to success page
-						    		window.location.href = "'. Mage::getBaseUrl()."adyen/process/successPosRedirect" . '";
-						    	} else {
-						    		window.location.href = "'. Mage::getBaseUrl()."adyen/process/cancel" . '";
-						    	}
-						    }
-						});
-					}';
+    				';
 
-            $expressCheckoutRedirectConnect = $this->_getConfigData("express_checkout_redirect_connect", "adyen_pos", null);
-
-            if($expressCheckoutRedirectConnect) {
-
-                if($iPod || $iPhone || $iPad) {
-                    $html .= 'document.getElementById(\'launchlink\').click();';
-                    $html .= 'setTimeout("checkStatus()", 5000);';
-                } else {
-                    // android
-                    $html .= 'var isActive;
-                    window.onfocus = function () {
-                      isActive = true;
-                    };
-
-                    window.onblur = function () {
-                      isActive = false;
-                    };
-
-                    // test
-                    setTimeout(function () {
-                        checkStatus();
-                    }, 1000);';
-                    $html .= 'url = document.getElementById(\'launchlink\').href;';
-                    $html .= 'window.location = url;';
-                }
+            if($iPod || $iPhone || $iPad) {
+                $html .= 'document.getElementById(\'launchlink\').click();';
             } else {
-
-                $html .= '  var eventName = "visibilitychange";
-                            document.addEventListener(eventName,visibilityChanged,false);
-                            function visibilityChanged() {
-                                if (document.hidden || document.mozHidden || document.msHidden || document.webkitHidden)
-                                {
-                                    //Page got hidden; Adyen App called and transaction on terminal triggered
-                                } else {
-                                    //The page is showing again; Cash Register regained control from Adyen App
-                                    checkStatus();
-                                }
-                            }';
+                // android
+                $html .= 'url = document.getElementById(\'launchlink\').href;';
+                $html .= 'window.location = url;';
             }
 
             $html .= '

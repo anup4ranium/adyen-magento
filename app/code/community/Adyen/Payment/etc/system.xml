@@ -1469,16 +1469,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </express_checkout>
-                        <express_checkout_redirect_connect>
-                            <label>Redirect direct</label>
-                            <tooltip>Redirect directly to the Adyen app to do the PIN payment. This is not supported for all browsers if you have problems set this setting to false</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>38</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </express_checkout_redirect_connect>
                         <express_checkout_kiosk_mode>
                             <label>Kiosk mode</label>
                             <tooltip>If you turn kiosk modus on it will not auto-complete the customers based on the filled in email address</tooltip>

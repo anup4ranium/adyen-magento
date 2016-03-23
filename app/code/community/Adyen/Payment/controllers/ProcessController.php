@@ -530,14 +530,17 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         // need to get the full request
         $response = $_REQUEST;
 
-        $html = $this->processPosResponse($response);
+        $result = $this->processPosResponse($response);
 
-        $this->getResponse()
-	        ->clearHeader('Content-Type')
-            ->setHeader('Content-Type', 'text/html')
-            ->setBody($html);
-
-        return $this;
+        if ($result) {
+            $session = $this->_getCheckout();
+            $session->unsAdyenRealOrderId();
+            $session->setQuoteId($session->getAdyenQuoteId(true));
+            $session->getQuote()->setIsActive(false)->save();
+            $this->_redirect('checkout/onepage/success');
+        } else {
+            $this->cancel();
+        }
     }
 
     public function getOrderStatusAction()
