@@ -300,6 +300,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     break;
             }
         } catch (SoapFault $e) {
+
+            // log the request
+            $this->_debugAdyen();
+            Mage::log($this->_pci()->obscureSensitiveData($requestData), self::DEBUG_LEVEL, "$request.log", true);
+
+
             if (isset($response)) {
                 Mage::getResourceModel('adyen/adyen_debug')->assignData($response);
                 $this->_debugAdyen();
