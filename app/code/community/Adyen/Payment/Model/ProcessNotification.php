@@ -1100,9 +1100,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             if($virtual_status != "") {
                 $status = $virtual_status;
 
-                // set the state to complete
-                $order->setState(Mage_Sales_Model_Order::STATE_COMPLETE);
-
+                // set the state to complete (this is not possible because Magento is blocking this will result in: The Order State COMPLETE must not be set manually
+//                $order->setState(Mage_Sales_Model_Order::STATE_COMPLETE);
             }
         }
 
