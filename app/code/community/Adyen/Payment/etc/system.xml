@@ -841,6 +841,8 @@
                     <frontend_type>text</frontend_type>
                     <comment><![CDATA[
                                 During checkout shoppers can choose to have their payment details remembered and stored for trusted websites in Adyen’s highly secure platform. Adyen takes care of this process for its customers. Shoppers can then select in the Magento checkout the saved card and checkout with ‘OneClick’.
+                                <br />
+                                <b>Make sure you have turned on RECURRING_CONTRACT notification on your merchantAccount. If you want to add this or if you are not sure, just send us an <a href="mailto:magento@adyen.com">email</a>.</b>
                             ]]></comment>
                     <sort_order>320</sort_order>
                     <show_in_default>1</show_in_default>
