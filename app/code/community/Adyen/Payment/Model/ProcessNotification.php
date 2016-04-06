@@ -539,56 +539,65 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $agreement->setStoreId($order->getStoreId());
                     $agreement->importOrderPayment($payment);
 
-                    $listRecurringContracts = Mage::getSingleton('adyen/api')->listRecurringContracts($agreement->getCustomerReference(), $agreement->getStoreId());
+                    $customerReference = $agreement->getCustomerReference();
 
-                    $contractDetail = null;
-                    // get currenct Contract details and get list of all current ones
-                    $recurringReferencesList = array();
-                    foreach ($listRecurringContracts as $rc) {
-                        $recurringReferencesList[] = $rc['recurringDetailReference'];
-                        if (isset($rc['recurringDetailReference']) && $rc['recurringDetailReference'] == $recurringDetailReference) {
-                            $contractDetail = $rc;
-                        }
-                    }
+                    if($customerReference) {
+                        $listRecurringContracts = Mage::getSingleton('adyen/api')->listRecurringContracts($agreement->getCustomerReference(), $agreement->getStoreId());
 
-                    if($contractDetail != null) {
-                        // update status of the agreements in magento
-                        $billingAgreements = Mage::getResourceModel('adyen/billing_agreement_collection')
-                            ->addFieldToFilter('customer_id', $agreement->getCustomerReference());
-
-                        foreach($billingAgreements as $billingAgreement) {
-                            if(!in_array($billingAgreement->getReferenceId(), $recurringReferencesList)) {
-                                $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_CANCELED);
-                                $billingAgreement->save();
-                            } else {
-                                $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_ACTIVE);
-                                $billingAgreement->save();
+                        $contractDetail = null;
+                        // get currenct Contract details and get list of all current ones
+                        $recurringReferencesList = array();
+                        foreach ($listRecurringContracts as $rc) {
+                            $recurringReferencesList[] = $rc['recurringDetailReference'];
+                            if (isset($rc['recurringDetailReference']) && $rc['recurringDetailReference'] == $recurringDetailReference) {
+                                $contractDetail = $rc;
                             }
                         }
 
-                        $agreement->parseRecurringContractData($contractDetail);
+                        if($contractDetail != null) {
+                            // update status of the agreements in magento
+                            $billingAgreements = Mage::getResourceModel('adyen/billing_agreement_collection')
+                                ->addFieldToFilter('customer_id', $agreement->getCustomerReference());
 
-                        if ($agreement->isValid()) {
-                            $message = Mage::helper('adyen')->__('Created billing agreement #%s.', $agreement->getReferenceId());
+                            foreach($billingAgreements as $billingAgreement) {
+                                if(!in_array($billingAgreement->getReferenceId(), $recurringReferencesList)) {
+                                    $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_CANCELED);
+                                    $billingAgreement->save();
+                                } else {
+                                    $billingAgreement->setStatus(Adyen_Payment_Model_Billing_Agreement::STATUS_ACTIVE);
+                                    $billingAgreement->save();
+                                }
+                            }
 
-                            // save into sales_billing_agreement_order
-                            $agreement->addOrderRelation($order);
+                            $agreement->parseRecurringContractData($contractDetail);
 
-                            // add to order to save agreement
-                            $order->addRelatedObject($agreement);
+                            if ($agreement->isValid()) {
+                                $message = Mage::helper('adyen')->__('Created billing agreement #%s.', $agreement->getReferenceId());
+
+                                // save into sales_billing_agreement_order
+                                $agreement->addOrderRelation($order);
+
+                                // add to order to save agreement
+                                $order->addRelatedObject($agreement);
+                            } else {
+                                $message = Mage::helper('adyen')->__('Failed to create billing agreement for this order.');
+                            }
                         } else {
-                            $message = Mage::helper('adyen')->__('Failed to create billing agreement for this order.');
+                            $this->_debugData[$this->_count]['_processNotification error'] = 'Failed to create billing agreement for this order (listRecurringCall did not contain contract)';
+                            $this->_debugData[$this->_count]['_processNotification ref'] = sprintf('recurringDetailReference in notification is %s', $recurringDetailReference) ;
+                            $this->_debugData[$this->_count]['_processNotification customer ref'] = sprintf('CustomerReference is: %s and storeId is %s', $agreement->getCustomerReference(), $agreement->getStoreId());
+                            $this->_debugData[$this->_count]['_processNotification customer result'] = $listRecurringContracts;
+                            $message = Mage::helper('adyen')->__('Failed to create billing agreement for this order (listRecurringCall did not contain contract)');
                         }
                     } else {
-                        $this->_debugData[$this->_count]['_processNotification error'] = 'Failed to create billing agreement for this order (listRecurringCall did not contain contract)';
-                        $this->_debugData[$this->_count]['_processNotification ref'] = sprintf('recurringDetailReference in notification is %s', $recurringDetailReference) ;
-                        $this->_debugData[$this->_count]['_processNotification customer ref'] = sprintf('CustomerReference is: %s and storeId is %s', $agreement->getCustomerReference(), $agreement->getStoreId());
-                        $this->_debugData[$this->_count]['_processNotification customer result'] = $listRecurringContracts;
-                        $message = Mage::helper('adyen')->__('Failed to create billing agreement for this order (listRecurringCall did not contain contract)');
+                        $this->_debugData[$this->_count]['_processNotification error'] = 'merchantReference is empty, probably checked out as quest we can\'t save billing agreemnents for quest checkout';
                     }
                 }
-                $comment = $order->addStatusHistoryComment($message);
-                $order->addRelatedObject($comment);
+
+                if($message) {
+                    $comment = $order->addStatusHistoryComment($message);
+                    $order->addRelatedObject($comment);
+                }
                 break;
             default:
                 $this->_debugData[$this->_count]['_processNotification info'] = sprintf('This notification event: %s is not supported so will be ignored', $this->_eventCode);
@@ -643,7 +652,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     {
         $this->_debugData[$this->_count]['_refundOrder'] = 'Refunding the order';
 
-        // Don't create a credit memo if refund is initialize in Magento because in this case the credit memo already exits
+        // Don't create a credit memo if refund is initialize in Magento because in this case the credit memo already exists
         $result = Mage::getModel('adyen/event')
             ->getEvent($this->_pspReference, '[refund-received]');
         if (!empty($result)) {
