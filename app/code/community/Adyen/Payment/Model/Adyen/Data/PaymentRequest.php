@@ -273,6 +273,9 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->installments->value = $payment->getAdditionalInformation('number_of_installments');
                 }
 
+                // add observer to have option to overrule and or add request data
+                Mage::dispatchEvent('adyen_payment_card_payment_request', array('order' => $order, 'paymentMethod' => $paymentMethod, 'paymentRequest' => $this));
+
                 break;
             case "boleto":
             	$boleto = unserialize($payment->getPoNumber());

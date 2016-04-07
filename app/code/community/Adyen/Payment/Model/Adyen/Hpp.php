@@ -300,6 +300,14 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             }
         }
 
+        // set offset to 0
+        $adyFields['offset'] = "0";
+
+        // eventHandler to overwrite the adyFields without changing module code
+        $adyFields = new Varien_Object($adyFields);
+        Mage::dispatchEvent('adyen_payment_hpp_fields', array('order' => $order, 'fields' => $adyFields));
+        $adyFields = $adyFields->getData();
+
         // Sort the array by key using SORT_STRING order
         ksort($adyFields, SORT_STRING);
 
