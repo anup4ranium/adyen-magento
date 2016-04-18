@@ -71,10 +71,13 @@ abstract class Adyen_Payment_Block_Form_Abstract extends Mage_Payment_Block_Form
     {
         if (is_null($this->_paymentData)) {
             $payment = $this->_getQuote()->getPayment();
-            try {
-                $this->_paymentData = unserialize($payment->getPoNumber());
-            } catch (Exception $e) {
-                $this->_paymentData = array();
+
+            if($payment->getPoNumber()) {
+                try {
+                    $this->_paymentData = unserialize($payment->getPoNumber());
+                } catch (Exception $e) {
+                    $this->_paymentData = array();
+                }
             }
         }
 
