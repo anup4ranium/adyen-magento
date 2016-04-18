@@ -510,6 +510,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_RECURRING_CONTRACT:
 
+                $this->_debugData[$this->_count]['process recurring contract start'] = 'Processing Recurring Contract notification';
+
                 // get payment object
                 $payment = $order->getPayment();
 
@@ -521,6 +523,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
                 if ($agreement && $agreement->getAgreementId() > 0 && $agreement->isValid()) {
 
+                    $this->_debugData[$this->_count]['process recurring contract exists'] = 'Billing agreement for recurring contract already exists so update it';
+
                     $agreement->addOrderRelation($order);
                     $agreement->setStatus($agreement::STATUS_ACTIVE);
                     $agreement->setIsObjectChanged(true);
@@ -528,6 +532,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $message = Mage::helper('adyen')->__('Used existing billing agreement #%s.', $agreement->getReferenceId());
 
                 } else {
+
+                    $this->_debugData[$this->_count]['process recurring contract new'] = 'Create a new billing agreement for this recurring contract';
+
                     // set billing agreement data
                     $payment->setBillingAgreementData(array(
                         'billing_agreement_id'  => $recurringDetailReference,
@@ -542,6 +549,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $customerReference = $agreement->getCustomerReference();
 
                     if($customerReference) {
+
+                        $this->_debugData[$this->_count]['process recurring contract customerref'] = 'There is a custumor reference';
+
                         $listRecurringContracts = Mage::getSingleton('adyen/api')->listRecurringContracts($agreement->getCustomerReference(), $agreement->getStoreId());
 
                         $contractDetail = null;
@@ -555,6 +565,9 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         }
 
                         if($contractDetail != null) {
+
+                            $this->_debugData[$this->_count]['process recurring contract contractdetail'] = 'There is a contractDetail result';
+
                             // update status of the agreements in magento
                             $billingAgreements = Mage::getResourceModel('adyen/billing_agreement_collection')
                                 ->addFieldToFilter('customer_id', $agreement->getCustomerReference());
@@ -569,9 +582,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                                 }
                             }
 
+                            $this->_debugData[$this->_count]['process recurring contract existing updated'] = 'The existing billing agreements are updated';
+
                             $agreement->parseRecurringContractData($contractDetail);
 
                             if ($agreement->isValid()) {
+
+                                $this->_debugData[$this->_count]['process recurring contract billing agreement'] = 'The billing agreements is valid';
                                 $message = Mage::helper('adyen')->__('Created billing agreement #%s.', $agreement->getReferenceId());
 
                                 // save into sales_billing_agreement_order
@@ -580,6 +597,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                                 // add to order to save agreement
                                 $order->addRelatedObject($agreement);
                             } else {
+                                $this->_debugData[$this->_count]['process recurring contract billing agreement'] = 'The billing agreements is not valid';
                                 $message = Mage::helper('adyen')->__('Failed to create billing agreement for this order.');
                             }
                         } else {
