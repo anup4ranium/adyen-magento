@@ -1231,16 +1231,20 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         // If notification is pending status and pending status is set add the status change to the comment history
         if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING)
         {
-            $pendingStatus = $this->_getConfigData('pending_status', 'adyen_abstract', $order->getStoreId());
-            if($pendingStatus != "") {
-                $order->addStatusHistoryComment($comment, $pendingStatus);
-                /**
-                 * save order needed for old magento version so that status is not reverted to state NEW
-                 */
-                $order->save();
+            if ($order->isCanceled() || $order->getState() === Mage_Sales_Model_Order::STATE_HOLDED) {
+                $this->_debugData[$this->_count]['_addStatusHistoryComment'] = 'Did not change status because order is already canceled or on hold.';
+            } else {
+                $pendingStatus = $this->_getConfigData('pending_status', 'adyen_abstract', $order->getStoreId());
+                if($pendingStatus != "") {
+                    $order->addStatusHistoryComment($comment, $pendingStatus);
+                    /**
+                     * save order needed for old magento version so that status is not reverted to state NEW
+                     */
+                    $order->save();
 
-                $this->_debugData[$this->_count]['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $pendingStatus;
-                return;
+                    $this->_debugData[$this->_count]['_addStatusHistoryComment'] = 'Created comment history for this notification with status change to: ' . $pendingStatus;
+                    return;
+                }
             }
         }
 
