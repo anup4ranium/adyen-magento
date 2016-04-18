@@ -176,6 +176,17 @@
             </order_creditmemo>
         </sales>
     </global>
+    <frontend>
+        <translate>
+            <modules>
+                <Adyen_Payment>
+                    <files>
+                        <default>Adyen_Fee.csv</default>
+                    </files>
+                </Adyen_Payment>
+            </modules>
+        </translate>
+    </frontend>
     <default>
         <sales>
             <totals_sort>
