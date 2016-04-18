@@ -1362,7 +1362,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             ->addFieldToFilter('attempt', array('lteq' => '4'))
             ->addFieldToFilter('created_at', array(
                 'from' => strtotime('-1 day', time()),
-                'to' => strtotime('-5 minutes', time()),
+                'to' => strtotime('-1 minutes', time()),
                 'datetime' => true))
             ->addOrder('created_at', 'asc');
 
