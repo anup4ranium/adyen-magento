@@ -233,6 +233,10 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                         $this->additionalData->entry = $kv;
                     } else {
                         if($paymentMethod == 'cc') {
+
+                            // log the browser data to see why it is failing
+                            Mage::log($_SERVER['HTTP_USER_AGENT'], Zend_Log::ERR, "adyen_exception.log", true);
+
                             // For CC encrypted data is needed if you use CSE
                             Adyen_Payment_Exception::throwException(
                                 Mage::helper('adyen')->__('Missing the encrypted data value. Make sure the Client Side Encryption(CSE) script did encrypt the Credit Card details')
