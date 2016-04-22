@@ -179,11 +179,11 @@
     <frontend>
         <translate>
             <modules>
-                <Adyen_Payment>
+                <Adyen_Fee>
                     <files>
                         <default>Adyen_Fee.csv</default>
                     </files>
-                </Adyen_Payment>
+                </Adyen_Fee>
             </modules>
         </translate>
     </frontend>
