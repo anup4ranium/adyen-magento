@@ -75,8 +75,13 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $data = new Varien_Object($data);
         }
         $info    = $this->getInfoInstance();
-        $hppType = str_replace('adyen_hpp_', '', $info->getData('method'));
-        $hppType = str_replace('adyen_ideal', 'ideal', $hppType);
+
+        if(!$this->getHppOptionsDisabled()) {
+            $hppType = str_replace('adyen_hpp_', '', $info->getData('method'));
+            $hppType = str_replace('adyen_ideal', 'ideal', $hppType);
+        } else {
+            $hppType = null;
+        }
 
         // set hpp type
         $info->setCcType($hppType);
@@ -361,7 +366,6 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
      */
     public function getFormUrl()
     {
-        $brandCode        = $this->getInfoInstance()->getCcType();
         $paymentRoutine   = $this->_getConfigData('payment_routines', 'adyen_hpp');
         $isConfigDemoMode = $this->getConfigDataDemoMode();
         switch ($isConfigDemoMode) {
