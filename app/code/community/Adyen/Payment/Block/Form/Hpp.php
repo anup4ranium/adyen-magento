@@ -50,19 +50,19 @@ class Adyen_Payment_Block_Form_Hpp extends Mage_Payment_Block_Form {
                 $imgFileName = substr($this->getMethod()->getCode(), 10);
                 $result = Mage::getDesign()->getFilename("images/adyen/{$imgFileName}.png", array('_type' => 'skin'));
 
+                $isConfigDemoMode = $this->getMethod()->getConfigDataDemoMode();
+                if ($isConfigDemoMode) {
+                    $adyenUrl = "https://test.adyen.com";
+                } else {
+                    $adyenUrl = "https://live.adyen.com";
+                }
+
                 $imageUrl = file_exists($result)
                     ? $this->getSkinUrl("images/adyen/{$imgFileName}.png")
                     : ($this->getMethod()->getCode() != 'adyen_ideal') ? "{$adyenUrl}/hpp/img/pm/{$imgFileName}.png" : $this->getSkinUrl("images/adyen/img_trans.gif");
                 
             } else {
                 $imageUrl = $this->getSkinUrl("images/adyen/img_trans.gif");
-            }
-
-            $isConfigDemoMode = $this->getMethod()->getConfigDataDemoMode();
-            if ($isConfigDemoMode) {
-                $adyenUrl = "https://test.adyen.com";
-            } else {
-                $adyenUrl = "https://live.adyen.com";
             }
 
             $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
