@@ -149,11 +149,11 @@
         </routers>
         <translate>
             <modules>
-                <Adyen_Payment>
+                <adyen>
                     <files>
                         <default>Adyen_Payment.csv</default>
                     </files>
-                </Adyen_Payment>
+                </adyen>
             </modules>
         </translate>
         <layout>
