@@ -426,16 +426,6 @@
                             <sort_order>40</sort_order>
                             <frontend_model>adyen/adminhtml_system_config_fieldset_expanded</frontend_model>
                             <fields>
-                                <notification_hmac>
-                                    <label>Notification HMAC Key</label>
-                                    <tooltip>This is not required and should be left empty by default. You can use this as extra security, or if you do not want to use HTTP authentication. If the latter is the case, leave notification user name and password in 'Required Settings' empty and only use this key. Key can be generated at Adyen Customer Area => Server Communication => Standard Notification => Additional Settings => Generate new HMAC key</tooltip>
-                                    <frontend_type>text</frontend_type>
-                                    <config_path>payment/adyen_abstract/notification_hmac</config_path>
-                                    <sort_order>77</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </notification_hmac>
                                 <ignore_refund_notification>
                                     <label>Ignore refund notification</label>
                                     <tooltip>If the refund is done on the Adyen Platform it will send a refund notification to Magento which automatically creates a credit memo. If you set this setting to 'Yes', this will not happen because it will not process any of the REFUND notification that is received.</tooltip>
