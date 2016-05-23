@@ -921,7 +921,7 @@
                         </skinCode>
                         <secret_wordt translate="label">
                             <label>HMAC Key for Test</label>
-                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Test platform. Only the SHA-256 HMAC calculation method is supported in this plugin. SHA-1 is deprecate and will not be supported by Adyen.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -930,7 +930,7 @@
                         </secret_wordt>
                         <secret_wordp translate="label">
                             <label>HMAC Key for Live</label>
-                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform. Currently, only the older SHA-1 HMAC calculation method is supported in this plugin.</tooltip>
+                            <tooltip>Copy and paste the HMAC key of the skin you want to use from Test Customer Area => Skins. => click on [skin code] => Edit => HMAC for Live platform. Only the SHA-256 HMAC calculation method is supported in this plugin. SHA-1 is deprecate and will not be supported by Adyen.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
