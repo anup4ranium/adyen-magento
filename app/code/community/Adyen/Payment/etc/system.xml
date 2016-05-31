@@ -394,7 +394,7 @@
                                     <show_in_store>0</show_in_store>
                                 </autorefundoncancel>
                                 <send_invoice_update_mail translate="label">
-                                    <label>Invoice email (deprecated)</label>
+                                    <label>Invoice email</label>
                                     <frontend_type>select</frontend_type>
                                     <tooltip>Enable/Disable update mails to customers.</tooltip>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
