@@ -822,6 +822,17 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </installments_hipercard>
+                                <disable_zero_total>
+                                    <label>Disable at zero grand total</label>
+                                    <tooltip>Disable this payment method in the checkout when the grand total of the quote is 0.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <config_path>payment/adyen_cc/disable_zero_total</config_path>
+                                    <sort_order>220</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>1</show_in_store>
+                                </disable_zero_total>
                             </fields>
                         </adyen_cc_advanced>
                     </fields>
@@ -1000,6 +1011,17 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>1</show_in_store>
                                 </return_url_in_request>
+                                <disable_zero_total>
+                                    <label>Disable at zero grand total</label>
+                                    <tooltip>Disable this payment method in the checkout when the grand total of the quote is 0.</tooltip>
+                                    <frontend_type>select</frontend_type>
+                                    <source_model>adminhtml/system_config_source_yesno</source_model>
+                                    <config_path>payment/adyen_hpp/disable_zero_total</config_path>
+                                    <sort_order>120</sort_order>
+                                    <show_in_default>1</show_in_default>
+                                    <show_in_website>1</show_in_website>
+                                    <show_in_store>1</show_in_store>
+                                </disable_zero_total>
                             </fields>
                         </adyen_hpp_advanced>
                     </fields>
