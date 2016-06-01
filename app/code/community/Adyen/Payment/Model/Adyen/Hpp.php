@@ -442,7 +442,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     {
         $isAvailable = parent::isAvailable();
 
-        $disableZeroTotal = Mage::getStoreConfig('payment/adyen_hpp_advanced/disable_zero_total', $quote->getStoreId());
+        $disableZeroTotal = Mage::getStoreConfig('payment/adyen_hpp/disable_zero_total', $quote->getStoreId());
         if (!is_null($quote) && $quote->getGrandTotal() <= 0 && $disableZeroTotal) {
             return false;
         }
