@@ -62,4 +62,20 @@ class Adyen_Payment_Model_Adyen_Ideal
         ksort($issuers);
         return $issuers;
     }
+
+    /**
+     * @param Mage_Sales_Model_Quote|null $quote
+     * @return bool
+     */
+    public function isAvailable($quote = null)
+    {
+        $isAvailable = parent::isAvailable();
+
+        $disableZeroTotal = Mage::getStoreConfig('payment/adyen_hpp/disable_zero_total', $quote->getStoreId());
+        if (!is_null($quote) && $quote->getGrandTotal() <= 0 && $disableZeroTotal) {
+            return false;
+        }
+
+        return $isAvailable;
+    }
 }
