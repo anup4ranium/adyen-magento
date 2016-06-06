@@ -223,9 +223,9 @@
     <adminhtml>
         <layout>
             <updates>
-                <adyen>
+                <adyen_fee>
                     <file>adyen_fee.xml</file>
-                </adyen>
+                </adyen_fee>
             </updates>
         </layout>
         <translate>
