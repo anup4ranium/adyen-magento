@@ -220,6 +220,24 @@
             </modules>
         </translate>
     </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <adyen>
+                    <file>adyen_fee.xml</file>
+                </adyen>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Adyen_Fee>
+                    <files>
+                        <default>Adyen_Fee.csv</default>
+                    </files>
+                </Adyen_Fee>
+            </modules>
+        </translate>
+    </adminhtml>
     <default>
         <sales>
             <totals_sort>
