@@ -419,7 +419,7 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
 //        $streetNr = implode('',$street);
         $streetNr = implode(' ',$street);
 
-        return new Varien_Object(array('name' => $streetName, 'house_number' => $streetNr));
+        return new Varien_Object(array('name' => trim($streetName), 'house_number' => trim($streetNr)));
     }
 
     /**
