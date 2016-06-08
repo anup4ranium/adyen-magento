@@ -159,23 +159,23 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
     {
         $this->_initOrder();
         $order             = $this->_order;
-        $realOrderId       = $order->getRealOrderId();
-        $orderCurrencyCode = $order->getOrderCurrencyCode();
+        $realOrderId       = trim($order->getRealOrderId());
+        $orderCurrencyCode = trim($order->getOrderCurrencyCode());
         $skinCode          = trim($this->_getConfigData('skinCode', 'adyen_hpp'));
-        $amount            = Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
+        $amount            = trim(Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode));
         $merchantAccount   = trim($this->_getConfigData('merchantAccount'));
-        $shopperEmail      = $order->getCustomerEmail();
-        $customerId        = $order->getCustomerId();
-        $shopperIP         = $order->getRemoteIp();
-        $browserInfo       = $_SERVER['HTTP_USER_AGENT'];
+        $shopperEmail      = trim($order->getCustomerEmail());
+        $customerId        = trim($order->getCustomerId());
+        $shopperIP         = trim($order->getRemoteIp());
+        $browserInfo       = trim($_SERVER['HTTP_USER_AGENT']);
         $shopperLocale     = trim($this->_getConfigData('shopperlocale'));
-        $shopperLocale     = (!empty($shopperLocale)) ? $shopperLocale : Mage::app()->getLocale()->getLocaleCode();
+        $shopperLocale     = (!empty($shopperLocale)) ? $shopperLocale : trim(Mage::app()->getLocale()->getLocaleCode());
         $countryCode       = trim($this->_getConfigData('countryCode'));
         $countryCode       = (!empty($countryCode)) ? $countryCode : false;
         // if directory lookup is enabled use the billingadress as countrycode
         if ($countryCode == false) {
             if (is_object($order->getBillingAddress()) && $order->getBillingAddress()->getCountry() != "") {
-                $countryCode = $order->getBillingAddress()->getCountry();
+                $countryCode = trim($order->getBillingAddress()->getCountry());
             }
         }
         $adyFields                      = array();
@@ -214,11 +214,11 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
                 $orderCurrencyCode
             );
         }
-        $adyFields['orderData']       = base64_encode(gzencode($prodDetails)); //depreacated by Adyen
-        $adyFields['sessionValidity'] = date(
+        $adyFields['orderData']       = base64_encode(gzencode(trim($prodDetails))); //depreacated by Adyen
+        $adyFields['sessionValidity'] = trim(date(
             DATE_ATOM,
             mktime(date("H") + 1, date("i"), date("s"), date("m"), date("j"), date("Y"))
-        );
+        ));
         $adyFields['shopperEmail']    = $shopperEmail;
         // recurring
         $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract'));
@@ -236,7 +236,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         }
 
         $adyFields['recurringContract'] = $recurringType;
-        $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
+        $adyFields['shopperReference']  = (!empty($customerId)) ? trim($customerId) : self::GUEST_ID . $realOrderId;
         //blocked methods
         $adyFields['blockedMethods'] = "";
 
@@ -283,25 +283,25 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
 
         // For IDEAL add isuerId into request so bank selection is skipped
         if (strpos($this->getInfoInstance()->getCcType(), "ideal") !== false) {
-            $adyFields['issuerId'] = $this->getInfoInstance()->getPoNumber();
+            $adyFields['issuerId'] = trim($this->getInfoInstance()->getPoNumber());
         }
 
         // if option to put Return Url in request from magento is enabled add this in the request
         $returnUrlInRequest = $this->_getConfigData('return_url_in_request', 'adyen_hpp');
         if ($returnUrlInRequest) {
             $url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success";
-            $adyFields['resURL'] = $url;
+            $adyFields['resURL'] = trim($url);
         }
 
         $secretWord               = $this->_getSecretWord();
 
         if ($this->_code == "adyen_openinvoice") {
             $brandCode = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
-            $adyFields['brandCode'] = $brandCode;
+            $adyFields['brandCode'] = trim($brandCode);
         } else {
             $brandCode        = $this->getInfoInstance()->getCcType();
             if($brandCode) {
-                $adyFields['brandCode'] = $brandCode;
+                $adyFields['brandCode'] = trim($brandCode);
             }
         }
 
