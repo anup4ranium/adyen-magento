@@ -1298,9 +1298,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         // check if order has in invoice only cancel/hold if this is not the case
         if ($ignoreHasInvoice || !$order->hasInvoices()) {
-            $order->setActionFlag($orderStatus, true);
 
             if($orderStatus == Mage_Sales_Model_Order::STATE_HOLDED) {
+
+                // Allow magento to hold order
+                $order->setActionFlag(Mage_Sales_Model_Order::ACTION_FLAG_HOLD, true);
+
                 if ($order->canHold()) {
                     $order->hold();
                 } else {
@@ -1308,6 +1311,10 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     return;
                 }
             } else {
+
+                // Allow magento to cancel order
+                $order->setActionFlag(Mage_Sales_Model_Order::ACTION_FLAG_CANCEL, true);
+
                 if ($order->canCancel()) {
                     $order->cancel();
                 } else {
