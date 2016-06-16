@@ -67,6 +67,7 @@
         </reference>
     </checkout_onepage_index>
 
+    <!-- For the Idev onestepcheckout module !-->
     <onestepcheckout_index_index>
         <reference name="head">
             <action method="addJs"><script>adyen/payment/cc.js</script></action>
@@ -89,6 +90,30 @@
             </block>
         </reference>
     </onestepcheckout_index_index>
+
+    <!-- For the IWD onestep checkout module !-->
+    <opc_index_index>
+        <reference name="head">
+            <action method="addJs"><script>adyen/payment/cc.js</script></action>
+            <action method="addJs"><script>adyen/payment/iban.js</script></action>
+            <action method="addJs"><script>adyen/payment/elv.js</script></action>
+            <action method="addCss"><stylesheet>css/adyenstyle.css</stylesheet></action>
+        </reference>
+        <reference name="after_body_start">
+            <block type="core/text" name="adyen.diners.validation" after="-">
+                <action method="setText">
+                    <text>
+                        <![CDATA[<script type="text/javascript">
+                            Validation.creditCartTypes.set('DC', [new RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('CB', [new RegExp('^4[0-9]{12}([0-9]{3})?$'), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('ELO', [new RegExp(/^((((636368)|(438935)|(504175)|(451416)|(636297)|(506699))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/), new RegExp('^[0-9]{3}$'), true]);
+                            Validation.creditCartTypes.set('hipercard', [new RegExp(/^(606282\d{10}(\d{3})?)|(3841\d{15})$/), new RegExp('^[0-9]{3}$'), true]);
+                        </script>]]>
+                    </text>
+                </action>
+            </block>
+        </reference>
+    </opc_index_index>
 
     <checkout_multishipping_billing>
         <reference name="head">
