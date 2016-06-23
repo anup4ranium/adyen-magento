@@ -270,7 +270,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         }
 
         // get extra fields
-        $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $this->_order);
+        $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $this->_order, false);
 
         // For IDEAL add isuerId into request so bank selection is skipped
         if (strpos($this->getInfoInstance()->getCcType(), "ideal") !== false) {

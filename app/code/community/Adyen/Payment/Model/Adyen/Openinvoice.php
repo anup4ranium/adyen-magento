@@ -75,7 +75,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         return parent::isApplicableToQuote($quote, $checksBitMask);
     }
 
-    public function assignData($data) {
+    public function assignData($data)
+    {
         if (!($data instanceof Varien_Object)) {
             $data = new Varien_Object($data);
         }
@@ -144,7 +145,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
      * @desc Get url of Adyen payment
      * @return string
      */
-    public function getFormUrl() {
+    public function getFormUrl()
+    {
         $paymentRoutine = $this->_getConfigData('payment_routines', 'adyen_hpp');
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
 
@@ -167,7 +169,8 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         return $url;
     }
 
-    public function getFormName() {
+    public function getFormName()
+    {
         return "Adyen HPP";
     }
 
@@ -176,13 +179,15 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
      * @desc Notice these are used to prepopulate the fields, but client can edit them at Adyen.
      * @return type array
      */
-    public function getFormFields() {
+    public function getFormFields()
+    {
         $adyFields = parent::getFormFields();
-        $adyFields = $this->getOptionalFormFields($adyFields,$this->_order);
+        $adyFields = $this->getOptionalFormFields($adyFields,$this->_order, true);
         return $adyFields;
     }
 
-    public function getOptionalFormFields($adyFields,$order) {
+    public function getOptionalFormFields($adyFields,$order, $logging)
+    {
         if (empty($order)) return $adyFields;
 
         $helper = Mage::helper('adyen');
@@ -395,7 +400,9 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields[trim($key)] = trim($value);
         }
 
-        Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
+        if($logging) {
+            Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
+        }
 
         return $adyFields;
     }
@@ -431,15 +438,18 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
     }
 
 
-    public function genderShow() {
+    public function genderShow()
+    {
         return $this->_getConfigData('gender_show', 'adyen_openinvoice');
     }
 
-    public function dobShow() {
+    public function dobShow()
+    {
         return $this->_getConfigData('dob_show', 'adyen_openinvoice');
     }
 
-    public function telephoneShow() {
+    public function telephoneShow()
+    {
         return $this->_getConfigData('telephone_show', 'adyen_openinvoice');
     }
 }
