@@ -508,21 +508,6 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         return $this;
     }
 
-    public function cashAction() {
-
-        $status = $this->processCashResponse();
-
-        $session = $this->_getCheckout();
-        $session->unsAdyenRealOrderId();
-        $session->setQuoteId($session->getAdyenQuoteId(true));
-        $session->getQuote()->setIsActive(false)->save();
-        if ($status) {
-            $this->_redirect('checkout/onepage/success');
-        } else {
-            $this->cancel();
-        }
-    }
-
     /* START actions for POS */
     public function successPosAction()
     {
@@ -570,10 +555,6 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
         return Mage::getModel('adyen/processPosResult')->processPosResponse($response);
     }
     /* END actions for POS */
-
-    public function processCashResponse() {
-        return Mage::getModel('adyen/process')->processCashResponse();
-    }
 
     protected function _return401(){
         $this->getResponse()->setHttpResponseCode(401);
