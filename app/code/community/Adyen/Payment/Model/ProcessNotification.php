@@ -931,7 +931,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 $invoice->getOrder()->setIsInProcess(true);
 
                 // set transaction id so you can do a online refund from credit memo
-                $invoice->setTransactionId(1);
+                $invoice->setTransactionId($this->_pspReference);
 
                 $autoCapture = $this->_isAutoCapture($order);
                 $createPendingInvoice = (bool) $this->_getConfigData('create_pending_invoice', 'adyen_abstract', $order->getStoreId());
