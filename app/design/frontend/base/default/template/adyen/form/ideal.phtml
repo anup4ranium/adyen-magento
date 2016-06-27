@@ -50,7 +50,7 @@
                     <label class="adyen-ideal-image-label" for="adyen_ideal_type_<?php echo $_issuerId ?>">
                         <input type="radio" id="adyen_ideal_type_<?php echo $_issuerId ?>"
                             name="payment[adyen_ideal_type]" value="<?php echo $_issuerId ?>"
-                               class="<?php if ($size == $count) { echo 'validate-one-required';} ?>"
+                               class="<?php if ($size == $count) { echo 'validate-one-required-by-name';} ?>"
                             <?php if (isset($_issuerData['selected'])): ?>checked<?php endif; ?>
 
                         />
