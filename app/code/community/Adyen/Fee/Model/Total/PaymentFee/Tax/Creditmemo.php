@@ -32,7 +32,7 @@ class Adyen_Fee_Model_Total_PaymentFee_Tax_Creditmemo extends Mage_Sales_Model_O
         $order = $creditmemo->getOrder();
 
         //recalculate tax amounts in case if refund shipping value was changed
-        if ($creditmemo->getBasePaymentFeeAmount() && $order->getBasePaymentFeeAmount()) {
+        if ((float) $creditmemo->getBasePaymentFeeAmount() && (float) $order->getBasePaymentFeeAmount()) {
             $taxFactor = $creditmemo->getBasePaymentFeeAmount()/$order->getBasePaymentFeeAmount();
             $paymentFeeTax = $creditmemo->getPaymentFeeTax() * $taxFactor;
             $paymentBaseFeeTax = $creditmemo->getBasePaymentFeeTax() * $taxFactor;
@@ -41,7 +41,6 @@ class Adyen_Fee_Model_Total_PaymentFee_Tax_Creditmemo extends Mage_Sales_Model_O
             $paymentBaseFeeTax = $creditmemo->getBasePaymentFeeTax();
         }
 
-        
         // set the tax fee
         $creditmemo->setPaymentFeeTax($paymentFeeTax);
         $creditmemo->setBasePaymentFeeTax($paymentBaseFeeTax);
