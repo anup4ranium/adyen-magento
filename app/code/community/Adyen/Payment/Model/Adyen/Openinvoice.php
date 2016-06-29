@@ -210,25 +210,63 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             $adyFields['billingAddress.houseNumberOrName'] = trim($helper->getStreet($billingAddress,true)->getHouseNumber());
         }
 
-        $adyFields['billingAddress.city'] = trim($billingAddress->getCity());
-        $adyFields['billingAddress.postalCode'] = trim($billingAddress->getPostcode());
-        $adyFields['billingAddress.stateOrProvince'] = trim($billingAddress->getRegionCode());
-        $adyFields['billingAddress.country'] = trim($billingAddress->getCountryId());
+        if (trim($billingAddress->getCity()) == "") {
+            $adyFields['billingAddress.city'] = "NA";
+        } else {
+            $adyFields['billingAddress.city'] = trim($billingAddress->getCity());
+        }
+
+        if (trim($billingAddress->getPostcode()) == "") {
+            $adyFields['billingAddress.postalCode'] = "NA";
+        } else {
+            $adyFields['billingAddress.postalCode'] = trim($billingAddress->getPostcode());
+        }
+
+        if (trim($billingAddress->getRegionCode()) == "") {
+            $adyFields['billingAddress.stateOrProvince'] = "NA";
+        } else {
+            $adyFields['billingAddress.stateOrProvince'] = trim($billingAddress->getRegionCode());
+        }
+
+        if (trim($billingAddress->getCountryId()) == "") {
+            $adyFields['billingAddress.country'] = "NA";
+        } else {
+            $adyFields['billingAddress.country'] = trim($billingAddress->getCountryId());
+        }
 
         $deliveryAddress = $order->getShippingAddress();
         if($deliveryAddress != null)
         {
             $adyFields['deliveryAddress.street'] = trim($helper->getStreet($deliveryAddress,true)->getName());
-            if($helper->getStreet($deliveryAddress,true)->getHouseNumber() == "") {
+            if (trim($helper->getStreet($deliveryAddress,true)->getHouseNumber()) == "") {
                 $adyFields['deliveryAddress.houseNumberOrName'] = "NA";
             } else {
                 $adyFields['deliveryAddress.houseNumberOrName'] = trim($helper->getStreet($deliveryAddress,true)->getHouseNumber());
             }
 
-            $adyFields['deliveryAddress.city'] = trim($deliveryAddress->getCity());
-            $adyFields['deliveryAddress.postalCode'] = trim($deliveryAddress->getPostcode());
-            $adyFields['deliveryAddress.stateOrProvince'] = trim($deliveryAddress->getRegionCode());
-            $adyFields['deliveryAddress.country'] = trim($deliveryAddress->getCountryId());
+            if (trim($deliveryAddress->getCity()) == "") {
+                $adyFields['deliveryAddress.city'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.city'] = trim($deliveryAddress->getCity());
+            }
+
+            if (trim($deliveryAddress->getPostcode()) == "") {
+                $adyFields['deliveryAddress.postalCode'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.postalCode'] = trim($deliveryAddress->getPostcode());
+            }
+
+            if (trim($deliveryAddress->getRegionCode()) == "") {
+                $adyFields['deliveryAddress.stateOrProvince'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.stateOrProvince'] = trim($deliveryAddress->getRegionCode());
+            }
+
+            if (trim($deliveryAddress->getCountryId()) == "") {
+                $adyFields['deliveryAddress.country'] = "NA";
+            } else {
+                $adyFields['deliveryAddress.country'] = trim($deliveryAddress->getCountryId());
+            }
         }
 
 
