@@ -336,7 +336,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
             ++$count;
             $linename = "line".$count;
             $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $item->getName();
+            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = str_replace("\n", '', trim($item->getName()));
             $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($item->getPrice(), $currency);
             $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? $helper->formatAmount($item->getPriceInclTax(), $currency) - $helper->formatAmount($item->getPrice(), $currency):$helper->formatAmount($item->getTaxAmount(), $currency);
 
