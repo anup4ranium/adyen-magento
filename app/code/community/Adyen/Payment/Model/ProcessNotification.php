@@ -243,6 +243,14 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $this->_value = $valueArray->value; // for soap
         }
 
+
+        // reset values because data can not be present in notification
+        $this->_boletoOriginalAmount = null;
+        $this->_boletoPaidAmount = null;
+        $this->_fraudManualReview = false;
+        $this->_modificationResult = null;
+        $this->_klarnaReservationNumber = null;
+        
         $additionalData = $params->getData('additionalData');
 
         // boleto data
