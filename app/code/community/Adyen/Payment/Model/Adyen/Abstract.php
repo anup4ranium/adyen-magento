@@ -118,6 +118,12 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
         // if amount is a full refund send a refund/cancelled request so if it is not captured yet it will cancel the order
         $grandTotal = $order->getGrandTotal();
+        $currency   = $order->getOrderCurrencyCode();
+
+        if ($payment->hasCreditmemo() && $currency != $order->getBaseCurrencyCode()) {
+                $creditmemo = $payment->getCreditmemo();
+                $amount     = $creditmemo->getGrandTotal();
+        }
 
         if($grandTotal == $amount) {
             $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
@@ -203,6 +209,13 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $payment->setStatus(self::STATUS_APPROVED)
             ->setTransactionId($this->getTransactionId())
             ->setIsTransactionClosed(0);
+        $order      = $payment->getOrder();
+        $currency   = $order->getOrderCurrencyCode();
+
+        if ($payment->hasCurrentInvoice() && $currency != $order->getBaseCurrencyCode()) {
+                $invoice = $payment->getCurrentInvoice();
+                $amount  = $invoice->getGrandTotal();
+        }
 
         // do capture request to adyen
         $order = $payment->getOrder();

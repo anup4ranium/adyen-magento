@@ -111,6 +111,14 @@
             </groups>
         </payment>
         <events>
+            <sales_order_payment_capture>
+                <observers>
+                    <adyen_payment_capture>
+                        <class>adyen/observer</class>
+                        <method>addCurrentInvoiceToPayment</method>
+                    </adyen_payment_capture>
+                </observers>
+            </sales_order_payment_capture>
             <controller_action_predispatch>
                 <observers>
                     <adyen_payment_hpp>
