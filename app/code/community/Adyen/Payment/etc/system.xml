@@ -384,7 +384,7 @@
                                     <show_in_store>0</show_in_store>
                                 </uncancelorder>
                                 <autorefundoncancel translate="label">
-                                    <label>Automatic refund when a order is canceled</label>
+                                    <label>Automatic cancel\refund when a order is canceled</label>
                                     <tooltip>Enable/Disable automatic refund when canceling a order.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/autorefundoncancel</config_path>
