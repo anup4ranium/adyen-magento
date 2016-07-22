@@ -337,12 +337,11 @@ class Adyen_Payment_Model_Observer {
 
 
     protected $_requiredHmacFields = array(
-        'merchantReference',
-        'paymentAmount',
         'currencyCode',
-        'shipBeforeDate',
-        'skinCode',
         'merchantAccount',
+        'paymentAmount',
+        'skinCode',
+        'merchantReference',
         'sessionValidity'
     );
 
