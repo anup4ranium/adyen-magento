@@ -226,7 +226,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->card = null;
 
                     // this is only needed for creditcards
-                    if($payment->getAdditionalInformation("encrypted_data") != "") {
+                    if($payment->getAdditionalInformation("encrypted_data") != "" && $payment->getAdditionalInformation("encrypted_data") != "false" ) {
                         $kv = new Adyen_Payment_Model_Adyen_Data_AdditionalDataKVPair();
                         $kv->key = new SoapVar("card.encrypted.json", XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
                         $kv->value = new SoapVar($payment->getAdditionalInformation("encrypted_data"), XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
