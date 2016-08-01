@@ -158,7 +158,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 $orderPaymentCollection->addPaymentFilterDescending($payment->getId());
             } elseif($refundStrategy == "3") {
                 // refund based on ratio
-                $ratio = $grandTotal / $amount;
+                $ratio =  $amount / $grandTotal;
                 $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
             }
 
