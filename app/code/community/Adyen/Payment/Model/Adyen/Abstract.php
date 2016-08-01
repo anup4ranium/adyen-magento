@@ -146,24 +146,24 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             }
         } else {
 
-            // loop over payments and refund based on refund strategy
-            $refundStrategy = $this->_getConfigData('split_payments_refund_strategy', 'adyen_abstract', $order->getStoreId());
-            $ratio = null;
+            // partial refund if multiple payments check refund strategy
+            if($orderPaymentCollection->getSize() > 1) {
 
-            if($refundStrategy == "1") {
-                // Refund in ascending order
-                $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
-            } elseif($refundStrategy == "2") {
-                // Refund in descending order
-                $orderPaymentCollection->addPaymentFilterDescending($payment->getId());
-            } elseif($refundStrategy == "3") {
-                // refund based on ratio
-                $ratio =  $amount / $grandTotal;
-                $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
-            }
+                // loop over payments and refund based on refund strategy
+                $refundStrategy = $this->_getConfigData('split_payments_refund_strategy', 'adyen_abstract', $order->getStoreId());
+                $ratio = null;
 
-            // partial refund
-            if($orderPaymentCollection->getSize()) {
+                if($refundStrategy == "1") {
+                    // Refund in ascending order
+                    $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
+                } elseif($refundStrategy == "2") {
+                    // Refund in descending order
+                    $orderPaymentCollection->addPaymentFilterDescending($payment->getId());
+                } elseif($refundStrategy == "3") {
+                    // refund based on ratio
+                    $ratio =  $amount / $grandTotal;
+                    $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
+                }
 
                 // loop over payment methods and refund them all
                 foreach($orderPaymentCollection as $splitPayment) {
