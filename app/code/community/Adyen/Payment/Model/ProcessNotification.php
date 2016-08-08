@@ -460,10 +460,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_HANDLED_EXTERNALLY:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_AUTHORISATION:
-                // for POS don't do anything on the AUTHORIZATION
-                if($_paymentCode != "adyen_pos") {
                     $this->_authorizePayment($order, $this->_paymentMethod);
-                }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_REJECT:
                 // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
@@ -481,12 +478,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                         $this->_setPaymentAuthorized($order, false, true, true);
                     }
                 } else {
-
-                    // uncancel the order just to be sure that order is going trough
-                    $this->_uncancelOrder($order);
-
-                    // FOR POS authorize the payment on the CAPTURE notification
-                    $this->_authorizePayment($order, $this->_paymentMethod);
+                    // do nothing (this is a backwards-compatible notification that can be ignored
+                    $this->_debugData[$this->_count]['_processNotification info'] = 'Ignore this refund already done processing on AUTHROISATION';
                 }
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE_FAILED:
