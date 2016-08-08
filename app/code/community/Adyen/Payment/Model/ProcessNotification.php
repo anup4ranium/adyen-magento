@@ -128,6 +128,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
     // notification attributes
     protected $_pspReference;
+    protected $_originalReference;
     protected $_merchantReference;
     protected $_eventCode;
     protected $_success;
@@ -230,6 +231,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     {
         //  declare the common parameters
         $this->_pspReference = trim($params->getData('pspReference'));
+        $this->_originalReference = trim($params->getData('originalReference'));
         $this->_merchantReference = trim($params->getData('merchantReference'));
         $this->_eventCode = trim($params->getData('eventCode'));
         $this->_success = trim($params->getData('success'));
@@ -678,6 +680,23 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
     {
         $this->_debugData[$this->_count]['_refundOrder'] = 'Refunding the order';
 
+        $currency = $order->getOrderCurrencyCode(); // use orderCurrency because adyen respond in the same currency as in the request
+        
+        // check if it is a split payment if so save the refunded data
+        if ($this->_originalReference != "") {
+            $orderPayment = Mage::getModel('adyen/order_payment')
+                ->getCollection()
+                ->addFieldToFilter('pspreference', $this->_originalReference)
+                ->getFirstItem();
+
+            if ($orderPayment->getId() > 0) {
+                $currency = $order->getOrderCurrencyCode();
+                $amountRefunded =  Mage::helper('adyen')->originalAmount($this->_value, $currency);
+                $orderPayment->setTotalRefunded($amountRefunded);
+                $orderPayment->save();
+            }
+        }
+
         // Don't create a credit memo if refund is initialize in Magento because in this case the credit memo already exists
         $result = Mage::getModel('adyen/event')
             ->getEvent($this->_pspReference, '[refund-received]');
@@ -687,8 +706,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
         }
 
         $_mail = (bool) $this->_getConfigData('send_update_mail', 'adyen_abstract', $order->getStoreId());
-
-        $currency = $order->getOrderCurrencyCode(); // use orderCurrency because adyen respond in the same currency as in the request
         $amount = Mage::helper('adyen')->originalAmount($this->_value, $currency);
 
         if ($order->canCreditmemo()) {
@@ -857,17 +874,30 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             }
         }
 
-        // validate if amount is total amount
+        // Check if this is the first partial authorisation or if there is already been an authorisation
+        $paymentObj = $order->getPayment();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
+
+        // save into adyen_order_payment
+        $amount = Mage::helper('adyen')->originalAmount($this->_value, $orderCurrencyCode);
+        Mage::getModel('adyen/order_payment')
+            ->setPspreference($this->_pspReference)
+            ->setMerchantReference($this->_merchantReference)
+            ->setPaymentId($paymentObj->getId())
+            ->setPaymentMethod($this->_paymentMethod)
+            ->setAmount($amount)
+            ->setTotalRefunded(0)
+            ->save();
+
+
+        // validate if amount is total amount
+
         $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
 
         if($this->_isTotalAmount($orderAmount)) {
             $this->_createInvoice($order);
         } else {
             $this->_debugData[$this->_count]['_prepareInvoice partial authorisation step1'] = 'This is a partial AUTHORISATION';
-
-            // Check if this is the first partial authorisation or if there is already been an authorisation
-            $paymentObj = $order->getPayment();
             $authorisationAmount = $paymentObj->getAdyenAuthorisationAmount();
             if($authorisationAmount != "") {
                 $this->_debugData[$this->_count]['_prepareInvoice partial authorisation step2'] = 'There is already a partial AUTHORISATION received check if this combined with the previous amounts match the total amount of the order';
@@ -998,57 +1028,105 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
      */
     protected function _isAutoCapture($order)
     {
-        $captureMode = trim($this->_getConfigData('capture_mode', 'adyen_abstract', $order->getStoreId()));
-        $sepaFlow = trim($this->_getConfigData('flow', 'adyen_sepa', $order->getStoreId()));
-        $_paymentCode = $this->_paymentMethodCode($order);
-        $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract', $order->getStoreId());
-        $captureModePayPal = trim($this->_getConfigData('paypal_capture_mode', 'adyen_abstract', $order->getStoreId()));
+        // validate if payment methods allowes manual capture
+        if ($this->_manualCaptureAllowed()) {
+            $captureMode = trim($this->_getConfigData('capture_mode', 'adyen_abstract', $order->getStoreId()));
+            $sepaFlow = trim($this->_getConfigData('flow', 'adyen_sepa', $order->getStoreId()));
+            $_paymentCode = $this->_paymentMethodCode($order);
+            $captureModeOpenInvoice = $this->_getConfigData('auto_capture_openinvoice', 'adyen_abstract', $order->getStoreId());
+            $captureModePayPal = trim($this->_getConfigData('paypal_capture_mode', 'adyen_abstract', $order->getStoreId()));
 
-        //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
-        $isBankTransfer = $this->_isBankTransfer($this->_paymentMethod);
+            //check if it is a banktransfer. Banktransfer only a Authorize notification is send.
+            $isBankTransfer = $this->_isBankTransfer($this->_paymentMethod);
 
-        /**
-         * Payment method IDeal, Cash, adyen_pos and adyen_boleto are always auto capture
-         * For sepadirectdebit in sale modues is always auto capture but in auth/cap modus it will follow the overall capture modus
-         */
-        if (strcmp($this->_paymentMethod, 'ideal') === 0 ||
-            strcmp($this->_paymentMethod, 'c_cash' ) === 0 ||
-            $_paymentCode == "adyen_pos" ||
-            $isBankTransfer == true ||
-            (($_paymentCode == "adyen_sepa" || ($_paymentCode == "adyen_oneclick" && strcmp($this->_paymentMethod, 'sepadirectdebit') === 0)) && $sepaFlow != "authcap") ||
-            $_paymentCode == "adyen_boleto")
-        {
-            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture because payment method does not allow manual capture';
-            return true;
-        }
-        // if auto capture mode for openinvoice is turned on then use auto capture
-        if ($captureModeOpenInvoice == true && (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0)) {
-            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture';
-            return true;
-        }
-
-        // by default openinvoice payment methods are manual capture
-        if (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0) {
-            return false;
-        }
-
-        // if PayPal capture modues is different from the default use this one
-        if(strcmp($this->_paymentMethod, 'paypal' ) === 0 && $captureModePayPal != "") {
-            if(strcmp($captureModePayPal, 'auto') === 0 ) {
-                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to auto capture';
+            /**
+             * Payment method IDeal, Cash, adyen_pos and adyen_boleto are always auto capture
+             * For sepadirectdebit in sale modues is always auto capture but in auth/cap modus it will follow the overall capture modus
+             */
+            if (strcmp($this->_paymentMethod, 'ideal') === 0 ||
+                strcmp($this->_paymentMethod, 'c_cash' ) === 0 ||
+                $_paymentCode == "adyen_pos" ||
+                $isBankTransfer == true ||
+                (($_paymentCode == "adyen_sepa" || ($_paymentCode == "adyen_oneclick" && strcmp($this->_paymentMethod, 'sepadirectdebit') === 0)) && $sepaFlow != "authcap") ||
+                $_paymentCode == "adyen_boleto")
+            {
+                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture because payment method does not allow manual capture';
                 return true;
-            } elseif(strcmp($captureModePayPal, 'manual') === 0 ) {
-                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to manual capture';
+            }
+            // if auto capture mode for openinvoice is turned on then use auto capture
+            if ($captureModeOpenInvoice == true && (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0)) {
+                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'openinvoice capture mode is set to auto capture';
+                return true;
+            }
+
+            // by default openinvoice payment methods are manual capture
+            if (strcmp($this->_paymentMethod, 'openinvoice') === 0 || strcmp($this->_paymentMethod, 'afterpay_default') === 0 || strcmp($this->_paymentMethod, 'klarna') === 0) {
                 return false;
             }
+
+            // if PayPal capture modues is different from the default use this one
+            if(strcmp($this->_paymentMethod, 'paypal' ) === 0 && $captureModePayPal != "") {
+                if(strcmp($captureModePayPal, 'auto') === 0 ) {
+                    $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to auto capture';
+                    return true;
+                } elseif(strcmp($captureModePayPal, 'manual') === 0 ) {
+                    $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Paypal capture mode is set to manual capture';
+                    return false;
+                }
+            }
+            if (strcmp($captureMode, 'manual') === 0) {
+                $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is manual capture';
+                return false;
+            }
+
+            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is immediate capture';
+            return true;
+        } else {
+            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'This payment method does not allow manual capture';
+            return true;
         }
-        if (strcmp($captureMode, 'manual') === 0) {
-            $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is manual capture';
-            return false;
+    }
+
+    /**
+     * Validate if this payment methods allows manual capture
+     * This is a default can be forced differently to overrule on acquirer level
+     *
+     * @return bool|null
+     */
+    protected function _manualCaptureAllowed()
+    {
+        $manualCaptureAllowed = null;
+        $paymentMethod = $this->_paymentMethod;
+
+        switch($paymentMethod) {
+            case 'cup':
+            case 'cartebancaire':
+            case 'visa':
+            case 'mc':
+            case 'uatp':
+            case 'amex':
+            case 'bcmc':
+            case 'maestro':
+            case 'maestrouk':
+            case 'diners':
+            case 'discover':
+            case 'jcb':
+            case 'laser':
+            case 'paypal':
+            case 'klarna':
+            case 'afterpay_default':
+            case 'sepadirectdebit':
+                $manualCaptureAllowed = true;
+                break;
+            default:
+                // To be sure check if it payment method starts with afterpay_ then manualCapture is allowed
+                if (strlen($this->_paymentMethod) >= 9 && substr($this->_paymentMethod, 0, 9) == "afterpay_") {
+                    $manualCaptureAllowed = true;
+                }
+                $manualCaptureAllowed = false;
         }
 
-        $this->_debugData[$this->_count]['_isAutoCapture result'] = 'Fall back on default capture delay that is immediate capture';
-        return true;
+        return $manualCaptureAllowed;
     }
 
     /**
@@ -1250,9 +1328,13 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $boletoPaidAmountText = "";
         }
 
+        if($this->_value != null && $this->_value != "") {
+            $valueText = "<br /> amount value: " . $this->_value;
+        }
+
         $type = 'Adyen HTTP Notification(s):';
         $comment = Mage::helper('adyen')
-            ->__('%s <br /> eventCode: %s <br /> pspReference: %s <br /> paymentMethod: %s <br /> success: %s %s %s', $type, $this->_eventCode, $this->_pspReference, $this->_paymentMethod, $success, $klarnaReservationNumberText, $boletoPaidAmountText);
+            ->__('%s <br /> eventCode: %s <br /> pspReference: %s <br /> paymentMethod: %s <br /> success: %s %s %s %s', $type, $this->_eventCode, $this->_pspReference, $this->_paymentMethod, $success, $valueText, $klarnaReservationNumberText, $boletoPaidAmountText);
 
         // If notification is pending status and pending status is set add the status change to the comment history
         if($this->_eventCode == Adyen_Payment_Model_Event::ADYEN_EVENT_PENDING)

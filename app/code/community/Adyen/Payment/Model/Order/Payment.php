@@ -25,30 +25,13 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Info_Hpp extends Mage_Payment_Block_Info {
-
+class Adyen_Payment_Model_Order_Payment extends Mage_Core_Model_Abstract
+{
+    /**
+     * Initialize resources
+     */
     protected function _construct() {
-        parent::_construct();
-        $this->setTemplate('adyen/info/hpp.phtml');
-    }
-
-    public function toPdf() {
-        $this->setTemplate('adyen/pdf/hpp.phtml');
-        return $this->toHtml();
-    }
-
-
-    public function getSplitPayments()
-    {
-        // retrieve split payments of the order
-        $orderPaymentCollection = Mage::getModel('adyen/order_payment')->getCollection();
-        $orderPaymentCollection->addPaymentFilterAscending($this->getInfo()->getId());
-
-        if($orderPaymentCollection->getSize() > 0) {
-            return $orderPaymentCollection;
-        } else {
-            return null;
-        }
+        $this->_init('adyen/order_payment');
     }
 
 }

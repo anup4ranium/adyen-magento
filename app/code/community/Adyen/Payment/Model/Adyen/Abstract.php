@@ -125,10 +125,74 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 $amount     = $creditmemo->getGrandTotal();
         }
 
+
+        // check if payment was a split payment
+        $orderPaymentCollection = Mage::getModel('adyen/order_payment')->getCollection();
+
         if($grandTotal == $amount) {
-            $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
+
+            // Refund in ascending order
+            $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
+
+
+            // full refund
+            if ($orderPaymentCollection->getSize()) {
+                // loop over payment methods and refund them all
+                foreach($orderPaymentCollection as $splitPayment) {
+                    $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $splitPayment->getPspreference());
+                }
+            } else {
+                $order->getPayment()->getMethodInstance()->SendCancelOrRefund($payment, $pspReference);
+            }
         } else {
-            $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $pspReference);
+
+            // partial refund if multiple payments check refund strategy
+            if($orderPaymentCollection->getSize() > 1) {
+
+                // loop over payments and refund based on refund strategy
+                $refundStrategy = $this->_getConfigData('split_payments_refund_strategy', 'adyen_abstract', $order->getStoreId());
+                $ratio = null;
+
+                if($refundStrategy == "1") {
+                    // Refund in ascending order
+                    $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
+                } elseif($refundStrategy == "2") {
+                    // Refund in descending order
+                    $orderPaymentCollection->addPaymentFilterDescending($payment->getId());
+                } elseif($refundStrategy == "3") {
+                    // refund based on ratio
+                    $ratio =  $amount / $grandTotal;
+                    $orderPaymentCollection->addPaymentFilterAscending($payment->getId());
+                }
+
+                // loop over payment methods and refund them all
+                foreach($orderPaymentCollection as $splitPayment) {
+
+                    // could be that not all the split payments need a refund
+                    if($amount > 0) {
+                        if($ratio) {
+                            // refund based on ratio calculate refund amount
+                            $amount = $ratio * ($splitPayment->getAmount() - $splitPayment->getRefundedAmount());
+                            $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $splitPayment->getPspreference());
+                        } else {
+                            // total authorised amount of the split payment
+                            $splitPaymentAmount = $splitPayment->getAmount() - $splitPayment->getRefundedAmount();
+
+                            // if refunded amount is greather then split payment amount do a full refund
+                            if($amount >= $splitPaymentAmount) {
+                                $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $splitPaymentAmount, $splitPayment->getPspreference());
+                                // update amount with rest of the available amount
+                            } else {
+                                $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $splitPayment->getPspreference());
+                            }
+                            // update the rest amount
+                            $amount = $amount - $splitPaymentAmount;
+                        }
+                    }
+                }
+            } else {
+                $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $amount, $pspReference);
+            }
         }
 
         return $this;
@@ -338,7 +402,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             Mage::log("Response from Adyen:", self::DEBUG_LEVEL, "$request.log", true);
             Mage::log($this->_pci()->obscureSensitiveData($response), self::DEBUG_LEVEL, "$request.log", true);
 
-            $this->_processResponse($payment, $response, $request);
+            $this->_processResponse($payment, $response, $request, $pspReference);
         }
 
         /*
@@ -352,17 +416,14 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
     }
 
     /**
-     * @desc authorise response
-     * Process the response of the soap
-     *
      * @param Varien_Object $payment
-     * @param stdClass      $response
-     * @param null          $request
-     *
-     * @return $this
-     * @todo Add comment with checkout Authorised
+     * @param $response
+     * @param null $request
+     * @param null $pspReference
+     * @return $this|bool
+     * @throws Adyen_Payment_Exception
      */
-    protected function _processResponse(Varien_Object $payment, $response, $request = null) {
+    protected function _processResponse(Varien_Object $payment, $response, $request = null, $originalPspReference = null) {
         if (!($response instanceof stdClass)) {
             return false;
         }
@@ -464,7 +525,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             case '[capture-received]':
             case '[refund-received]':
             case '[cancelOrRefund-received]':
-                $this->_addStatusHistory($payment, $responseCode, $pspReference);
+                $this->_addStatusHistory($payment, $responseCode, $pspReference, false, null, $originalPspReference);
                 break;
             case "Error":
                 $this->resetReservedOrderId();
@@ -506,13 +567,20 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
      * @param unknown_type $request
      * @param unknown_type $pspReference
      */
-    protected function _addStatusHistory(Varien_Object $payment, $responseCode, $pspReference, $status = false, $boletoPDF = null) {
+    protected function _addStatusHistory(Varien_Object $payment, $responseCode, $pspReference, $status = false, $boletoPDF = null, $originalPspReference = null) {
 
-        if($boletoPDF)
+        if($boletoPDF) {
             $payment->getOrder()->setAdyenBoletoPdf($boletoPDF);
+        }
+
+        if($originalPspReference) {
+            $originalPspReferenceText = "originalPspReference: " . $originalPspReference;
+        } else {
+            $originalPspReferenceText = "";
+        }
 
         $type = 'Adyen Result URL Notification(s):';
-        $comment = Mage::helper('adyen')->__('%s <br /> authResult: %s <br /> pspReference: %s <br /> paymentMethod: %s', $type, $responseCode, $pspReference, "");
+        $comment = Mage::helper('adyen')->__('%s <br /> authResult: %s <br /> pspReference: %s <br /> %s', $type, $responseCode, $pspReference, $originalPspReferenceText);
         $payment->getOrder()->setAdyenEventCode($responseCode);
         $payment->getOrder()->addStatusHistoryComment($comment, $status);
         $payment->setAdyenEventCode($responseCode);

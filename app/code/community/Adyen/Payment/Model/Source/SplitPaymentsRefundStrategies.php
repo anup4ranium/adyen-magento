@@ -25,30 +25,14 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Info_Hpp extends Mage_Payment_Block_Info {
+class Adyen_Payment_Model_Source_SplitPaymentsRefundStrategies {
 
-    protected function _construct() {
-        parent::_construct();
-        $this->setTemplate('adyen/info/hpp.phtml');
-    }
-
-    public function toPdf() {
-        $this->setTemplate('adyen/pdf/hpp.phtml');
-        return $this->toHtml();
-    }
-
-
-    public function getSplitPayments()
-    {
-        // retrieve split payments of the order
-        $orderPaymentCollection = Mage::getModel('adyen/order_payment')->getCollection();
-        $orderPaymentCollection->addPaymentFilterAscending($this->getInfo()->getId());
-
-        if($orderPaymentCollection->getSize() > 0) {
-            return $orderPaymentCollection;
-        } else {
-            return null;
-        }
+    public function toOptionArray() {
+        return array(
+            array('value' => '1', 'label' => Mage::helper('adyen')->__('Refund from first payment first')),
+            array('value' => '2', 'label' => Mage::helper('adyen')->__('Refund from last payment first')),
+            array('value' => '3', 'label' => Mage::helper('adyen')->__('refund based on ratio'))
+        );
     }
 
 }

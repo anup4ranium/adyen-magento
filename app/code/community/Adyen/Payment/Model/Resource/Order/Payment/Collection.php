@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adyen Payment Module
  *
@@ -25,30 +24,33 @@
  * @property   Adyen B.V
  * @copyright  Copyright (c) 2014 Adyen BV (http://www.adyen.com)
  */
-class Adyen_Payment_Block_Info_Hpp extends Mage_Payment_Block_Info {
 
-    protected function _construct() {
-        parent::_construct();
-        $this->setTemplate('adyen/info/hpp.phtml');
-    }
-
-    public function toPdf() {
-        $this->setTemplate('adyen/pdf/hpp.phtml');
-        return $this->toHtml();
-    }
-
-
-    public function getSplitPayments()
+class Adyen_Payment_Model_Resource_Order_Payment_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
+{
+    protected function _construct()
     {
-        // retrieve split payments of the order
-        $orderPaymentCollection = Mage::getModel('adyen/order_payment')->getCollection();
-        $orderPaymentCollection->addPaymentFilterAscending($this->getInfo()->getId());
-
-        if($orderPaymentCollection->getSize() > 0) {
-            return $orderPaymentCollection;
-        } else {
-            return null;
-        }
+        $this->_init('adyen/order_payment');
     }
 
+    public function addPaymentFilterAscending($paymentId)
+    {
+        if ($paymentId instanceof Mage_Sales_Model_Order_Payment) {
+            $paymentId = $paymentId->getId();
+        }
+        $this->addFieldToFilter('payment_id', $paymentId);
+        $this->getSelect()->order(array('created_at ASC'));
+
+        return $this;
+    }
+
+    public function addPaymentFilterDescending($paymentId)
+    {
+        if ($paymentId instanceof Mage_Sales_Model_Order_Payment) {
+            $paymentId = $paymentId->getId();
+        }
+        $this->addFieldToFilter('payment_id', $paymentId);
+        $this->getSelect()->order(array('created_at DESC'));
+
+        return $this;
+    }
 }
