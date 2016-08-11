@@ -217,6 +217,10 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                             $session->setQuoteId($session->getAdyenQuoteId(true));
                             $session->getQuote()->setIsActive(false)->save();
 
+                            // add success to additionalData so you know that for this order 3D was successful
+                            $order->getPayment()->setAdditionalInformation('3d_successful', true);
+                            $order->save();
+
                             $this->_redirect('checkout/onepage/success');
                         }
                         else {
@@ -255,9 +259,14 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
                 Adyen_Payment_Exception::throwException($errorMsg);
             }
         } catch (Exception $e) {
-            Mage::logException($e);
-            $session->addException($e, Mage::helper('adyen')->__($e->getMessage()));
-            $this->cancel();
+            $alreadySuccessful = $order->getPayment()->getAdditionalInformation('3d_successful');
+            // ignore because 3d was already successful for this order
+            if (!$alreadySuccessful)  {
+                Mage::logException($e);
+                $this->cancel();
+            } else {
+                $this->_redirect('checkout/onepage/success');
+            }
         }
     }
 
@@ -304,7 +313,8 @@ class Adyen_Payment_ProcessController extends Mage_Core_Controller_Front_Action 
      * @desc reloads the items in the cart && cancel the order
      * @since v009
      */
-    public function cancel() {
+    public function cancel()
+    {
 
         $session = $this->_getCheckout();
 
