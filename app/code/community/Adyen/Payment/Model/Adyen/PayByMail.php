@@ -160,4 +160,18 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         }
         return false;
     }
+
+    /**
+     * @param Adyen_Payment_Model_Billing_Agreement $billingAgreement
+     * @param Mage_Sales_Model_Quote_Payment        $paymentInfo
+     *
+     * @return $this
+     */
+    public function initBillingAgreementPaymentInfo(
+        Adyen_Payment_Model_Billing_Agreement $billingAgreement,
+        Mage_Sales_Model_Quote_Payment $paymentInfo)
+    {
+        // do nothing for now
+        return $this;
+    }
 }
