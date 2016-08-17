@@ -86,22 +86,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $fields = $this->getFormFields();
 
         $url = $this->getFormUrl();
-
-        $count = 0;
-        $size = count($fields);
-        foreach ($fields as $field => $value) {
-
-            if($count == 0) {
-                $url .= "?";
-            }
-            $url .= urlencode($field) . "=" . urlencode($value);
-
-            if($count != $size) {
-                $url .= "&";
-            }
-
-            ++$count;
-        }
+        $url .= '?' . http_build_query($fields, '', '&');
 
         $payment->setAdditionalInformation('payment_url', $url);
     }
