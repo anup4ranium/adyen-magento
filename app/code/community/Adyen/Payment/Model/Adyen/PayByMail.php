@@ -85,10 +85,20 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         // create payment link and add it to comment history and send to shopper
         $fields = $this->getFormFields();
 
-        $isConfigDemoMode = $this->getConfigDataDemoMode();
-        $url = Mage::helper('adyen_payment')->getFormUrl($fields, $isConfigDemoMode);
+        $url = $this->getFormUrl($fields);
 
         $payment->setAdditionalInformation('payment_url', $url);
+    }
+
+    /**
+     * @param array $fields
+     * @return string
+     */
+    public function getFormUrl($fields = [])
+    {
+        $isConfigDemoMode = $this->getConfigDataDemoMode();
+
+        return Mage::helper('adyen/payment')->getFormUrl($fields, $isConfigDemoMode);
     }
 
     /**
@@ -101,12 +111,16 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $order             = $this->_order;
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
+        $shopperIP         = trim($order->getRemoteIp());
 
         $billingCountryCode = (is_object($order->getBillingAddress()) && $order->getBillingAddress()->getCountry() != "") ?
             $order->getBillingAddress()->getCountry() :
             false ;
 
-        $adyFields = Mage::helper('adyen_payment')->prepareFieldsForUrl(
+        $hasDeliveryAddress = $order->getShippingAddress()!= null;
+
+
+        $adyFields = Mage::helper('adyen/payment')->prepareFieldsForUrl(
             $orderCurrencyCode,
             $realOrderId,
             $order->getGrandTotal(),
@@ -115,8 +129,19 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             [],
             $order->getStoreId(),
             Mage::getStoreConfig('general/locale/code', $order->getStoreId()),
-            $billingCountryCode
+            $billingCountryCode,
+            $shopperIP,
+            $this->getInfoInstance()->getCcType(),
+            $this->getInfoInstance()->getMethod(),
+            trim($this->getInfoInstance()->getPoNumber()),
+            $this->_code,
+            $hasDeliveryAddress
         );
+
+
+        // calculate the signature
+        $secretWord = Mage::helper('adyen/payment')->_getSecretWord($order->getStoreId(), $this->_code);
+        $adyFields['merchantSig'] = Mage::helper('adyen/payment')->createHmacSignature($adyFields, $secretWord);
 
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log', true);
 
