@@ -33,6 +33,28 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      */
     const GUEST_ID = 'customer_';
 
+
+    /**
+     * @param array $fields
+     * @param bool $isConfigDemoMode
+     * @return string
+     */
+    public function getFormUrl($fields, $isConfigDemoMode = false)
+    {
+        switch ($isConfigDemoMode) {
+            case true:
+                $url = 'https://test.adyen.com/hpp/pay.shtml';
+                break;
+            default:
+                $url = 'https://live.adyen.com/hpp/pay.shtml';
+                break;
+        }
+
+        $url .= '?' . http_build_query($fields, '', '&');
+
+        return $url;
+    }
+
     /**
      * @desc prepares an array with order detail values to call the Adyen HPP page.
      *

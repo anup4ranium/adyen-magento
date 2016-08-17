@@ -85,8 +85,8 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         // create payment link and add it to comment history and send to shopper
         $fields = $this->getFormFields();
 
-        $url = $this->getFormUrl();
-        $url .= '?' . http_build_query($fields, '', '&');
+        $isConfigDemoMode = $this->getConfigDataDemoMode();
+        $url = Mage::helper('adyen_payment')->getFormUrl($fields, $isConfigDemoMode);
 
         $payment->setAdditionalInformation('payment_url', $url);
     }
@@ -131,19 +131,5 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
     protected function escapeString($val)
     {
         return str_replace(':','\\:',str_replace('\\','\\\\',$val));
-    }
-
-    public function getFormUrl()
-    {
-        $isConfigDemoMode = $this->getConfigDataDemoMode();
-        switch ($isConfigDemoMode) {
-            case true:
-                $url = 'https://test.adyen.com/hpp/pay.shtml';
-                break;
-            default:
-                $url = 'https://live.adyen.com/hpp/pay.shtml';
-                break;
-        }
-        return $url;
     }
 }
