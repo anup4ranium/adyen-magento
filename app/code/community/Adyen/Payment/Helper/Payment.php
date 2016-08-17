@@ -37,20 +37,36 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
     /**
      * @param array $fields
      * @param bool $isConfigDemoMode
+     * @param string $paymentRoutine
+     * @param bool $hppOptionsDisabled
      * @return string
      */
-    public function getFormUrl($fields, $isConfigDemoMode = false)
+    public function getFormUrl($fields, $isConfigDemoMode = false, $paymentRoutine='single', $hppOptionsDisabled = true)
     {
         switch ($isConfigDemoMode) {
             case true:
-                $url = 'https://test.adyen.com/hpp/pay.shtml';
+                if ($paymentRoutine == 'single' && $hppOptionsDisabled) {
+                    $url = 'https://test.adyen.com/hpp/pay.shtml';
+                } else {
+                    $url = ($hppOptionsDisabled)
+                        ? 'https://test.adyen.com/hpp/select.shtml'
+                        : "https://test.adyen.com/hpp/details.shtml";
+                }
                 break;
             default:
-                $url = 'https://live.adyen.com/hpp/pay.shtml';
+                if ($paymentRoutine == 'single' && $hppOptionsDisabled) {
+                    $url = 'https://live.adyen.com/hpp/pay.shtml';
+                } else {
+                    $url = ($hppOptionsDisabled)
+                        ? 'https://live.adyen.com/hpp/select.shtml'
+                        : "https://live.adyen.com/hpp/details.shtml";
+                }
                 break;
         }
 
-        $url .= '?' . http_build_query($fields, '', '&');
+        if (count($fields)) {
+            $url .= '?' . http_build_query($fields, '', '&');
+        }
 
         return $url;
     }
@@ -67,6 +83,14 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      * @param $orderStoreId
      * @param $storeLocaleCode
      * @param $billingCountryCode
+     * @param $shopperIP
+     * @param $infoInstanceCCType
+     * @param $infoInstanceMethod
+     * @param $infoInstancePoNumber
+     * @param $paymentMethodCode
+     * @param $hasDeliveryAddress
+     * @param $extraData
+     * @param $order
      *
      * @return array
      */
@@ -79,18 +103,21 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         $merchantReturnData,
         $orderStoreId,
         $storeLocaleCode,
-        $billingCountryCode
+        $billingCountryCode,
+        $shopperIP,
+        $infoInstanceCCType,
+        $infoInstanceMethod,
+        $infoInstancePoNumber,
+        $paymentMethodCode,
+        $hasDeliveryAddress,
+        $order = null
     )
     {
-        // check if Pay By Mail has a skincode and secretword, otherwise use HPP
-        $skinCode = trim($this->getConfigData('skin_code', 'adyen_pay_by_mail', $orderStoreId));
-        $secretWord = $this->_getSecretWord($orderStoreId, 'adyen_pay_by_mail');
-
+        // check if Pay By Mail has a skincode, otherwise use HPP
+        $skinCode = trim($this->getConfigData('skin_code', $paymentMethodCode, $orderStoreId));
         if ($skinCode=="") {
             $skinCode = trim($this->getConfigData('skin_code', 'adyen_hpp', $orderStoreId));
-            $secretWord = $this->_getSecretWord($orderStoreId, 'adyen_hpp');
         }
-
 
         $merchantAccount = trim($this->getConfigData('merchantAccount', null, $orderStoreId));
         $amount = Mage::helper('adyen')->formatAmount($orderGrandTotal, $orderCurrencyCode);
@@ -118,6 +145,42 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         // is recurring?
         $recurringType = trim($this->getConfigData('recurringtypes', 'adyen_abstract', $orderStoreId));
 
+        // @todo Paypal does not allow ONECLICK,RECURRING will be fixed on adyen platform but this is the quickfix for now
+        if($infoInstanceMethod == "adyen_hpp_paypal" && $recurringType == 'ONECLICK,RECURRING') {
+            $recurringType = "RECURRING";
+        }
+
+        // For IDEAL add isuerId into request so bank selection is skipped
+        $issuerId = (strstr($infoInstanceCCType, "ideal")) ?
+            $infoInstancePoNumber :
+            null ;
+
+        $customerId = $this->getShopperReference($customerId, $realOrderId);
+
+        // should billing and shipping address and customer info be shown, hidden or editable on the HPP page.
+        // this is heavily influenced by payment method requirements and best be left alone
+        $viewDetails = $this->getHppViewDetails($infoInstanceCCType, $paymentMethodCode, $hasDeliveryAddress);
+        $billingAddressType = $viewDetails['billing_address'];
+        $deliveryAddressType = $viewDetails['shipping_address'];
+        $shopperType = $viewDetails['customer_info'];
+
+        // if option to put Return Url in request from magento is enabled add this in the request
+        $returnUrlInRequest = $this->getConfigData('return_url_in_request', 'adyen_hpp', $orderStoreId);
+        $returnUrl = ($returnUrlInRequest) ?
+            trim(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success") :
+            "" ;
+
+        // type of payment method (card)
+        $brandCode = $paymentMethodCode == "adyen_openinvoice" ?
+            trim($this->getConfigData('openinvoicetypes', 'adyen_openinvoice', $orderStoreId)) :
+            trim($infoInstanceCCType) ;
+
+        // Risk offset, 0 to 100 points
+        $adyFields['offset'] = "0";
+
+
+        $browserInfo = trim($_SERVER['HTTP_USER_AGENT']);
+
         /*
          * This field will be appended as-is to the return URL when the shopper completes, or abandons, the payment and
          * returns to your shop; it is typically used to transmit a session ID. This field has a maximum of 128 characters
@@ -127,7 +190,6 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
 
         $adyFields = $this->adyenValueArray(
             $orderCurrencyCode,
-            $realOrderId,
             $shopperEmail,
             $customerId,
             $merchantAccount,
@@ -137,11 +199,29 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
             $shopperLocale,
             $countryCode,
             $recurringType,
-            $dataString
+            $dataString,
+            $browserInfo,
+            $shopperIP,
+            $billingAddressType,
+            $deliveryAddressType,
+            $shopperType,
+            $issuerId,
+            $returnUrl,
+            $brandCode
         );
 
-        // calculate the signature
-        $adyFields['merchantSig'] = $this->createHmacSignature($adyFields, $secretWord);
+        // eventHandler to overwrite the adyFields without changing module code
+        Mage::dispatchEvent('adyen_payment_prepare_fields', [
+            'fields' => new Varien_Object($adyFields)
+        ]);
+        $adyFields = $adyFields->getData();
+
+        // @deprecated in favor of above event, this one is left in for backwards compatibility
+        Mage::dispatchEvent('adyen_payment_hpp_fields', [
+            'order' => $order,
+            'fields' => new Varien_Object($adyFields)
+        ]);
+        $adyFields = $adyFields->getData();
 
         return $adyFields;
     }
@@ -150,7 +230,6 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      * @descr format the data in a specific array
      *
      * @param $orderCurrencyCode
-     * @param $realOrderId
      * @param $shopperEmail
      * @param $customerId
      * @param $merchantAccount
@@ -161,12 +240,19 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      * @param $countryCode
      * @param $recurringType
      * @param $dataString
-     * 
+     * @param $browserInfo
+     * @param $shopperIP
+     * @param $billingAddressType
+     * @param $deliveryAddressType
+     * @param $shopperType
+     * @param $issuerId
+     * @param $returnUrl
+     * @param $brandCode
+     *
      * @return array
      */
     public function adyenValueArray(
         $orderCurrencyCode,
-        $realOrderId,
         $shopperEmail,
         $customerId,
         $merchantAccount,
@@ -176,7 +262,15 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         $shopperLocale,
         $countryCode,
         $recurringType,
-        $dataString
+        $dataString,
+        $browserInfo,
+        $shopperIP,
+        $billingAddressType,
+        $deliveryAddressType,
+        $shopperType,
+        $issuerId,
+        $returnUrl,
+        $brandCode
     )
     {
         $adyFields = [
@@ -191,10 +285,15 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
             'sessionValidity' => $shipBeforeDate->format("c"),
             'shopperEmail' => $shopperEmail,
             'recurringContract' => $recurringType,
-            'shopperReference' => (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId,
-            'billingAddressType' => "",
-            'deliveryAddressType' => "",
-            'shopperType' => "",
+            'shopperReference' => $customerId,
+            'billingAddressType' => $billingAddressType,
+            'deliveryAddressType' => $deliveryAddressType,
+            'shopperType' => $shopperType,
+            'shopperIP' => $shopperIP,
+            'browserInfo' => $browserInfo,
+            'issuerId' => $issuerId,
+            'resURL' => $returnUrl,
+            'brandCode' => $brandCode,
             'merchantReturnData' => substr(urlencode($dataString), 0, 128),
 
             // @todo remove this and add allowed methods via a config xml node
@@ -211,6 +310,11 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      */
     public function _getSecretWord($storeId=null, $paymentMethodCode)
     {
+        $skinCode = trim($this->getConfigData('skin_code', $paymentMethodCode, $storeId));
+        if ($skinCode=="") { // fallback if no skincode is available for the specific method
+            $paymentMethodCode = 'adyen_hpp';
+        }
+
         switch ($this->getConfigDataDemoMode()) {
             case true:
                 $secretWord = trim($this->getConfigData('secret_wordt', $paymentMethodCode, $storeId));
@@ -253,5 +357,62 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         $signMac = Zend_Crypt_Hmac::compute(pack("H*", $secretWord), 'sha256', $signData);
 
         return base64_encode(pack('H*', $signMac));
+    }
+
+    /**
+     * @param $customerId
+     * @param $realOrderId
+     * @return string
+     */
+    public function getShopperReference($customerId, $realOrderId)
+    {
+        if ($customerId) { // there is a logged in customer for this order
+            // the following allows to send the 'pretty' customer ID or increment ID to Adyen instead of the entity id
+            // used collection here, it's about half the resources of using the load method on the customer opject
+            /* var $customer Mage_Customer_Model_Resource_Customer_Collection */
+            $customer = Mage::getResourceModel('customer/customer_collection')
+                ->addAttributeToSelect('adyen_customer_ref')
+                ->addAttributeToSelect('increment_id')
+                ->addAttributeToFilter('entity_id', $customerId)
+                ->getFirstItem();
+
+            $customerId = $customer->getId() && $customer->getData('adyen_customer_ref') ?
+                $customer->getData('increment_id') :
+                $customerId;
+            return $customerId;
+        } else { // it was a guest order
+            $customerId = self::GUEST_ID . $realOrderId;
+            return $customerId;
+        }
+    }
+
+    /**
+     * @param $infoInstanceCCType
+     * @param $paymentMethodCode
+     * @param $hasDeliveryAddress
+     * @return array
+     */
+    public function getHppViewDetails($infoInstanceCCType, $paymentMethodCode, $hasDeliveryAddress)
+    {
+        // should the HPP page show address and delivery type details
+        if ($paymentMethodCode == "adyen_openinvoice" || $infoInstanceCCType == "klarna" || $infoInstanceCCType == "afterpay_default") {
+            $billingAddressType = "1"; // yes, but not editable
+            $deliveryAddressType = "1"; // yes, but not editable
+
+            // get shopperType setting
+            $shopperType = $this->getConfigData("shoppertype", "adyen_openinvoice") == '1' ? "" : "1"; // only for openinvoice show this
+        } else {
+            $shopperType = "";
+            // for other payment methods like creditcard don't show the address field on the HPP page
+            $billingAddressType = "2";
+            // Only show DeliveryAddressType to hidden in request if there is a shipping address otherwise keep it empty
+            $deliveryAddressType = $hasDeliveryAddress ? "2" : "";
+        }
+
+        return [
+            'billing_address' => $billingAddressType,
+            'shipping_address' => $deliveryAddressType,
+            'customer_info' => $shopperType
+        ];
     }
 }
