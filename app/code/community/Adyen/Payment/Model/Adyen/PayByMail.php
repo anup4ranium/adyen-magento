@@ -123,13 +123,16 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         return $adyFields;
     }
 
-    /*
-     * @desc The character escape function is called from the array_map function in _signRequestParams
-     * $param $val
-     * return string
+    /**
+     * @return bool
      */
-    protected function escapeString($val)
+    public function canCreateAdyenSubscription()
     {
-        return str_replace(':','\\:',str_replace('\\','\\\\',$val));
+        // validate if recurringType is correctly configured
+        $recurringType = $this->_getConfigData('recurringtypes', 'adyen_abstract');
+        if($recurringType == "RECURRING" || $recurringType == "ONECLICK,RECURRING") {
+            return true;
+        }
+        return false;
     }
 }
