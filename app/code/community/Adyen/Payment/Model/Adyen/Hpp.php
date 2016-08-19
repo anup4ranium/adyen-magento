@@ -151,6 +151,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $this->_initOrder();
         /* @var $order Mage_Sales_Model_Order */
         $order             = $this->_order;
+        $incrementId       = $order->getIncrementId();
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         $shopperIP         = trim($order->getRemoteIp());
@@ -162,8 +163,9 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
         $hasDeliveryAddress = $order->getShippingAddress()!= null;
 
 
-        $adyFields = Mage::helper('adyen/payment')->prepareFieldsForUrl(
+        $adyFields = Mage::helper('adyen/payment')->prepareFields(
             $orderCurrencyCode,
+            $incrementId,
             $realOrderId,
             $order->getGrandTotal(),
             $order->getCustomerEmail(),
@@ -181,9 +183,7 @@ class Adyen_Payment_Model_Adyen_Hpp extends Adyen_Payment_Model_Adyen_Abstract
             $order
         );
 
-        // get extra fields for open invoice
-        $adyFields = Mage::getModel('adyen/adyen_openinvoice')->getOptionalFormFields($adyFields, $order, false);
-
+        
         // calculate the signature
         $secretWord = Mage::helper('adyen/payment')->_getSecretWord($order->getStoreId(), $this->_code);
         $adyFields['merchantSig'] = Mage::helper('adyen/payment')->createHmacSignature($adyFields, $secretWord);

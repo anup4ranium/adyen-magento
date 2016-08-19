@@ -27,7 +27,8 @@
  */
 class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abstract {
 
-    protected $_code = 'adyen_pay_by_mail';
+    const METHODCODE = 'adyen_pay_by_mail';
+    protected $_code = self::METHODCODE;
     protected $_formBlockType = 'adyen/form_payByMail';
     protected $_infoBlockType = 'adyen/info_payByMail';
     protected $_paymentMethod = 'pay_by_mail';
@@ -98,7 +99,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
     {
         $isConfigDemoMode = $this->getConfigDataDemoMode();
 
-        return Mage::helper('adyen/payment')->getFormUrl($fields, $isConfigDemoMode);
+        return Mage::helper('adyen/payment')->prepareFieldsforUrl($fields, $isConfigDemoMode);
     }
 
     /**
@@ -109,6 +110,7 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $this->_initOrder();
         /* @var $order Mage_Sales_Model_Order */
         $order             = $this->_order;
+        $incrementId       = $order->getIncrementId();
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         $shopperIP         = trim($order->getRemoteIp());
@@ -120,8 +122,9 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         $hasDeliveryAddress = $order->getShippingAddress()!= null;
 
 
-        $adyFields = Mage::helper('adyen/payment')->prepareFieldsForUrl(
+        $adyFields = Mage::helper('adyen/payment')->prepareFields(
             $orderCurrencyCode,
+            $incrementId,
             $realOrderId,
             $order->getGrandTotal(),
             $order->getCustomerEmail(),
@@ -135,7 +138,8 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
             $this->getInfoInstance()->getMethod(),
             trim($this->getInfoInstance()->getPoNumber()),
             $this->_code,
-            $hasDeliveryAddress
+            $hasDeliveryAddress,
+            $order
         );
 
 

@@ -63,9 +63,15 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
                 }
                 break;
         }
+        return $url;
+    }
+
+    public function prepareFieldsforUrl($fields, $isConfigDemoMode = false)
+    {
+        $url = $this->getFormUrl($fields, $isConfigDemoMode);
 
         if (count($fields)) {
-            $url .= '?' . http_build_query($fields, '', '&');
+            $url = $url . '?' . http_build_query($fields, '', '&');
         }
 
         return $url;
@@ -94,8 +100,9 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      *
      * @return array
      */
-    public function prepareFieldsForUrl(
+    public function prepareFields(
         $orderCurrencyCode,
+        $incrementId,
         $realOrderId,
         $orderGrandTotal,
         $shopperEmail,
@@ -115,8 +122,8 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
     {
         // check if Pay By Mail has a skincode, otherwise use HPP
         $skinCode = trim($this->getConfigData('skin_code', $paymentMethodCode, $orderStoreId));
-        if ($skinCode=="") {
-            $skinCode = trim($this->getConfigData('skin_code', 'adyen_hpp', $orderStoreId));
+        if ($skinCode == "") {
+            $skinCode = trim($this->getConfigData('skinCode', 'adyen_hpp', $orderStoreId));
         }
 
         $merchantAccount = trim($this->getConfigData('merchantAccount', null, $orderStoreId));
@@ -153,22 +160,34 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         // For IDEAL add isuerId into request so bank selection is skipped
         $issuerId = (strstr($infoInstanceCCType, "ideal")) ?
             $infoInstancePoNumber :
-            null ;
+            null;
 
         $customerId = $this->getShopperReference($customerId, $realOrderId);
 
         // should billing and shipping address and customer info be shown, hidden or editable on the HPP page.
         // this is heavily influenced by payment method requirements and best be left alone
         $viewDetails = $this->getHppViewDetails($infoInstanceCCType, $paymentMethodCode, $hasDeliveryAddress);
-        $billingAddressType = $viewDetails['billing_address'];
-        $deliveryAddressType = $viewDetails['shipping_address'];
+        $billingAddressType = $viewDetails['billing_address_type'];
+        $deliveryAddressType = $viewDetails['shipping_address_type'];
         $shopperType = $viewDetails['customer_info'];
+        
+        // set Shopper, Billing and DeliveryAddress
+        $shopperInfo =  $this->getHppShopperDetails($order->getBillingAddress(), $order->getCustomerGender(), $order->getCustomerDob());
+        $billingAddress = $this->getHppBillingAdressDetails($order->getBillingAddress());
+        $deliveryAddress = $this->getHppDeliveryAdressDetails($order->getShippingAddress());
+        
 
         // if option to put Return Url in request from magento is enabled add this in the request
-        $returnUrlInRequest = $this->getConfigData('return_url_in_request', 'adyen_hpp', $orderStoreId);
-        $returnUrl = ($returnUrlInRequest) ?
-            trim(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success") :
-            "" ;
+        if($paymentMethodCode != Adyen_Payment_Model_Adyen_PayByMail::METHODCODE) {
+            $returnUrlInRequest = $this->getConfigData('return_url_in_request', 'adyen_hpp', $orderStoreId);
+            $returnUrl = ($returnUrlInRequest) ?
+                trim(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . "adyen/process/success") :
+                "" ;
+        } else {
+            $returnUrl = null;
+        }
+
+
 
         // type of payment method (card)
         $brandCode = $paymentMethodCode == "adyen_openinvoice" ?
@@ -193,6 +212,7 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
             $shopperEmail,
             $customerId,
             $merchantAccount,
+            $incrementId,
             $amount,
             $shipBeforeDate,
             $skinCode,
@@ -207,21 +227,28 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
             $shopperType,
             $issuerId,
             $returnUrl,
-            $brandCode
+            $brandCode,
+            $shopperInfo,
+            $billingAddress,
+            $deliveryAddress
         );
 
         // eventHandler to overwrite the adyFields without changing module code
+        $adyFields = new Varien_Object($adyFields);
         Mage::dispatchEvent('adyen_payment_prepare_fields', [
-            'fields' => new Varien_Object($adyFields)
+            'fields' => $adyFields
         ]);
-        $adyFields = $adyFields->getData();
 
         // @deprecated in favor of above event, this one is left in for backwards compatibility
         Mage::dispatchEvent('adyen_payment_hpp_fields', [
             'order' => $order,
-            'fields' => new Varien_Object($adyFields)
+            'fields' => $adyFields
         ]);
         $adyFields = $adyFields->getData();
+
+        // remove keys that has empty or null value
+        $adyFields = array_filter($adyFields);
+
 
         return $adyFields;
     }
@@ -248,6 +275,9 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
      * @param $issuerId
      * @param $returnUrl
      * @param $brandCode
+     * @param $shopperInfo
+     * @param $billingAddress
+     * @param $deliveryAddress
      *
      * @return array
      */
@@ -256,6 +286,7 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         $shopperEmail,
         $customerId,
         $merchantAccount,
+        $merchantReference,
         $amount,
         $shipBeforeDate,
         $skinCode,
@@ -270,12 +301,15 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         $shopperType,
         $issuerId,
         $returnUrl,
-        $brandCode
+        $brandCode,
+        $shopperInfo,
+        $billingAddress,
+        $deliveryAddress
     )
     {
         $adyFields = [
             'merchantAccount' => $merchantAccount,
-            'merchantReference' => $merchantAccount,
+            'merchantReference' => $merchantReference,
             'paymentAmount' => (int)$amount,
             'currencyCode' => $orderCurrencyCode,
             'shipBeforeDate' => $shipBeforeDate->format('Y-m-d'),
@@ -286,20 +320,39 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
             'shopperEmail' => $shopperEmail,
             'recurringContract' => $recurringType,
             'shopperReference' => $customerId,
-            'billingAddressType' => $billingAddressType,
-            'deliveryAddressType' => $deliveryAddressType,
-            'shopperType' => $shopperType,
             'shopperIP' => $shopperIP,
             'browserInfo' => $browserInfo,
             'issuerId' => $issuerId,
             'resURL' => $returnUrl,
-            'brandCode' => $brandCode,
             'merchantReturnData' => substr(urlencode($dataString), 0, 128),
-
             // @todo remove this and add allowed methods via a config xml node
             'blockedMethods' => "",
+            // Will only work if billingAddress, deliveryAddress and shopperInfo is in request
+            'billingAddressType' => $billingAddressType,
+            'deliveryAddressType' => $deliveryAddressType,
+            'shopperType' => $shopperType
         ];
 
+        // explode details for request
+        $adyFields = $this->explodeArrayToRequestFields($adyFields, 'shopper', $shopperInfo);
+        $adyFields = $this->explodeArrayToRequestFields($adyFields, 'billingAddress', $billingAddress);
+        $adyFields = $this->explodeArrayToRequestFields($adyFields, 'deliveryAddress', $deliveryAddress);
+
+        // Add brandCode if payment selection is done
+        if($brandCode) {
+            $adyFields['brandCode'] = $brandCode;
+        }
+
+        return $adyFields;
+    }
+
+    public function explodeArrayToRequestFields($adyFields, $name, $items)
+    {
+        if (is_array($items)) {
+            foreach ($items as $field => $value) {
+                $adyFields[$name . '.' . $field] = $value;
+            }
+        }
         return $adyFields;
     }
 
@@ -410,9 +463,158 @@ class Adyen_Payment_Helper_Payment extends Adyen_Payment_Helper_Data
         }
 
         return [
-            'billing_address' => $billingAddressType,
-            'shipping_address' => $deliveryAddressType,
+            'billing_address_type' => $billingAddressType,
+            'shipping_address_type' => $deliveryAddressType,
             'customer_info' => $shopperType
         ];
+    }
+
+
+    /**
+     * @param $billingAddress
+     * @param $gender
+     * @param $dob
+     * @return array
+     */
+    public function getHppShopperDetails($billingAddress, $gender, $dob)
+    {
+        $shopperInfo = [];
+
+        $shopperInfo['firstName'] = trim($billingAddress->getFirstname());
+
+        $middleName = trim($billingAddress->getMiddlename());
+        if($middleName != "") {
+            $shopperInfo['infix'] = trim($middleName);
+        }
+
+        $shopperInfo['lastName'] = trim($billingAddress->getLastname());
+
+        $shopperInfo['gender'] = $this->getGenderText($gender);
+
+        if (!empty($dob)) {
+            $shopperInfo['dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
+            $shopperInfo['dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
+            $shopperInfo['dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
+        }
+
+        $shopperInfo['telephoneNumber'] = trim($billingAddress->getTelephone());
+
+        return $shopperInfo;
+    }
+
+    /**
+     * Date Manipulation
+     *
+     * @param null $date
+     * @param string $format
+     * @return string
+     */
+    public function getDate($date = null, $format = 'Y-m-d H:i:s') {
+        if (strlen($date) < 0) {
+            $date = date('d-m-Y H:i:s');
+        }
+        $timeStamp = new DateTime($date);
+        return $timeStamp->format($format);
+    }
+
+    /**
+     * @param $genderId
+     * @return string
+     */
+    public function getGenderText($genderId)
+    {
+        $result = "";
+        if($genderId == '1') {
+            $result = 'MALE';
+        } elseif($genderId == '2') {
+            $result = 'FEMALE';
+        }
+        return $result;
+    }
+
+    /**
+     * @param $billingAddress
+     * @return array
+     */
+    public function getHppBillingAdressDetails($billingAddress)
+    {
+        $billingAddressRequest = [];
+        $helper = Mage::helper('adyen');
+
+        $billingAddressRequest['street'] = trim($helper->getStreet($billingAddress,true)->getName());
+        if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
+            $billingAddressRequest['houseNumberOrName'] = "NA";
+        } else {
+            $billingAddressRequest['houseNumberOrName'] = trim($helper->getStreet($billingAddress,true)->getHouseNumber());
+        }
+
+        if (trim($billingAddress->getCity()) == "") {
+            $billingAddressRequest['city'] = "NA";
+        } else {
+            $billingAddressRequest['city'] = trim($billingAddress->getCity());
+        }
+
+        if (trim($billingAddress->getPostcode()) == "") {
+            $billingAddressRequest['postalCode'] = "NA";
+        } else {
+            $billingAddressRequest['postalCode'] = trim($billingAddress->getPostcode());
+        }
+
+        if (trim($billingAddress->getRegionCode()) == "") {
+            $billingAddressRequest['stateOrProvince'] = "NA";
+        } else {
+            $billingAddressRequest['stateOrProvince'] = trim($billingAddress->getRegionCode());
+        }
+
+        if (trim($billingAddress->getCountryId()) == "") {
+            $billingAddressRequest['country'] = "NA";
+        } else {
+            $billingAddressRequest['country'] = trim($billingAddress->getCountryId());
+        }
+        return $billingAddressRequest;
+    }
+
+
+    /**
+     * @param $deliveryAddress
+     * @return array
+     */
+    public function getHppDeliveryAdressDetails($deliveryAddress)
+    {
+        $deliveryAddressRequest = [];
+        $helper = Mage::helper('adyen');
+
+        $deliveryAddressRequest['street'] = trim($helper->getStreet($deliveryAddress,true)->getName());
+        if (trim($helper->getStreet($deliveryAddress,true)->getHouseNumber()) == "") {
+            $deliveryAddressRequest['houseNumberOrName'] = "NA";
+        } else {
+            $deliveryAddressRequest['houseNumberOrName'] = trim($helper->getStreet($deliveryAddress,true)->getHouseNumber());
+        }
+
+        if (trim($deliveryAddress->getCity()) == "") {
+            $deliveryAddressRequest['city'] = "NA";
+        } else {
+            $deliveryAddressRequest['city'] = trim($deliveryAddress->getCity());
+        }
+
+        if (trim($deliveryAddress->getPostcode()) == "") {
+            $deliveryAddressRequest['postalCode'] = "NA";
+        } else {
+            $deliveryAddressRequest['postalCode'] = trim($deliveryAddress->getPostcode());
+        }
+
+        if (trim($deliveryAddress->getRegionCode()) == "") {
+            $deliveryAddressRequest['stateOrProvince'] = "NA";
+        } else {
+            $deliveryAddressRequest['stateOrProvince'] = trim($deliveryAddress->getRegionCode());
+        }
+
+        if (trim($deliveryAddress->getCountryId()) == "") {
+            $deliveryAddressRequest['country'] = "NA";
+        } else {
+            $deliveryAddressRequest['country'] = trim($deliveryAddress->getCountryId());
+        }
+
+        return $deliveryAddressRequest;
     }
 }

@@ -27,8 +27,9 @@
  */
 class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hpp {
 
+    const METHODCODE = 'adyen_openinvoice';
     protected $_canUseInternal = false;
-    protected $_code = 'adyen_openinvoice';
+    protected $_code = self::METHODCODE;
     protected $_formBlockType = 'adyen/form_openinvoice';
     protected $_infoBlockType = 'adyen/info_openinvoice';
     protected $_paymentMethod = 'openinvoice';
