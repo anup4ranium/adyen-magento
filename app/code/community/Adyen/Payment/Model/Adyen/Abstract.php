@@ -127,7 +127,9 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
 
 
         // check if payment was a split payment
-        $orderPaymentCollection = Mage::getModel('adyen/order_payment')->getCollection();
+        $orderPaymentCollection = Mage::getModel('adyen/order_payment')
+            ->getCollection()
+            ->addFieldToFilter('payment_id', $payment->getId());
 
         if($grandTotal == $amount) {
 
