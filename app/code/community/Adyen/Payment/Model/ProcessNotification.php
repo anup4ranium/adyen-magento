@@ -684,7 +684,8 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
             if ($orderPayment->getId() > 0) {
                 $currency = $order->getOrderCurrencyCode();
-                $amountRefunded =  Mage::helper('adyen')->originalAmount($this->_value, $currency);
+                $amountRefunded =  $orderPayment->getTotalRefunded() +
+                    Mage::helper('adyen')->originalAmount($this->_value, $currency);
                 $orderPayment->setTotalRefunded($amountRefunded);
                 $orderPayment->save();
             }
