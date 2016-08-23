@@ -178,6 +178,11 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                             // total authorised amount of the split payment
                             $splitPaymentAmount = $splitPayment->getAmount() - $splitPayment->getTotalRefunded();
 
+                            // if rest amount is zero go to next payment
+                            if (!$splitPaymentAmount > 0) {
+                                continue;
+                            }
+
                             // if refunded amount is greather then split payment amount do a full refund
                             if($amount >= $splitPaymentAmount) {
                                 $order->getPayment()->getMethodInstance()->sendRefundRequest($payment, $splitPaymentAmount, $splitPayment->getPspreference());
