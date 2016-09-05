@@ -155,6 +155,14 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
     /**
      * @return bool
      */
+    public function isBillingAgreement()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
     public function canCreateAdyenSubscription()
     {
         // validate if recurringType is correctly configured
