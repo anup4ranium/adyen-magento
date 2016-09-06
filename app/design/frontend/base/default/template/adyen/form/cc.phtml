@@ -76,7 +76,7 @@ $_code = $this->getMethodCode();
 
     <?php if($this->hasVerification()): ?>
     <li class="adyen_payment_input_fields">
-        <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+        <label id="<?php echo $_code ?>_cc_cid_label" for="<?php echo $_code ?>_cc_cid" class="required"><em id="<?php echo $_code ?>_cc_cid_label_em">*</em><?php echo $this->__('Card Verification Number') ?></label>
         <div class="input-box">
             <div class="v-fix">
                 <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry validate-digits validate-length" id="<?php echo $_code ?>_cc_cid" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_cid]\"" : "data-encrypted-name=\"cvc\""); ?> value="" size="7" maxlength="4" />
@@ -202,6 +202,7 @@ $_code = $this->getMethodCode();
 
             cardSetCvcElementselectedCardType(selectedCard != null ? selectedCard.cardtype : null);
 
+            cardSetCVCRequired(selectedCard != null ? selectedCard.cardtype : null);
         }
 
         function cardSetCvcElementselectedCardType(selectedCardType) {
@@ -227,6 +228,27 @@ $_code = $this->getMethodCode();
                 cvcCodeElem.addClassName('minimum-length-3');
             }
         }
+
+        function cardSetCVCRequired(selectedCardType) {
+            <?php if($this->hasVerification()): ?>
+                var cvcCodeElem = document.getElementById( '<?php echo $_code; ?>_cc_cid');
+                var cvcCodeElemLabel = document.getElementById( '<?php echo $_code; ?>_cc_cid_label');
+                var cvcCodeElemLabelEm = document.getElementById( '<?php echo $_code; ?>_cc_cid_label_em');
+            
+                if(selectedCardType != null && selectedCardType == "SM") {
+                    // cvc not required
+                    cvcCodeElem.removeClassName('required-entry');
+                    cvcCodeElemLabel.removeClassName('required');
+                    cvcCodeElemLabelEm.hide();
+                } else {
+                    // cvc required
+                    cvcCodeElem.addClassName('required-entry');
+                    cvcCodeElemLabel.addClassName('required');
+                    cvcCodeElemLabelEm.show();
+                }
+            <?php endif; ?>
+        }
+
 
         var ajaxReq;
         function getInstallments(variant) {
@@ -300,7 +322,8 @@ $_code = $this->getMethodCode();
             var form =  element.match('form') ? element : element.up('form');
             var cse_key = <?php echo json_encode($this->getCsePublicKey()); ?>;
             var cse_options = {
-                name:  'payment_encrypted_data'
+                name:  'payment_encrypted_data',
+                cvcIgnoreBins: '6703,50,56,57,58,6' // ignore CVC for maestro cards
             };
 
             var cseUpdate = function() {
@@ -324,7 +347,7 @@ $_code = $this->getMethodCode();
                 if (typeof adyen === 'undefined') {
                     var script = document.createElement("script");
                     script.type = "text/javascript";
-                    script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt_0_1_16.js'); ?>";
+                    script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt_0_1_18.js'); ?>";
                     document.body.appendChild(script);
                 }
 
