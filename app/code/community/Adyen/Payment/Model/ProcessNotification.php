@@ -94,7 +94,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $incrementId = $params->getData('merchantReference');
 
             if($incrementId) {
-                $this->_debugData['error'] = 'Add this notification with Order increment_id to queue: ' . $incrementId;
+                $this->_debugData['info'] = 'Add this notification with Order increment_id to queue: ' . $incrementId;
                 $this->_addNotificationToQueue($params);
             } else {
                 $this->_debugData['error'] = 'Empty merchantReference';
