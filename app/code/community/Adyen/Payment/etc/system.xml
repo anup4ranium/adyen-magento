@@ -1924,26 +1924,27 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </shipping_type>
-                        <change_address>
-                            <label>Option to change address details in Apple Payment Sheet</label>
-                            <frontend_type>select</frontend_type>
-                            <tooltip>Do you want to offer the customer that is logged in to change his address in the Apple Payment Sheet?</tooltip>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </change_address>
                         <allow_quest_checkout>
                             <label>Allow Guest Checkout</label>
                             <tooltip>Show Apple Pay icon if user is not logged in. The user has the option to set his own contact detals and shipping\billing address</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>70</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </allow_quest_checkout>
+                        <change_address>
+                            <label>Option to change address details in Apple Payment Sheet</label>
+                            <frontend_type>select</frontend_type>
+                            <tooltip>Do you want to offer the customer that is logged in to change his address in the Apple Payment Sheet?</tooltip>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><allow_quest_checkout>0</allow_quest_checkout></depends>
+                        </change_address>
                         <show_in_payment_step_checkout>
                             <label>Show payment method as well in the Payment Information step of the checkout</label>
                             <tooltip>If you set this to NO this will not be shown as a payment method option in the checkout steps. It will be visable on the product and shopping basket page</tooltip>

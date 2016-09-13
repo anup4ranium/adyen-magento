@@ -86,8 +86,7 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
         }
         return $product;
     }
-
-
+    
     /**
      * @return array
      */
@@ -101,8 +100,7 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
             if ($shippingAddressId) {
                 $shippingAddress = Mage::getModel('customer/address')->load($shippingAddressId);
                 $country = $shippingAddress->getCountryId();
-
-
+                
                 // if it is a product retrieve shippping methods and calculate shippingCosts on this product
                 if ($product) {
                     $shippingCosts = $this->calculateShippingCosts($product->getId(), $country, Mage::app()->getStore()->getId());
@@ -202,8 +200,7 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
         if (Mage::getSingleton('customer/session')->isLoggedIn()) {
             $customer = Mage::getSingleton('customer/session')->getCustomer();
             $customerData = Mage::getModel('customer/customer')->load($customer->getId())->getData();
-
-
+            
             if($customerData['middlename'] != "") {
                 $lastName = $customerData['middlename'] . " " . $customerData['lastname'];
             } else {
@@ -284,12 +281,17 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
     }
     
     /**
+     * Only possible if quest checkout is turned off
+     *
      * @return bool
      */
     public function optionToChangeAddress()
     {
         if (!$this->onReviewStep()) {
-            return Mage::helper('adyen')->getConfigData('change_address', 'adyen_apple_pay');
+            if(!Mage::helper('adyen')->getConfigData('allow_quest_checkout', 'adyen_apple_pay')) {
+                return Mage::helper('adyen')->getConfigData('change_address', 'adyen_apple_pay');
+            }
+            return true;
         }
         return false;
     }
