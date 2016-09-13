@@ -487,4 +487,28 @@ class Adyen_Payment_Helper_Data extends Mage_Payment_Helper_Data
         );
         return $calculation->getRate($request->setProductClassId($taxClass));
     }
+    
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
+    public function getApplePayMerchantIdentifier($storeId = null)
+    {
+        if ($this->getConfigDataDemoMode($storeId)) {
+            return $this->getConfigData('merchant_identifier_test', 'adyen_apple_pay', $storeId);
+        }
+        return $this->getConfigData('merchant_identifier_live', 'adyen_apple_pay', $storeId);
+    }
+    
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
+    public function getApplePayFullPathLocationPEMFile($storeId = null)
+    {
+        if ($this->getConfigDataDemoMode($storeId)) {
+            return $this->getConfigData('full_path_location_pem_file_test', 'adyen_apple_pay', $storeId);
+        }
+        return $this->getConfigData('full_path_location_pem_file_test', 'adyen_apple_pay', $storeId);
+    }
 }

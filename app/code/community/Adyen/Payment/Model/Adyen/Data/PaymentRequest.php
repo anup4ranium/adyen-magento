@@ -155,6 +155,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                 $this->elv->bankLocationId = $elv['bank_location'];
                 $this->elv->bankName = $elv['bank_name'];
                 break;
+            case "apple_pay":
             case "cc":
             case "oneclick":
 
@@ -221,7 +222,17 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->selectedRecurringDetailReference = $recurringDetailReference;
                 }
 
-				if (Mage::getModel('adyen/adyen_cc')->isCseEnabled()) {
+                if ($paymentMethod == "apple_pay") {
+                    $token = $payment->getAdditionalInformation("token");
+                    if (!$token) {
+                        Mage::throwException(Mage::helper('adyen')->__('Missing token'));
+                    }
+
+                    $kv = new Adyen_Payment_Model_Adyen_Data_AdditionalDataKVPair();
+                    $kv->key = new SoapVar("payment.token", XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
+                    $kv->value = new SoapVar(base64_encode($token), XSD_STRING, "string", "http://www.w3.org/2001/XMLSchema");
+                    $this->additionalData->entry = $kv;
+                } else if (Mage::getModel('adyen/adyen_cc')->isCseEnabled()) {
 
                     $this->card = null;
 
