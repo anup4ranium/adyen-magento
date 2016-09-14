@@ -54,7 +54,7 @@
         </reference>
         <reference name="checkout.cart.methods">
             <block type="adyen/posExpressCheckout" before="-" name="adyen.pos.express.checkout" template="adyen/pos_express_checkout.phtml"/>
-            <block type="adyen/ApplePay" after="adyen.pos.express.checkout" name="adyen.applepay.express.checkout" template="adyen/apple_pay.phtml" />
+            <block type="adyen/ApplePay" after="adyen.pos.express.checkout" ifconfig="payment/adyen_apple_pay/show_outside_of_checkout" name="adyen.applepay.express.checkout" template="adyen/apple_pay.phtml" />
         </reference>
     </checkout_cart_index>
 
@@ -156,7 +156,7 @@
             <action method="addCss"><stylesheet>css/adyen.css</stylesheet></action>
         </reference>
         <reference name="product.info.addtocart">
-            <block type="adyen/ApplePay" name="adyen.applepay.express.checkout" template="adyen/apple_pay.phtml" />
+            <block type="adyen/ApplePay" ifconfig="payment/adyen_apple_pay/show_outside_of_checkout" name="adyen.applepay.express.checkout" template="adyen/apple_pay.phtml" />
         </reference>
 
     </catalog_product_view>
