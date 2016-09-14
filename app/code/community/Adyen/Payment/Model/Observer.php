@@ -511,7 +511,7 @@ class Adyen_Payment_Model_Observer {
                 foreach ($order->getInvoiceCollection() as $invoice) {
                     /* @var Mage_Sales_Model_Order_Invoice $invoice */
                     if (! $invoice->canCapture()) {
-                        throw new Exception($adyenHelper->__("Could not capture the invoice"));
+                        throw new Adyen_Payment_Exception($adyenHelper->__("Could not capture the invoice"));
 
                         continue;
                     }
@@ -538,7 +538,7 @@ class Adyen_Payment_Model_Observer {
                     } catch (Exception $e) {
                         Mage::logException($e);
 
-                        throw new Exception($adyenHelper->__("Could not capture the invoice"));
+                        throw new Adyen_Payment_Exception($adyenHelper->__("Could not capture the invoice"));
                     }
 
                     $invoiceAutoMail = (bool) $adyenHelper->getConfigData('send_invoice_update_mail', 'adyen_abstract', $storeId);
@@ -546,7 +546,7 @@ class Adyen_Payment_Model_Observer {
                         $invoice->sendEmail();
                     }
                 } else {
-                    throw new Exception($adyenHelper->__("Could not capture the invoice"));
+                    throw new Adyen_Payment_Exception($adyenHelper->__("Could not capture the invoice"));
                 }
             }
         }
