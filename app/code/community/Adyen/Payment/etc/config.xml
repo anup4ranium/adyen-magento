@@ -405,6 +405,7 @@
                 <allow_quest_checkout>1</allow_quest_checkout>
                 <change_address>1</change_address>
                 <show_in_payment_step_checkout>1</show_in_payment_step_checkout>
+                <show_outside_of_checkout>1</show_outside_of_checkout>
                 <allow_billing_agreement_wizard>0</allow_billing_agreement_wizard>
             </adyen_apple_pay>
         </payment>
