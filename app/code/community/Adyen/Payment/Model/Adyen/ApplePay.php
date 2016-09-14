@@ -54,7 +54,7 @@ class Adyen_Payment_Model_Adyen_ApplePay extends Adyen_Payment_Model_Adyen_Abstr
     public function assignData($data)
     {
         if (!($data instanceof Varien_Object)) {
-            $data = new Varien_Object($data);
+            $data = new Varien_Object((array)$data);
         }
         $info = $this->getInfoInstance();
         

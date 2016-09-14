@@ -80,11 +80,7 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
      */
     public function getProduct()
     {
-        $product = $this->_getData('product');
-        if (!$product) {
-            $product = Mage::registry('product');
-        }
-        return $product;
+        return Mage::registry('product');
     }
     
     /**
@@ -198,36 +194,23 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
         $customCustomerData = ['isLoggedIn' => Mage::getSingleton('customer/session')->isLoggedIn()];
 
         if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-            $customer = Mage::getSingleton('customer/session')->getCustomer();
-            $customerData = Mage::getModel('customer/customer')->load($customer->getId())->getData();
-            
-            if($customerData['middlename'] != "") {
-                $lastName = $customerData['middlename'] . " " . $customerData['lastname'];
-            } else {
-                $lastName = $customerData['lastname'];
-            }
-            
-            $customCustomerData['givenName'] = $customerData['firstname'];
-            $customCustomerData['familyName'] = $lastName;
-            $customCustomerData['emailAddress'] = $customerData['email'];
 
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            $lastName = trim($customer->getMiddlename() . " " . $customer->getLastName());
+            $customCustomerData['givenName'] = $customer->getFirstname();
+            $customCustomerData['familyName'] = $lastName;
+            $customCustomerData['emailAddress'] = $customer->getEmail();
             $billingAddressId = $customer->getDefaultBilling();
             
             // only add billingAddress if he has one and is not in the latest step of the checkout
             if ($billingAddressId && !$this->onReviewStep()) {
+
                 $billingAddress = Mage::getModel('customer/address')->load($billingAddressId);
-
-
-                if($billingAddress->getMiddlename() != "") {
-                    $lastName = $billingAddress->getMiddlename() . " " . $billingAddress->getLastname();
-                } else {
-                    $lastName = $billingAddress->getLastname();
-                }
-
+                $lastName = trim($billingAddress->getMiddlename() . " " . $billingAddress->getLastName());
                 $countryName = Mage::app()->getLocale()->getCountryTranslation($billingAddress->getCountryId());
 
                 $customCustomerData['billingContact'] = [
-                    'emailAddress' => $customerData['email'],
+                    'emailAddress' => $customer->getEmail(),
                     'phoneNumber' => $billingAddress->getTelephone(),
                     'familyName' => $lastName,
                     'givenName' => $billingAddress->getFirstname(),
@@ -246,17 +229,11 @@ class Adyen_Payment_Block_ApplePay extends Mage_Core_Block_Template
             if ($shippingAddressId && !$this->onReviewStep()) {
                 $shippingAddress = Mage::getModel('customer/address')->load($shippingAddressId);
 
-
-                if($shippingAddress->getMiddlename() != "") {
-                    $lastName = $shippingAddress->getMiddlename() . " " . $shippingAddress->getLastname();
-                } else {
-                    $lastName = $shippingAddress->getLastname();
-                }
-
+                $lastName = trim($shippingAddress->getMiddlename() . " " . $shippingAddress->getLastName());
                 $countryName = Mage::app()->getLocale()->getCountryTranslation($shippingAddress->getCountryId());
 
                 $customCustomerData['shippingContact'] = [
-                    'emailAddress' => $customerData['email'],
+                    'emailAddress' => $customer->getEmail(),
                     'phoneNumber' => $shippingAddress->getTelephone(),
                     'familyName' => $lastName,
                     'givenName' => $shippingAddress->getFirstname(),

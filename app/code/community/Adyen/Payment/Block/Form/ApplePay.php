@@ -50,7 +50,7 @@ class Adyen_Payment_Block_Form_ApplePay extends Adyen_Payment_Block_Form_Abstrac
         }
 
         if (! $this->hasData('_method_label_html')) {
-            $labelBlock = Mage::app()->getLayout()->createBlock('core/template', null, array(
+            $labelBlock = Mage::app()->getLayout()->createBlock('core/template', 'adyen-apple-pay-method-label', array(
                 'template' => 'adyen/payment/payment_method_label.phtml',
                 'payment_method_icon' =>  $this->getSkinUrl('images/adyen/apple_pay.png'),
                 'payment_method_label' => Mage::helper('adyen')->getConfigData('title', $this->getMethod()->getCode()),

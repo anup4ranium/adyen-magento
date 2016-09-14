@@ -74,7 +74,7 @@ class Adyen_Payment_ApplePayController extends Mage_Core_Controller_Front_Action
         $message = curl_error($ch);
 
         if ($httpStatus != 200 && $result) {
-
+            Mage::logException("Apple Merchant Valdiation Failed. Please check merchantIdentifier, domainname and PEM file. Request is: " . var_export($data,true));
         } elseif(!$result) {
             $errno = curl_errno($ch);
             $message = curl_error($ch);
@@ -200,7 +200,7 @@ class Adyen_Payment_ApplePayController extends Mage_Core_Controller_Front_Action
             ->setBaseSubtotalInclTax($product->getFinalPrice());
 
         $model = Mage::getModel('shipping/shipping')->collectRates($request);
-        $costs = array();
+        $costs = [];
 
         foreach($model->getResult()->getAllRates() as $shippingRate) {
 
