@@ -218,6 +218,21 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         $order = $payment->getOrder();
         $amount = $order->getGrandTotal();
 
+        // check if a zero auth should be done for this order
+        $useZeroAuth = (bool)Mage::helper('adyen')->getConfigData('use_zero_auth', null, $order->getStoreId());
+        $zeroAuthDateField = (bool)Mage::helper('adyen')->getConfigData('base_zero_auth_on_date', null, $order->getStoreId());
+        
+        if ($useZeroAuth) { // zero auth should be used
+
+            // only orders that are scheduled to be captured later than
+            // the auth valid period use zero auth
+            // the period is 7 days since this works for most payment methods
+            $scheduledDate = strtotime($order->getData($zeroAuthDateField));
+            if ($scheduledDate > strtotime("+7 days")) { // scheduled date is higher than now + 7 days
+                $amount = 0; // set amount to 0 for zero auth
+            }
+        }
+
         /*
          * ReserveOrderId for this quote so payment failed notification
          * does not interfere with new successful orders
