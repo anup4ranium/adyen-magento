@@ -27,8 +27,9 @@
  */
 class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hpp {
 
+    const METHODCODE = 'adyen_openinvoice';
     protected $_canUseInternal = false;
-    protected $_code = 'adyen_openinvoice';
+    protected $_code = self::METHODCODE;
     protected $_formBlockType = 'adyen/form_openinvoice';
     protected $_infoBlockType = 'adyen/info_openinvoice';
     protected $_paymentMethod = 'openinvoice';
@@ -169,281 +170,281 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
         return $url;
     }
 
-    public function getFormName()
-    {
-        return "Adyen HPP";
-    }
+//    public function getFormName()
+//    {
+//        return "Adyen HPP";
+//    }
 
     /**
      * @desc Openinvoice Optional Fields.
      * @desc Notice these are used to prepopulate the fields, but client can edit them at Adyen.
      * @return type array
      */
-    public function getFormFields()
-    {
-        $adyFields = parent::getFormFields();
-        $adyFields = $this->getOptionalFormFields($adyFields,$this->_order, true);
-        return $adyFields;
-    }
-
-    public function getOptionalFormFields($adyFields,$order, $logging)
-    {
-        if (empty($order)) return $adyFields;
-
-        $helper = Mage::helper('adyen');
-        $secretWord = $this->_getSecretWord();
-
-        $billingAddress = $order->getBillingAddress();
-        $adyFields['shopper.firstName'] = trim($billingAddress->getFirstname());
-
-        $middleName = trim($billingAddress->getMiddlename());
-        if($middleName != "") {
-            $adyFields['shopper.infix'] = trim($middleName);
-        }
-
-        $adyFields['shopper.lastName'] = trim($billingAddress->getLastname());
-        $adyFields['billingAddress.street'] = trim($helper->getStreet($billingAddress,true)->getName());
-
-        if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
-            $adyFields['billingAddress.houseNumberOrName'] = "NA";
-        } else {
-            $adyFields['billingAddress.houseNumberOrName'] = trim($helper->getStreet($billingAddress,true)->getHouseNumber());
-        }
-
-        if (trim($billingAddress->getCity()) == "") {
-            $adyFields['billingAddress.city'] = "NA";
-        } else {
-            $adyFields['billingAddress.city'] = trim($billingAddress->getCity());
-        }
-
-        if (trim($billingAddress->getPostcode()) == "") {
-            $adyFields['billingAddress.postalCode'] = "NA";
-        } else {
-            $adyFields['billingAddress.postalCode'] = trim($billingAddress->getPostcode());
-        }
-
-        if (trim($billingAddress->getRegionCode()) == "") {
-            $adyFields['billingAddress.stateOrProvince'] = "NA";
-        } else {
-            $adyFields['billingAddress.stateOrProvince'] = trim($billingAddress->getRegionCode());
-        }
-
-        if (trim($billingAddress->getCountryId()) == "") {
-            $adyFields['billingAddress.country'] = "NA";
-        } else {
-            $adyFields['billingAddress.country'] = trim($billingAddress->getCountryId());
-        }
-
-        $deliveryAddress = $order->getShippingAddress();
-        if($deliveryAddress != null)
-        {
-            $adyFields['deliveryAddress.street'] = trim($helper->getStreet($deliveryAddress,true)->getName());
-            if (trim($helper->getStreet($deliveryAddress,true)->getHouseNumber()) == "") {
-                $adyFields['deliveryAddress.houseNumberOrName'] = "NA";
-            } else {
-                $adyFields['deliveryAddress.houseNumberOrName'] = trim($helper->getStreet($deliveryAddress,true)->getHouseNumber());
-            }
-
-            if (trim($deliveryAddress->getCity()) == "") {
-                $adyFields['deliveryAddress.city'] = "NA";
-            } else {
-                $adyFields['deliveryAddress.city'] = trim($deliveryAddress->getCity());
-            }
-
-            if (trim($deliveryAddress->getPostcode()) == "") {
-                $adyFields['deliveryAddress.postalCode'] = "NA";
-            } else {
-                $adyFields['deliveryAddress.postalCode'] = trim($deliveryAddress->getPostcode());
-            }
-
-            if (trim($deliveryAddress->getRegionCode()) == "") {
-                $adyFields['deliveryAddress.stateOrProvince'] = "NA";
-            } else {
-                $adyFields['deliveryAddress.stateOrProvince'] = trim($deliveryAddress->getRegionCode());
-            }
-
-            if (trim($deliveryAddress->getCountryId()) == "") {
-                $adyFields['deliveryAddress.country'] = "NA";
-            } else {
-                $adyFields['deliveryAddress.country'] = trim($deliveryAddress->getCountryId());
-            }
-        }
-
-
-        if ($adyFields['shopperReference'] != (self::GUEST_ID .  $order->getRealOrderId())) {
-
-            $customer = Mage::getModel('customer/customer')->load($adyFields['shopperReference']);
-
-            if($customer->getGender()) {
-                $adyFields['shopper.gender'] = $this->getGenderText($customer->getGender());
-            } else {
-                // fix for OneStepCheckout (guest is not logged in but uses email that exists with account)
-                if($order->getCustomerGender()) {
-                    $customerGender = $order->getCustomerGender();
-                } else {
-                    // this is still empty for OneStepCheckout so uses extra saved parameter
-                    $payment = $order->getPayment();
-                    $customerGender = $payment->getAdditionalInformation('customerGender');
-                }
-                $adyFields['shopper.gender'] = $this->getGenderText($customerGender);
-            }
-
-            $dob = $customer->getDob();
-
-            if (!empty($dob)) {
-                $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
-                $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
-                $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
-            } else {
-                // fix for OneStepCheckout (guest is not logged in but uses email that exists with account)
-                $dob = $order->getCustomerDob();
-                if (!empty($dob)) {
-                    $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
-                    $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
-                    $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
-                }
-            }
-        } else {
-            // checkout as guest use details from the order
-            $_customer = Mage::getModel('customer/customer');
-            $adyFields['shopper.gender'] = $this->getGenderText($order->getCustomerGender());
-            $dob = $order->getCustomerDob();
-            if (!empty($dob)) {
-                $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
-                $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
-                $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
-            }
-        }
-        // for sweden add here your socialSecurityNumber
-        // $adyFields['shopper.socialSecurityNumber'] = "Result of your custom input field";
-
-        $adyFields['shopper.telephoneNumber'] = trim($billingAddress->getTelephone());
-
-        $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
-
-        // get current payment method
-        if($order->getPayment()->getMethod() == "adyen_openinvoice" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "klarna" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default" ) {
-            // initialize values if they are empty
-            $adyFields['shopper.gender'] = (isset($adyFields['shopper.gender'])) ? $adyFields['shopper.gender'] : "";
-            $adyFields['shopper.dateOfBirthDayOfMonth'] = (isset($adyFields['shopper.dateOfBirthDayOfMonth'])) ? $adyFields['shopper.dateOfBirthDayOfMonth'] : "";
-            $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
-            $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
-
-        }
-
-        $count = 0;
-        $currency = $order->getOrderCurrencyCode();
-        $additional_data_sign = array();
-
-        foreach ($order->getItemsCollection() as $item) {
-            //skip dummies
-            if ($item->isDummy()) continue;
-
-            ++$count;
-            $linename = "line".$count;
-            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = str_replace("\n", '', trim($item->getName()));
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($item->getPrice(), $currency);
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? $helper->formatAmount($item->getPriceInclTax(), $currency) - $helper->formatAmount($item->getPrice(), $currency):$helper->formatAmount($item->getTaxAmount(), $currency);
-
-            // Calculate vat percentage
-            $id = $item->getProductId();
-            $product = $this->_loadProductById($id);
-            $taxRate = $helper->getTaxRate($order, $product->getTaxClassId());
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
-
-            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
-
-            // afterpay_default_nl ?
-            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
-            } else {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
-            }
-        }
-
-        //discount cost
-        if($order->getDiscountAmount() > 0 || $order->getDiscountAmount() < 0)
-        {
-            $linename = "line".++$count;
-            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Total Discount');
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getDiscountAmount(), $currency);
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
-            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
-            } else {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
-            }
-
-        }
-
-        //shipping cost
-        if($order->getShippingAmount() > 0 || $order->getShippingTaxAmount() > 0)
-        {
-            $linename = "line".++$count;
-            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $order->getShippingDescription();
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getShippingAmount(), $currency);
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = $helper->formatAmount($order->getShippingTaxAmount(), $currency);
-
-            // Calculate vat percentage
-            $taxClass = Mage::getStoreConfig('tax/classes/shipping_tax_class', $order->getStoreId());
-            $taxRate = $helper->getTaxRate($order, $taxClass);
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
-
-            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-
-            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
-            } else {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
-            }
-        }
-
-        if($order->getPaymentFeeAmount() > 0) {
-            $linename = "line".++$count;
-            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Payment Fee');
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getPaymentFeeAmount(), $currency);
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
-            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
-            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-
-            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
-            } else {
-                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
-            }
-        }
-
-        // Klarna wants tax cost provided in the lines of the products so overal tax cost is not needed anymore
-//        $linename = "line".++$count;
-//        $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
-//        $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Tax');
-//        $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getTaxAmount(), $currency);
-//        $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
-//        $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
-//        $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
-
-        // general for invoicelines
-        $additional_data_sign['openinvoicedata.refundDescription'] = "Refund / Correction for ".$adyFields['merchantReference'];
-        $additional_data_sign['openinvoicedata.numberOfLines'] = $count;
-
-        // signature is first alphabatical keys seperate by : and then | and then the values seperate by :
-        foreach($additional_data_sign as $key => $value) {
-            // add to fields
-            $adyFields[trim($key)] = trim($value);
-        }
-
-        if($logging) {
-            Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
-        }
-
-        return $adyFields;
-    }
+//    public function getFormFields()
+//    {
+//        $adyFields = parent::getFormFields();
+//        $adyFields = $this->getOptionalFormFields($adyFields,$this->_order, true);
+//        return $adyFields;
+//    }
+//
+//    public function getOptionalFormFields($adyFields,$order, $logging)
+//    {
+//        if (empty($order)) return $adyFields;
+//
+//        $helper = Mage::helper('adyen');
+//        $secretWord = $this->_getSecretWord();
+//
+//        $billingAddress = $order->getBillingAddress();
+//        $adyFields['shopper.firstName'] = trim($billingAddress->getFirstname());
+//
+//        $middleName = trim($billingAddress->getMiddlename());
+//        if($middleName != "") {
+//            $adyFields['shopper.infix'] = trim($middleName);
+//        }
+//
+//        $adyFields['shopper.lastName'] = trim($billingAddress->getLastname());
+//        $adyFields['billingAddress.street'] = trim($helper->getStreet($billingAddress,true)->getName());
+//
+//        if($helper->getStreet($billingAddress,true)->getHouseNumber() == "") {
+//            $adyFields['billingAddress.houseNumberOrName'] = "NA";
+//        } else {
+//            $adyFields['billingAddress.houseNumberOrName'] = trim($helper->getStreet($billingAddress,true)->getHouseNumber());
+//        }
+//
+//        if (trim($billingAddress->getCity()) == "") {
+//            $adyFields['billingAddress.city'] = "NA";
+//        } else {
+//            $adyFields['billingAddress.city'] = trim($billingAddress->getCity());
+//        }
+//
+//        if (trim($billingAddress->getPostcode()) == "") {
+//            $adyFields['billingAddress.postalCode'] = "NA";
+//        } else {
+//            $adyFields['billingAddress.postalCode'] = trim($billingAddress->getPostcode());
+//        }
+//
+//        if (trim($billingAddress->getRegionCode()) == "") {
+//            $adyFields['billingAddress.stateOrProvince'] = "NA";
+//        } else {
+//            $adyFields['billingAddress.stateOrProvince'] = trim($billingAddress->getRegionCode());
+//        }
+//
+//        if (trim($billingAddress->getCountryId()) == "") {
+//            $adyFields['billingAddress.country'] = "NA";
+//        } else {
+//            $adyFields['billingAddress.country'] = trim($billingAddress->getCountryId());
+//        }
+//
+//        $deliveryAddress = $order->getShippingAddress();
+//        if($deliveryAddress != null)
+//        {
+//            $adyFields['deliveryAddress.street'] = trim($helper->getStreet($deliveryAddress,true)->getName());
+//            if (trim($helper->getStreet($deliveryAddress,true)->getHouseNumber()) == "") {
+//                $adyFields['deliveryAddress.houseNumberOrName'] = "NA";
+//            } else {
+//                $adyFields['deliveryAddress.houseNumberOrName'] = trim($helper->getStreet($deliveryAddress,true)->getHouseNumber());
+//            }
+//
+//            if (trim($deliveryAddress->getCity()) == "") {
+//                $adyFields['deliveryAddress.city'] = "NA";
+//            } else {
+//                $adyFields['deliveryAddress.city'] = trim($deliveryAddress->getCity());
+//            }
+//
+//            if (trim($deliveryAddress->getPostcode()) == "") {
+//                $adyFields['deliveryAddress.postalCode'] = "NA";
+//            } else {
+//                $adyFields['deliveryAddress.postalCode'] = trim($deliveryAddress->getPostcode());
+//            }
+//
+//            if (trim($deliveryAddress->getRegionCode()) == "") {
+//                $adyFields['deliveryAddress.stateOrProvince'] = "NA";
+//            } else {
+//                $adyFields['deliveryAddress.stateOrProvince'] = trim($deliveryAddress->getRegionCode());
+//            }
+//
+//            if (trim($deliveryAddress->getCountryId()) == "") {
+//                $adyFields['deliveryAddress.country'] = "NA";
+//            } else {
+//                $adyFields['deliveryAddress.country'] = trim($deliveryAddress->getCountryId());
+//            }
+//        }
+//
+//
+//        if ($adyFields['shopperReference'] != (self::GUEST_ID .  $order->getRealOrderId())) {
+//
+//            $customer = Mage::getModel('customer/customer')->load($adyFields['shopperReference']);
+//
+//            if($customer->getGender()) {
+//                $adyFields['shopper.gender'] = $this->getGenderText($customer->getGender());
+//            } else {
+//                // fix for OneStepCheckout (guest is not logged in but uses email that exists with account)
+//                if($order->getCustomerGender()) {
+//                    $customerGender = $order->getCustomerGender();
+//                } else {
+//                    // this is still empty for OneStepCheckout so uses extra saved parameter
+//                    $payment = $order->getPayment();
+//                    $customerGender = $payment->getAdditionalInformation('customerGender');
+//                }
+//                $adyFields['shopper.gender'] = $this->getGenderText($customerGender);
+//            }
+//
+//            $dob = $customer->getDob();
+//
+//            if (!empty($dob)) {
+//                $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
+//                $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
+//                $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
+//            } else {
+//                // fix for OneStepCheckout (guest is not logged in but uses email that exists with account)
+//                $dob = $order->getCustomerDob();
+//                if (!empty($dob)) {
+//                    $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
+//                    $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
+//                    $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
+//                }
+//            }
+//        } else {
+//            // checkout as guest use details from the order
+//            $_customer = Mage::getModel('customer/customer');
+//            $adyFields['shopper.gender'] = $this->getGenderText($order->getCustomerGender());
+//            $dob = $order->getCustomerDob();
+//            if (!empty($dob)) {
+//                $adyFields['shopper.dateOfBirthDayOfMonth'] = trim($this->getDate($dob, 'd'));
+//                $adyFields['shopper.dateOfBirthMonth'] = trim($this->getDate($dob, 'm'));
+//                $adyFields['shopper.dateOfBirthYear'] = trim($this->getDate($dob, 'Y'));
+//            }
+//        }
+//        // for sweden add here your socialSecurityNumber
+//        // $adyFields['shopper.socialSecurityNumber'] = "Result of your custom input field";
+//
+//        $adyFields['shopper.telephoneNumber'] = trim($billingAddress->getTelephone());
+//
+//        $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
+//
+//        // get current payment method
+//        if($order->getPayment()->getMethod() == "adyen_openinvoice" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "klarna" || $order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default" ) {
+//            // initialize values if they are empty
+//            $adyFields['shopper.gender'] = (isset($adyFields['shopper.gender'])) ? $adyFields['shopper.gender'] : "";
+//            $adyFields['shopper.dateOfBirthDayOfMonth'] = (isset($adyFields['shopper.dateOfBirthDayOfMonth'])) ? $adyFields['shopper.dateOfBirthDayOfMonth'] : "";
+//            $adyFields['shopper.dateOfBirthMonth'] = (isset($adyFields['shopper.dateOfBirthMonth'])) ? $adyFields['shopper.dateOfBirthMonth'] : "";
+//            $adyFields['shopper.dateOfBirthYear'] = (isset($adyFields['shopper.dateOfBirthYear'])) ? $adyFields['shopper.dateOfBirthYear'] : "";
+//
+//        }
+//
+//        $count = 0;
+//        $currency = $order->getOrderCurrencyCode();
+//        $additional_data_sign = array();
+//
+//        foreach ($order->getItemsCollection() as $item) {
+//            //skip dummies
+//            if ($item->isDummy()) continue;
+//
+//            ++$count;
+//            $linename = "line".$count;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = str_replace("\n", '', trim($item->getName()));
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($item->getPrice(), $currency);
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = ($item->getTaxAmount() > 0 && $item->getPriceInclTax() > 0) ? $helper->formatAmount($item->getPriceInclTax(), $currency) - $helper->formatAmount($item->getPrice(), $currency):$helper->formatAmount($item->getTaxAmount(), $currency);
+//
+//            // Calculate vat percentage
+//            $id = $item->getProductId();
+//            $product = $this->_loadProductById($id);
+//            $taxRate = $helper->getTaxRate($order, $product->getTaxClassId());
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
+//
+//            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = (int) $item->getQtyOrdered();
+//
+//            // afterpay_default_nl ?
+//            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+//            } else {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+//            }
+//        }
+//
+//        //discount cost
+//        if($order->getDiscountAmount() > 0 || $order->getDiscountAmount() < 0)
+//        {
+//            $linename = "line".++$count;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Total Discount');
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getDiscountAmount(), $currency);
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
+//            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+//            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+//            } else {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+//            }
+//
+//        }
+//
+//        //shipping cost
+//        if($order->getShippingAmount() > 0 || $order->getShippingTaxAmount() > 0)
+//        {
+//            $linename = "line".++$count;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $order->getShippingDescription();
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getShippingAmount(), $currency);
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = $helper->formatAmount($order->getShippingTaxAmount(), $currency);
+//
+//            // Calculate vat percentage
+//            $taxClass = Mage::getStoreConfig('tax/classes/shipping_tax_class', $order->getStoreId());
+//            $taxRate = $helper->getTaxRate($order, $taxClass);
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = $helper->getMinorUnitTaxPercent($taxRate);
+//
+//            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+//
+//            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+//            } else {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+//            }
+//        }
+//
+//        if($order->getPaymentFeeAmount() > 0) {
+//            $linename = "line".++$count;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
+//            $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Payment Fee');
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getPaymentFeeAmount(), $currency);
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
+//            $additional_data_sign['openinvoicedata.' . $linename . '.itemVatPercentage'] = "0";
+//            $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+//
+//            if(($order->getPayment()->getMethod() == "adyen_openinvoice" && $openinvoiceType == "afterpay_default") || ($order->getPayment()->getMethodInstance()->getInfoInstance()->getCcType() == "afterpay_default")) {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "High";
+//            } else {
+//                $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+//            }
+//        }
+//
+//        // Klarna wants tax cost provided in the lines of the products so overal tax cost is not needed anymore
+////        $linename = "line".++$count;
+////        $additional_data_sign['openinvoicedata.' . $linename . '.currencyCode'] = $currency;
+////        $additional_data_sign['openinvoicedata.' . $linename . '.description'] = $helper->__('Tax');
+////        $additional_data_sign['openinvoicedata.' . $linename . '.itemAmount'] = $helper->formatAmount($order->getTaxAmount(), $currency);
+////        $additional_data_sign['openinvoicedata.' . $linename . '.itemVatAmount'] = "0";
+////        $additional_data_sign['openinvoicedata.' . $linename . '.numberOfItems'] = 1;
+////        $additional_data_sign['openinvoicedata.' . $linename . '.vatCategory'] = "None";
+//
+//        // general for invoicelines
+//        $additional_data_sign['openinvoicedata.refundDescription'] = "Refund / Correction for ".$adyFields['merchantReference'];
+//        $additional_data_sign['openinvoicedata.numberOfLines'] = $count;
+//
+//        // signature is first alphabatical keys seperate by : and then | and then the values seperate by :
+//        foreach($additional_data_sign as $key => $value) {
+//            // add to fields
+//            $adyFields[trim($key)] = trim($value);
+//        }
+//
+//        if($logging) {
+//            Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log');
+//        }
+//
+//        return $adyFields;
+//    }
 
     protected function _loadProductById($id)
     {

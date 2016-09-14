@@ -27,7 +27,8 @@
  */
 class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abstract {
 
-    protected $_code = 'adyen_pay_by_mail';
+    const METHODCODE = 'adyen_pay_by_mail';
+    protected $_code = self::METHODCODE;
     protected $_formBlockType = 'adyen/form_payByMail';
     protected $_infoBlockType = 'adyen/info_payByMail';
     protected $_paymentMethod = 'pay_by_mail';
@@ -85,199 +86,104 @@ class Adyen_Payment_Model_Adyen_PayByMail extends Adyen_Payment_Model_Adyen_Abst
         // create payment link and add it to comment history and send to shopper
         $fields = $this->getFormFields();
 
-        $url = $this->getFormUrl();
-
-        $count = 0;
-        $size = count($fields);
-        foreach ($fields as $field => $value) {
-
-            if($count == 0) {
-                $url .= "?";
-            }
-            $url .= urlencode($field) . "=" . urlencode($value);
-
-            if($count != $size) {
-                $url .= "&";
-            }
-
-            ++$count;
-        }
+        $url = $this->getFormUrl($fields);
 
         $payment->setAdditionalInformation('payment_url', $url);
     }
 
+    /**
+     * @param array $fields
+     * @return string
+     */
+    public function getFormUrl($fields = [])
+    {
+        $isConfigDemoMode = $this->getConfigDataDemoMode();
 
+        return Mage::helper('adyen/payment')->prepareFieldsforUrl($fields, $isConfigDemoMode);
+    }
+
+    /**
+     * @return mixed
+     */
     public function getFormFields()
     {
         $this->_initOrder();
+        /* @var $order Mage_Sales_Model_Order */
         $order             = $this->_order;
+        $incrementId       = $order->getIncrementId();
         $realOrderId       = $order->getRealOrderId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
+        $shopperIP         = trim($order->getRemoteIp());
 
-        // check if paybymail has it's own skin
-        $skinCode = trim($this->_getConfigData('skin_code', 'adyen_pay_by_mail', $order->getStoreId()));
-        if($skinCode == "") {
-            // use HPP skin and HMAC
-            $skinCode = trim($this->_getConfigData('skinCode', 'adyen_hpp', $order->getStoreId()));
-            $secretWord = $this->_getSecretWord($order->getStoreId(), 'adyen_hpp');
-        } else {
-            // use paybymail skin and hmac
-            $secretWord = $this->_getSecretWord($order->getStoreId(), 'adyen_pay_by_mail');
-        }
+        $billingCountryCode = (is_object($order->getBillingAddress()) && $order->getBillingAddress()->getCountry() != "") ?
+            $order->getBillingAddress()->getCountry() :
+            false ;
 
-        $amount            = Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
-        $merchantAccount   = trim($this->_getConfigData('merchantAccount', null, $order->getStoreId()));
-        $shopperEmail      = $order->getCustomerEmail();
-        $customerId        = $order->getCustomerId();
-        $shopperIP         = $order->getRemoteIp();
-        $browserInfo       = $_SERVER['HTTP_USER_AGENT'];
-        $shopperLocale     = trim($this->_getConfigData('shopperlocale', null, $order->getStoreId()));
-        $shopperLocale     = (!empty($shopperLocale)) ? $shopperLocale : Mage::app()->getLocale()->getLocaleCode();
-        $countryCode       = trim($this->_getConfigData('countryCode', null, $order->getStoreId()));
-        $countryCode       = (!empty($countryCode)) ? $countryCode : false;
-        // if directory lookup is enabled use the billingadress as countrycode
-        if ($countryCode == false) {
-            if (is_object($order->getBillingAddress()) && $order->getBillingAddress()->getCountry() != "") {
-                $countryCode = $order->getBillingAddress()->getCountry();
-            }
-        }
-        $adyFields                      = array();
-        $deliveryDays                   = (int)$this->_getConfigData('delivery_days', 'adyen_hpp', $order->getStoreId());
-        $deliveryDays                   = (!empty($deliveryDays)) ? $deliveryDays : 5;
-        $adyFields['merchantAccount']   = $merchantAccount;
-        $adyFields['merchantReference'] = $realOrderId;
-        $adyFields['paymentAmount']     = (int)$amount;
-        $adyFields['currencyCode']      = $orderCurrencyCode;
-        $adyFields['shipBeforeDate']    = date(
-            "Y-m-d",
-            mktime(date("H"), date("i"), date("s"), date("m"), date("j") + $deliveryDays, date("Y"))
+        $hasDeliveryAddress = $order->getShippingAddress()!= null;
+
+
+        $adyFields = Mage::helper('adyen/payment')->prepareFields(
+            $orderCurrencyCode,
+            $incrementId,
+            $realOrderId,
+            $order->getGrandTotal(),
+            $order->getCustomerEmail(),
+            $order->getCustomerId(),
+            [],
+            $order->getStoreId(),
+            Mage::getStoreConfig('general/locale/code', $order->getStoreId()),
+            $billingCountryCode,
+            $shopperIP,
+            $this->getInfoInstance()->getCcType(),
+            $this->getInfoInstance()->getMethod(),
+            trim($this->getInfoInstance()->getPoNumber()),
+            $this->_code,
+            $hasDeliveryAddress,
+            $order
         );
-        $adyFields['skinCode']          = $skinCode;
-        $adyFields['shopperLocale']     = $shopperLocale;
-        $adyFields['countryCode']       = $countryCode;
-
-        //order data
-        $items          = $order->getAllItems();
-        $shipmentAmount = number_format($order->getShippingAmount() + $order->getShippingTaxAmount(), 2, ',', ' ');
-        $prodDetails    = Mage::helper('adyen')->__('Shipment cost: %s %s <br />', $shipmentAmount, $orderCurrencyCode);
-        $prodDetails .= Mage::helper('adyen')->__('Order rows: <br />');
-        foreach ($items as $item) {
-            if ($item->getParentItem()) {
-                continue;
-            }
-            $name       = $item->getName();
-            $qtyOrdered = $this->_numberFormat($item->getQtyOrdered(), '0');
-            $rowTotal   = number_format($item->getRowTotalInclTax(), 2, ',', ' ');
-            $prodDetails .= Mage::helper('adyen')->__(
-                '%s ( Qty: %s ) (Price: %s %s ) <br />',
-                $name,
-                $qtyOrdered,
-                $rowTotal,
-                $orderCurrencyCode
-            );
-        }
-        $adyFields['orderData']       = base64_encode(gzencode($prodDetails)); //depreacated by Adyen
 
 
-        $sessionValidity = (int) trim($this->_getConfigData('session_validity', 'adyen_pay_by_mail', $order->getStoreId()));
-        if($sessionValidity == "") {
-            $sessionValidity = 3;
-        }
-
-        $adyFields['sessionValidity'] = date("c",strtotime("+". $sessionValidity . " days"));
-        $adyFields['shopperEmail']    = $shopperEmail;
-        // recurring
-        $recurringType                  = trim($this->_getConfigData('recurringtypes', 'adyen_abstract', $order->getStoreId()));
-        $adyFields['recurringContract'] = $recurringType;
-        $adyFields['shopperReference']  = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
-        //blocked methods
-        $adyFields['blockedMethods'] = "";
-
-        /*
-         * This feld will be appended as-is to the return URL when the shopper completes, or abandons, the payment and
-         * returns to your shop; it is typically used to transmit a session ID. This feld has a maximum of 128 characters
-         * This is an optional field and not necessary by default
-         */
-        $adyFields['merchantReturnData'] = "";
-
-        $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice', $order->getStoreId());
-        if ($this->_code == "adyen_openinvoice" || $this->getInfoInstance()->getCcType() == "klarna"
-            || $this->getInfoInstance()->getCcType() == "afterpay_default"
-        ) {
-            $adyFields['billingAddressType']  = "1";
-            $adyFields['deliveryAddressType'] = "1";
-            $adyFields['shopperType']         = "1";
-        } else {
-            $adyFields['billingAddressType']  = "";
-            $adyFields['deliveryAddressType'] = "";
-            $adyFields['shopperType']         = "";
-        }
-        //the data that needs to be signed is a concatenated string of the form data
-        $sign = $adyFields['paymentAmount'] .
-            $adyFields['currencyCode'] .
-            $adyFields['shipBeforeDate'] .
-            $adyFields['merchantReference'] .
-            $adyFields['skinCode'] .
-            $adyFields['merchantAccount'] .
-            $adyFields['sessionValidity'] .
-            $adyFields['shopperEmail'] .
-            $adyFields['shopperReference'] .
-            $adyFields['recurringContract'] .
-            $adyFields['blockedMethods'] .
-            $adyFields['merchantReturnData'] .
-            $adyFields['billingAddressType'] .
-            $adyFields['deliveryAddressType'] .
-            $adyFields['shopperType'];
-
-
-        // Sort the array by key using SORT_STRING order
-        ksort($adyFields, SORT_STRING);
-
-        // Generate the signing data string
-        $signData = implode(":",array_map(array($this, 'escapeString'),array_merge(array_keys($adyFields), array_values($adyFields))));
-
-        //Generate SHA256 HMAC encrypted merchant signature
-        $signMac = Zend_Crypt_Hmac::compute(pack("H*" , $secretWord), 'sha256', $signData);
-        $adyFields['merchantSig'] = base64_encode(pack('H*', $signMac));
+        // calculate the signature
+        $secretWord = Mage::helper('adyen/payment')->_getSecretWord($order->getStoreId(), $this->_code);
+        $adyFields['merchantSig'] = Mage::helper('adyen/payment')->createHmacSignature($adyFields, $secretWord);
 
         Mage::log($adyFields, self::DEBUG_LEVEL, 'adyen_http-request.log', true);
+
         return $adyFields;
     }
 
-    /*
-     * @desc The character escape function is called from the array_map function in _signRequestParams
-     * $param $val
-     * return string
+    /**
+     * @return bool
      */
-    protected function escapeString($val)
+    public function isBillingAgreement()
     {
-        return str_replace(':','\\:',str_replace('\\','\\\\',$val));
+        return true;
     }
 
-    protected function _getSecretWord($storeId=null, $paymentMethodCode)
+    /**
+     * @return bool
+     */
+    public function canCreateAdyenSubscription()
     {
-        switch ($this->getConfigDataDemoMode()) {
-            case true:
-                $secretWord = trim($this->_getConfigData('secret_wordt', $paymentMethodCode, $storeId));
-                break;
-            default:
-                $secretWord = trim($this->_getConfigData('secret_wordp', $paymentMethodCode ,$storeId));
-                break;
+        // validate if recurringType is correctly configured
+        $recurringType = $this->_getConfigData('recurringtypes', 'adyen_abstract');
+        if($recurringType == "RECURRING" || $recurringType == "ONECLICK,RECURRING") {
+            return true;
         }
-        return $secretWord;
+        return false;
     }
 
-    public function getFormUrl()
+    /**
+     * @param Adyen_Payment_Model_Billing_Agreement $billingAgreement
+     * @param Mage_Sales_Model_Quote_Payment        $paymentInfo
+     *
+     * @return $this
+     */
+    public function initBillingAgreementPaymentInfo(
+        Adyen_Payment_Model_Billing_Agreement $billingAgreement,
+        Mage_Sales_Model_Quote_Payment $paymentInfo)
     {
-        $isConfigDemoMode = $this->getConfigDataDemoMode();
-        switch ($isConfigDemoMode) {
-            case true:
-                $url = 'https://test.adyen.com/hpp/pay.shtml';
-                break;
-            default:
-                $url = 'https://live.adyen.com/hpp/pay.shtml';
-                break;
-        }
-        return $url;
+        // do nothing for now
+        return $this;
     }
 }

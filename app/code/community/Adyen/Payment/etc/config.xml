@@ -122,7 +122,7 @@
                     </adyen_payment_capture>
                 </observers>
             </sales_order_payment_capture>
-            <controller_action_predispatch>
+            <controller_action_predispatch_checkout>
                 <observers>
                     <adyen_payment_hpp>
                         <class>adyen/observer</class>
@@ -133,7 +133,19 @@
                         <method>addMethodsToConfig</method>
                     </adyen_payment_billing_agreement>
                 </observers>
-            </controller_action_predispatch>
+            </controller_action_predispatch_checkout>
+            <adminhtml_controller_action_predispatch_start>
+                <observers>
+                    <adyen_payment_hpp>
+                        <class>adyen/observer</class>
+                        <method>addMethodsToConfig</method>
+                    </adyen_payment_hpp>
+                    <adyen_payment_billing_agreement>
+                        <class>adyen/billing_agreement_observer</class>
+                        <method>addMethodsToConfig</method>
+                    </adyen_payment_billing_agreement>
+                </observers>
+            </adminhtml_controller_action_predispatch_start>
             <sales_order_shipment_save_after>
                 <observers>
                     <adyen_payment_capture_invoice_on_shipment>
@@ -383,6 +395,19 @@
                 <session_validity>3</session_validity>
                 <sort_order>70</sort_order>
             </adyen_pay_by_mail>
+            <adyen_apple_pay translate="title" module="adyen">
+                <active>0</active>
+                <model>adyen/adyen_applePay</model>
+                <group>adyen</group>
+                <title>Adyen Apple Pay</title>
+                <sort_order>80</sort_order>
+                <shipping_type>shipping</shipping_type>
+                <allow_quest_checkout>1</allow_quest_checkout>
+                <change_address>1</change_address>
+                <show_in_payment_step_checkout>1</show_in_payment_step_checkout>
+                <show_outside_of_checkout>1</show_outside_of_checkout>
+                <allow_billing_agreement_wizard>0</allow_billing_agreement_wizard>
+            </adyen_apple_pay>
         </payment>
         <adyen>
             <payment>
