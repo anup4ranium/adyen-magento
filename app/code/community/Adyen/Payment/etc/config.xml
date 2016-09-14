@@ -146,14 +146,14 @@
                     </adyen_payment_billing_agreement>
                 </observers>
             </adminhtml_controller_action_predispatch_start>
-            <sales_order_shipment_save_after>
+            <sales_order_shipment_save_before>
                 <observers>
                     <adyen_payment_capture_invoice_on_shipment>
                         <class>adyen/observer</class>
                         <method>captureInvoiceOnShipment</method>
                     </adyen_payment_capture_invoice_on_shipment>
                 </observers>
-            </sales_order_shipment_save_after>
+            </sales_order_shipment_save_before>
         </events>
     </global>
 
