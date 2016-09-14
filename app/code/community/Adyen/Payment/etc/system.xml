@@ -242,7 +242,7 @@
                                 </payment_authorized>
                                 <payment_cancelled translate="label">
                                     <label>Order status: order cancellation</label>
-                                    <tooltip>Status given to orders after order cancellation is confirmed by a CANCEL_OR_REFUND notification from Adyen. If orders are already invoiced, they cannot be cancelled, but will be refunded instead.</tooltip>
+                                    <tooltip>Status given to orders after order cancellation is confirmed by a AUTHORIZATION with success false, CANCEL OR CANCEL_OR_REFUND notification from Adyen. If orders are already invoiced, they cannot be cancelled, but will be refunded instead.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_cancelled</config_path>
                                     <source_model>adyen/source_cancelModes</source_model>
