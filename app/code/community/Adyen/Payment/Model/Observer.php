@@ -509,7 +509,7 @@ class Adyen_Payment_Model_Observer {
                 $transaction->addObject($order);
 
                 foreach ($order->getInvoiceCollection() as $invoice) {
-                    /* @var Sales_Model_Order_Invoice $invoice */
+                    /* @var Mage_Sales_Model_Order_Invoice $invoice */
                     if (! $invoice->canCapture()) {
                         throw new Exception($adyenHelper->__("Could not capture the invoice"));
 
@@ -527,6 +527,7 @@ class Adyen_Payment_Model_Observer {
                 // create an invoice and do a capture to adyen
                 if ($order->canInvoice()) {
                     try {
+                        /* @var Mage_Sales_Model_Order_Invoice $invoice */
                         $invoice = $order->prepareInvoice();
                         $invoice->getOrder()->setIsInProcess(true);
 
