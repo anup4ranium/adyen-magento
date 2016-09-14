@@ -214,7 +214,9 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         parent::authorize($payment, $amount);
         $payment->setLastTransId($this->getTransactionId())->setIsTransactionPending(true);
 
+        /** @var Mage_Sales_Model_Order $order */
         $order = $payment->getOrder();
+        $amount = $order->getGrandTotal();
 
         /*
          * ReserveOrderId for this quote so payment failed notification

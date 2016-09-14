@@ -78,7 +78,6 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $incrementId = $order->getIncrementId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         // override amount because this amount uses the right currency
-        $amount = $order->getGrandTotal();
 
         $customerId = $order->getCustomerId();
         if ($customerId) {
