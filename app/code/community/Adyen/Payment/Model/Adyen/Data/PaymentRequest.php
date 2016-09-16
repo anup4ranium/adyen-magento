@@ -100,8 +100,8 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $this->shopperIP = $order->getRemoteIp();
         $this->shopperReference = (!empty($customerId)) ? $customerId : self::GUEST_ID . $realOrderId;
 
-        // Set the recurring contract
-        if($recurringType) {
+        // Set the recurring contract for apple pay do not save as oneclick or recurring because that will give errors on recurring payments
+        if($paymentMethod != "apple_pay" && $recurringType) {
             if($paymentMethod == "oneclick") {
                 // For ONECLICK look at the recurringPaymentType that the merchant has selected in Adyen ONECLICK settings
                 if($payment->getAdditionalInformation('customer_interaction')) {
