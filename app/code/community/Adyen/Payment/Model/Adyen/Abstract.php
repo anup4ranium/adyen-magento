@@ -529,6 +529,10 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED.');
                 }
 
+                $errorMsg = new Varien_Object(array('error_message' => $errorMsg));
+                Mage::dispatchEvent('adyen_payment_authorize_refused_error', array('responseResult' => $response->paymentResult, 'error' => $errorMsg));
+                $errorMsg = $errorMsg->getErrorMessage();
+
                 $this->resetReservedOrderId();
                 Adyen_Payment_Exception::throwException($errorMsg);
                 break;
