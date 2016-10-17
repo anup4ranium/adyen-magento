@@ -39,22 +39,22 @@ $_code = $this->getMethodCode();
         endforeach; ?>
         <input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" value=""/>
     </li>
-    <li class="adyen_payment_input_fields">
+    <li class="adyen_payment_input_fields adyen_payment_input_fields_cc_number">
         <label for="creditCardNumber" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">
             <input type="text" id="creditCardNumber" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_number]\"" : " data-encrypted-name=\"number\""); ?> title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-type required-entry" value="" maxlength="23"/>
         </div>
     </li>
-    <li class="adyen_payment_input_fields">
+    <li class="adyen_payment_input_fields adyen_payment_input_fields_cc_name">
         <label for="creditCardHolderName" class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
         <div class="input-box">
             <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="creditCardHolderName" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_owner]\"" : "data-encrypted-name=\"holderName\""); ?> value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" maxlength="100" />
         </div>
     </li>
-    <li class="adyen_payment_input_fields">
+    <li class="adyen_payment_input_fields adyen_payment_input_fields_expiry">
         <label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
         <div class="input-box">
-            <div class="v-fix">
+            <div class="v-fix adyen_expiry_month">
                 <select id="<?php echo $_code ?>_expiration" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_exp_month]\"" : "data-encrypted-name=\"expiryMonth\""); ?> class="month validate-cc-exp required-entry">
                     <?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
                     <?php foreach ($this->getCcMonths() as $k=>$v): ?>
@@ -62,7 +62,7 @@ $_code = $this->getMethodCode();
                     <?php endforeach ?>
                 </select>
             </div>
-            <div class="v-fix">
+            <div class="v-fix adyen_expiry_year">
                 <?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
                 <select id="<?php echo $_code ?>_expiration_yr" <?php echo (!$this->isCseEnabled() ? "name=\"payment[cc_exp_year]\"" : "data-encrypted-name=\"expiryYear\""); ?> class="year required-entry">
                     <?php foreach ($this->getCcYears() as $k=>$v): ?>
@@ -75,7 +75,7 @@ $_code = $this->getMethodCode();
     <?php echo $this->getChildHtml() ?>
 
     <?php if($this->hasVerification()): ?>
-    <li class="adyen_payment_input_fields">
+    <li class="adyen_payment_input_fields adyen_payment_input_fields_cc_verify">
         <label id="<?php echo $_code ?>_cc_cid_label" for="<?php echo $_code ?>_cc_cid" class="required"><em id="<?php echo $_code ?>_cc_cid_label_em">*</em><?php echo $this->__('Card Verification Number') ?></label>
         <div class="input-box">
             <div class="v-fix">
@@ -86,7 +86,7 @@ $_code = $this->getMethodCode();
     </li>
     <?php endif; ?>
     <?php if($this->hasInstallments()): ?>
-    <li class="adyen_payment_input_fields">
+    <li class="adyen_payment_input_fields adyen_payment_input_fields_cc_installments">
         <label for="<?php echo $_code ?>_installments" class="required"><em>*</em><?php echo $this->__('Installments') ?></label>
         <div class="input-box">
             <div class="v-fix">
