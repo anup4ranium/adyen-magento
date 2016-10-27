@@ -158,8 +158,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
             case "cc":
             case "oneclick":
 
-                $this->shopperName = null;
-            	$this->elv = null;
+                $this->elv = null;
                 $this->bankAccount = null;
 
                 $billingAddress = $order->getBillingAddress();
@@ -167,6 +166,14 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
 
                 if($billingAddress)
                 {
+                    // add shopperName with firstName, middleName and lastName to support PapPal seller protection
+                    $this->shopperName->firstName = trim($billingAddress->getFirstname());
+                    $middleName = trim($billingAddress->getMiddlename());
+                    if($middleName != "") {
+                        $this->shopperName->infix = trim($middleName);
+                    }
+                    $this->shopperName->lastName = trim($billingAddress->getLastname());
+
                     $this->billingAddress = new Adyen_Payment_Model_Adyen_Data_BillingAddress();
                     $this->billingAddress->street = $helper->getStreet($billingAddress)->getName();
                     $this->billingAddress->houseNumberOrName = $helper->getStreet($billingAddress)->getHouseNumber();
