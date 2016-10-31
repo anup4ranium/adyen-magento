@@ -146,7 +146,7 @@ class Adyen_Payment_Model_Adyen_Openinvoice extends Adyen_Payment_Model_Adyen_Hp
      * @desc Get url of Adyen payment
      * @return string
      */
-    public function getFormUrl()
+    public function getFormUrl($fields = null)
     {
         $paymentRoutine = $this->_getConfigData('payment_routines', 'adyen_hpp');
         $openinvoiceType = $this->_getConfigData('openinvoicetypes', 'adyen_openinvoice');
