@@ -163,6 +163,18 @@
                     </adyen_payment_billing_agreement>
                 </observers>
             </controller_action_predispatch_checkout>
+            <controller_action_predispatch_firecheckout>
+                <observers>
+                    <adyen_payment_hpp>
+                        <class>adyen/observer</class>
+                        <method>addMethodsToConfig</method>
+                    </adyen_payment_hpp>
+                    <adyen_payment_billing_agreement>
+                        <class>adyen/billing_agreement_observer</class>
+                        <method>addMethodsToConfig</method>
+                    </adyen_payment_billing_agreement>
+                </observers>
+            </controller_action_predispatch_firecheckout>
             <adminhtml_controller_action_predispatch_start>
                 <observers>
                     <adyen_payment_hpp>
