@@ -12,5 +12,8 @@
     ],
     "replace": {
         "connect20/madia_adyen": "1.*"
+    },
+    "require": {
+        "php": ">=5.6.0"
     }
 }
