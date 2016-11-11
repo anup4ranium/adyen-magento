@@ -48,7 +48,8 @@ class Adyen_Payment_Model_Event extends Mage_Core_Model_Abstract {
     const ADYEN_EVENT_ORDER_CLOSED = "ORDER_CLOSED";
     const ADYEN_EVENT_NOF = "NOTIFICATION_OF_FRAUD";
     const ADYEN_EVENT_NOC = "NOTIFICATION_OF_CHARGEBACK";
-    
+    const ADYEN_EVENT_OFFER_CLOSED = "OFFER_CLOSED";
+
     /**
      * Initialize resources
      */
