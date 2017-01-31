@@ -13,10 +13,10 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category    Adyen
- * @package Adyen_Payment
- * @copyright   Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 /**
  * @category   Payment Gateway
@@ -214,24 +214,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
         parent::authorize($payment, $amount);
         $payment->setLastTransId($this->getTransactionId())->setIsTransactionPending(true);
 
-        /** @var Mage_Sales_Model_Order $order */
         $order = $payment->getOrder();
-        $amount = $order->getGrandTotal();
-
-        // check if a zero auth should be done for this order
-        $useZeroAuth = (bool)Mage::helper('adyen')->getConfigData('use_zero_auth', null, $order->getStoreId());
-        $zeroAuthDateField = (bool)Mage::helper('adyen')->getConfigData('base_zero_auth_on_date', null, $order->getStoreId());
-        
-        if ($useZeroAuth) { // zero auth should be used
-
-            // only orders that are scheduled to be captured later than
-            // the auth valid period use zero auth
-            // the period is 7 days since this works for most payment methods
-            $scheduledDate = strtotime($order->getData($zeroAuthDateField));
-            if ($scheduledDate > strtotime("+7 days")) { // scheduled date is higher than now + 7 days
-                $amount = 0; // set amount to 0 for zero auth
-            }
-        }
 
         /*
          * ReserveOrderId for this quote so payment failed notification
@@ -529,10 +512,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     $errorMsg = Mage::helper('adyen')->__('The payment is REFUSED.');
                 }
 
-                $errorMsg = new Varien_Object(array('error_message' => $errorMsg));
-                Mage::dispatchEvent('adyen_payment_authorize_refused_error', array('responseResult' => $response->paymentResult, 'error' => $errorMsg));
-                $errorMsg = $errorMsg->getErrorMessage();
-
                 $this->resetReservedOrderId();
                 Adyen_Payment_Exception::throwException($errorMsg);
                 break;
@@ -573,8 +552,8 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
             $installments = number_format(((int)$total/3),2);
             $totalInstallments = $installments * 3;
             $remainingCents = $total - $totalInstallments;
+            
             $firstInstallment = $installments + $remainingCents;
-
             //Todays date to calculate next two installments due date
             $todaysDate = date('Y-m-d');
 
@@ -582,7 +561,6 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                         'effectivedate' => $todaysDate,
                         'duration'      => 2
                     );
-
             function getPaymentDates(array $data)
             {   
                 $begin = new DateTime($data['effectivedate']);
@@ -591,7 +569,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     new DateInterval('P1M'),
                     (int) $data['duration']
                 );
-              
+                
                 $clean = array();
                 $last = (int) $begin->format('m');
                 foreach ($period as $date)
@@ -604,9 +582,7 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                 }
                 return $clean;
             }
-
             $duedates = getPaymentDates($data);
-
             //Saving into new table (for next installments)
             for ($i=0; $i <= 2; $i++) { 
                 $orderId  = $payment->getOrder()->getId();
@@ -620,18 +596,18 @@ abstract class Adyen_Payment_Model_Adyen_Abstract extends Mage_Payment_Model_Met
                     $done = 0;
                     $attempt = 0;
                 }
-
                 $noInstallment = $i+1;
                 //if today's date(order placing date) is equal to last day of this month
                 //then due date of next two installments should be last day of respective months
                 $duedate = $duedates[$i];
                 $created_at = now();
-             
+                
                 $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
                 $sql = "insert into adyen_order_installments (order_id, increment_id, number_installment, amount, due_date, done, attempt,created_at) values ('$orderId','$incrementId', '$noInstallment', '$amount', '$duedate','$done', '$attempt', '$created_at')";
                 $connWrite->query($sql);
             }
         }
+       
 
         //save all response data for a pure duplicate detection
         Mage::getModel('adyen/event')

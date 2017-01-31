@@ -50,9 +50,6 @@ class Adyen_Payment_Model_Adyen_CcInstallment extends Adyen_Payment_Model_Adyen_
         }
         $info = $this->getInfoInstance();
 
-        // set number of installements
-        $info->setAdditionalInformation('number_of_installments', $data->getAdditionalData());
-
         // save value remember details checkbox
         $info->setAdditionalInformation('store_cc', $data->getStoreCc());
         //assigning data - password
@@ -73,12 +70,6 @@ class Adyen_Payment_Model_Adyen_CcInstallment extends Adyen_Payment_Model_Adyen_
                 ->setPoNumber($data->getAdditionalData());
         }
 
-        if($info->getAdditionalInformation('number_of_installments') != "") {
-            // recalculate the totals so that extra fee is defined
-            $quote = (Mage::getModel('checkout/type_onepage') !== false)? Mage::getModel('checkout/type_onepage')->getQuote(): Mage::getModel('checkout/session')->getQuote();
-            $quote->setTotalsCollectedFlag(false);
-            $quote->collectTotals();
-        }
 
         return $this;
     }
@@ -227,7 +218,7 @@ class Adyen_Payment_Model_Adyen_CcInstallment extends Adyen_Payment_Model_Adyen_
         } else {
             $disableZeroTotal = Mage::getStoreConfig('payment/adyen_hpp/disable_zero_total');
         }
-        
+
         if (!is_null($quote) && $quote->getGrandTotal() <= 0 && $disableZeroTotal) {
             return false;
         } else if ($quote->getGrandTotal() <= 400 && $quote->getGrandTotal() >= 10000) {

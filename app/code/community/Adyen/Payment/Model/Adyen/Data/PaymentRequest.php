@@ -13,10 +13,10 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category    Adyen
- * @package Adyen_Payment
- * @copyright   Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 /**
  * @category   Payment Gateway
@@ -50,13 +50,13 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
     public $shopperStatement;
     public $additionalData;
 
-    // added for boleto
-    public $shopperName;
-    public $socialSecurityNumber;
+	// added for boleto
+	public $shopperName;
+	public $socialSecurityNumber;
     const GUEST_ID = 'customer_';
 
     public function __construct() {
-        $this->browserInfo = new Adyen_Payment_Model_Adyen_Data_BrowserInfo();
+    	$this->browserInfo = new Adyen_Payment_Model_Adyen_Data_BrowserInfo();
         $this->card = new Adyen_Payment_Model_Adyen_Data_Card();
         $this->amount = new Adyen_Payment_Model_Adyen_Data_Amount();
         $this->elv = new Adyen_Payment_Model_Adyen_Data_Elv();
@@ -78,6 +78,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $incrementId = $order->getIncrementId();
         $orderCurrencyCode = $order->getOrderCurrencyCode();
         // override amount because this amount uses the right currency
+        $amount = $order->getGrandTotal();
 
         $customerId = $order->getCustomerId();
         if ($customerId) {
@@ -92,12 +93,13 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
         $this->reference = $incrementId;
         $this->merchantAccount = $merchantAccount;
         $this->amount->currency = $orderCurrencyCode;
-
         //Calculating first installment
-        $cartTotal =  $order->getGrandTotal();                  
+        $cartTotal =  $order->getGrandTotal(); 
+                     
         $installments = number_format(((int)$cartTotal/3),2);
         $totalInstallments = $installments * 3;
-        $remainingCents = $cartTotal - $totalInstallments;        
+        $remainingCents = $cartTotal - $totalInstallments;
+        
         $firstInstallment = $installments + $remainingCents;
 
         if ($paymentMethod == "cc_installment") {
@@ -123,7 +125,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                     $this->recurring->contract = "RECURRING";
                 }
-            } elseif($paymentMethod == "cc" || $paymentMethod == "cc_installment") {
+            } elseif($paymentMethod == "cc") {
                 // if save card is disabled only shoot in as recurring if recurringType is set to ONECLICK,RECURRING
                 if($payment->getAdditionalInformation("store_cc") == "" && $recurringType == "ONECLICK,RECURRING") {
                     $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
@@ -136,6 +138,9 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                     $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                     $this->recurring->contract = "RECURRING";
                 }
+            }  else if ($paymentMethod == "cc_installment") {
+                $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
+                $this->recurring->contract = "RECURRING";
             } else {
                 $this->recurring = new Adyen_Payment_Model_Adyen_Data_Recurring();
                 $this->recurring->contract = $recurringType;
@@ -171,7 +176,8 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
             case "cc_installment":
             case "oneclick":
 
-                $this->elv = null;
+                $this->shopperName = null;
+            	$this->elv = null;
                 $this->bankAccount = null;
 
                 $billingAddress = $order->getBillingAddress();
@@ -179,14 +185,6 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
 
                 if($billingAddress)
                 {
-                    // add shopperName with firstName, middleName and lastName to support PapPal seller protection
-                    $this->shopperName->firstName = trim($billingAddress->getFirstname());
-                    $middleName = trim($billingAddress->getMiddlename());
-                    if($middleName != "") {
-                        $this->shopperName->infix = trim($middleName);
-                    }
-                    $this->shopperName->lastName = trim($billingAddress->getLastname());
-
                     $this->billingAddress = new Adyen_Payment_Model_Adyen_Data_BillingAddress();
                     $this->billingAddress->street = $helper->getStreet($billingAddress)->getName();
                     $this->billingAddress->houseNumberOrName = $helper->getStreet($billingAddress)->getHouseNumber();
@@ -273,8 +271,8 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                             );
                         }
                     }
-                }
-                else {
+				}
+				else {
 
                     if($recurringDetailReference && $recurringDetailReference != "") {
 
@@ -299,7 +297,7 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
                         $this->card->holderName = $payment->getCcOwner();
                         $this->card->number = $payment->getCcNumber();
                     }
-                }
+				}
 
                 // installments
                 if($payment->getAdditionalInformation('number_of_installments') > 0){
@@ -312,16 +310,16 @@ class Adyen_Payment_Model_Adyen_Data_PaymentRequest extends Adyen_Payment_Model_
 
                 break;
             case "boleto":
-                $boleto = unserialize($payment->getPoNumber());
-                $this->card = null;
-                $this->elv = null;
+            	$boleto = unserialize($payment->getPoNumber());
+            	$this->card = null;
+            	$this->elv = null;
                 $this->bankAccount = null;
-                $this->socialSecurityNumber = $boleto['social_security_number'];
-                $this->selectedBrand = $boleto['selected_brand'];
-                $this->shopperName->firstName = $boleto['firstname'];
-                $this->shopperName->lastName = $boleto['lastname'];
-                $this->deliveryDate = $boleto['delivery_date'];
-                break;
+            	$this->socialSecurityNumber = $boleto['social_security_number'];
+            	$this->selectedBrand = $boleto['selected_brand'];
+            	$this->shopperName->firstName = $boleto['firstname'];
+            	$this->shopperName->lastName = $boleto['lastname'];
+            	$this->deliveryDate = $boleto['delivery_date'];
+            	break;
             case "sepa":
                 $sepa = unserialize($payment->getPoNumber());
                 $this->card = null;

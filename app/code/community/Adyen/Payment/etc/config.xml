@@ -13,10 +13,10 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category    Adyen
- * @package Adyen_Payment
- * @copyright   Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 /**
  * @category   Payment Gateway
@@ -113,36 +113,7 @@
                 <adyen>Adyen</adyen>
             </groups>
         </payment>
-        <fieldsets>
-            <sales_convert_quote_item>
-                <adyen_pre_order>
-                    <to_order_item>*</to_order_item>
-                </adyen_pre_order>
-            </sales_convert_quote_item>
-            <sales_convert_order_item>
-                <adyen_pre_order>
-                    <to_quote_item>*</to_quote_item>
-                </adyen_pre_order>
-            </sales_convert_order_item>
-        </fieldsets>
-        <sales>
-            <quote>
-                <item>
-                    <product_attributes>
-                        <adyen_pre_order />
-                    </product_attributes>
-                </item>
-            </quote>
-        </sales>
         <events>
-            <sales_quote_item_set_product>
-                <observers>
-                    <adyen_payment_sales_quote_item_set_product>
-                        <class>Adyen_Payment_Model_Observers_Quote</class>
-                        <method>salesQuoteItemSetProduct</method>
-                    </adyen_payment_sales_quote_item_set_product>
-                </observers>
-            </sales_quote_item_set_product>
             <sales_order_payment_capture>
                 <observers>
                     <adyen_payment_capture>
@@ -151,7 +122,7 @@
                     </adyen_payment_capture>
                 </observers>
             </sales_order_payment_capture>
-            <controller_action_predispatch_checkout>
+            <controller_action_predispatch>
                 <observers>
                     <adyen_payment_hpp>
                         <class>adyen/observer</class>
@@ -162,39 +133,15 @@
                         <method>addMethodsToConfig</method>
                     </adyen_payment_billing_agreement>
                 </observers>
-            </controller_action_predispatch_checkout>
-            <controller_action_predispatch_firecheckout>
-                <observers>
-                    <adyen_payment_hpp>
-                        <class>adyen/observer</class>
-                        <method>addMethodsToConfig</method>
-                    </adyen_payment_hpp>
-                    <adyen_payment_billing_agreement>
-                        <class>adyen/billing_agreement_observer</class>
-                        <method>addMethodsToConfig</method>
-                    </adyen_payment_billing_agreement>
-                </observers>
-            </controller_action_predispatch_firecheckout>
-            <adminhtml_controller_action_predispatch_start>
-                <observers>
-                    <adyen_payment_hpp>
-                        <class>adyen/observer</class>
-                        <method>addMethodsToConfig</method>
-                    </adyen_payment_hpp>
-                    <adyen_payment_billing_agreement>
-                        <class>adyen/billing_agreement_observer</class>
-                        <method>addMethodsToConfig</method>
-                    </adyen_payment_billing_agreement>
-                </observers>
-            </adminhtml_controller_action_predispatch_start>
-            <sales_order_shipment_save_before>
+            </controller_action_predispatch>
+            <sales_order_shipment_save_after>
                 <observers>
                     <adyen_payment_capture_invoice_on_shipment>
                         <class>adyen/observer</class>
                         <method>captureInvoiceOnShipment</method>
                     </adyen_payment_capture_invoice_on_shipment>
                 </observers>
-            </sales_order_shipment_save_before>
+            </sales_order_shipment_save_after>
         </events>
     </global>
 
@@ -621,7 +568,7 @@
             </adyen_payment_process_notification_queue>
             <adyen_installment_process>
                 <schedule>
-                    <cron_expr>5 0 * * *</cron_expr>
+                    <cron_expr>0 7 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>adyen/recurringcron::processNextInstallment</model>

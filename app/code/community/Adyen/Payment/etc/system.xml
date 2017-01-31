@@ -13,10 +13,10 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category    Adyen
- * @package Adyen_Payment
- * @copyright   Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 /**
  * @category   Payment Gateway
@@ -242,7 +242,7 @@
                                 </payment_authorized>
                                 <payment_cancelled translate="label">
                                     <label>Order status: order cancellation</label>
-                                    <tooltip>Status given to orders after order cancellation is confirmed by a AUTHORIZATION with success false, CANCEL OR CANCEL_OR_REFUND notification from Adyen. If orders are already invoiced, they cannot be cancelled, but will be refunded instead.</tooltip>
+                                    <tooltip>Status given to orders after order cancellation is confirmed by a CANCEL_OR_REFUND notification from Adyen. If orders are already invoiced, they cannot be cancelled, but will be refunded instead.</tooltip>
                                     <frontend_type>select</frontend_type>
                                     <config_path>payment/adyen_abstract/payment_cancelled</config_path>
                                     <source_model>adyen/source_cancelModes</source_model>
@@ -416,31 +416,6 @@
                                     <show_in_website>1</show_in_website>
                                     <show_in_store>0</show_in_store>
                                 </send_update_mail>
-
-                                <use_zero_auth translate="label">
-                                    <label>Do not perform a full authorisation, only a zero auth to check if the card is valid</label>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <config_path>payment/adyen_abstract/use_zero_auth</config_path>
-                                    <sort_order>1210</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                </use_zero_auth>
-                                <base_zero_auth_on_date translate="label tooltip">
-                                    <label>Base zero authentication vs. full authentication on the date field</label>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adyen/source_zeroauthdatefield</source_model>
-                                    <config_path>payment/adyen_abstract/base_zero_auth_on_date</config_path>
-                                    <tooltip>Full authentication is only valid for 7 days, after that it expires. The value here should be the date column name in 'sales_flat_order' on which the order will be shipped and thus captured.</tooltip>
-                                    <sort_order>1220</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>0</show_in_store>
-                                    <depends>
-                                        <use_zero_auth>1</use_zero_auth>
-                                    </depends>
-                                </base_zero_auth_on_date>
                             </fields>
                         </adyen_order_process>
                         <adyen_order_notifications type="group" translate="label comment tooltip">
@@ -469,7 +444,6 @@
                                     <frontend_type>select</frontend_type>
                                     <source_model>adminhtml/system_config_source_yesno</source_model>
                                     <sort_order>250</sort_order>
-                                    <config_path>payment/adyen_abstract/multiple_merchants</config_path>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>0</show_in_website>
                                     <show_in_store>0</show_in_store>
@@ -671,7 +645,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+    			            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -893,7 +867,7 @@
                         </adyen_cc_advanced>
                     </fields>
                 </adyen_cc>
-                <!-- @CC installment only -->
+                 <!-- @CC only -->
                 <adyen_cc_installment translate="label" module="adyen">
                     <label>Credit Card Installments</label>
                     <frontend_type>text</frontend_type>
@@ -1036,7 +1010,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1078,7 +1052,7 @@
                         </active>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1252,7 +1226,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1385,7 +1359,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1473,7 +1447,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1589,7 +1563,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1758,7 +1732,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1915,7 +1889,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2133,7 +2107,7 @@
                         </title>
                         <sort_order translate="label">
                             <label>Sort Order</label>
-                            <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
+            			    <tooltip>Set the sequence number of this payment method in the checkout. Payment methods with a higher sort order number will be displayed lower in the list.</tooltip>
                             <frontend_type>text</frontend_type>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>

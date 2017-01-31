@@ -144,13 +144,4 @@ class Adyen_Payment_Model_Adyen_Sepa extends Adyen_Payment_Model_Adyen_Abstract
 
         // TODO: add config where merchant can set the payment types that are available for subscription
     }
-    /**
-     * @return bool
-     */
-    public function isBillingAgreement()
-    {
-        return true;
-    }
-
-
 }

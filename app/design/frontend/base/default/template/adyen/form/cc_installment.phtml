@@ -34,33 +34,33 @@ $_code = $this->getMethodCode();
         <div>
             <ul class="alignCenter marginBottom" style="max-width: 600px; margin-right: auto; margin-left: auto;font-family: Arial,Helvetica,sans-serif">
                 <li>Voici l'échéancier de votre paiement en 3x sans frais:</li>
-                <li>1er paiement (aujourd'hui) : 
-                <?php 
-                    $cartTotal =  Mage::getSingleton('checkout/cart')->getQuote()->getGrandTotal(); 
-                     
+                <li>1er paiement (aujourd'hui) :
+                <?php
+                    $cartTotal =  Mage::getSingleton('checkout/cart')->getQuote()->getGrandTotal();
+
                     $installments = number_format(((int)$cartTotal/3),2);
                     $totalInstallments = $installments * 3;
                     $remainingCents = $cartTotal - $totalInstallments;
-                    
+
                     $firstInstallment = $installments + $remainingCents;
                     echo '<strong>'.$this->helper('checkout')->formatPrice($firstInstallment).'</strong>';
-                ?>     
+                ?>
                 </li>
-                <?php 
+                <?php
                     $todaysDate = date('Y-m-d');
                     $data = array(
                         'effectivedate' => $todaysDate,
                         'duration'      => 2
                     );
                     function getPaymentDates(array $data)
-                    {   
+                    {
                         $begin = new DateTime($data['effectivedate']);
                         $period = new DatePeriod(
                             $begin,
                             new DateInterval('P1M'),
                             (int) $data['duration']
                         );
-                        
+
                         $clean = array();
                         $last = (int) $begin->format('m');
                         foreach ($period as $date)
@@ -75,10 +75,10 @@ $_code = $this->getMethodCode();
                     }
                     $duedate = getPaymentDates($data);
                 ?>
-                <li>2e paiement ( <?php echo $duedate[1]; ?> ) : 
+                <li>2e paiement ( <?php echo $duedate[1]; ?> ) :
                 <?php echo '<strong>'.$this->helper('checkout')->formatPrice($installments).'</strong>'; ?>
                 </li>
-                <li class="marginBottom">3e paiement ( <?php echo $duedate[2]; ?> ) : 
+                <li class="marginBottom">3e paiement ( <?php echo $duedate[2]; ?> ) :
                 <?php echo '<strong>'.$this->helper('checkout')->formatPrice($installments).'</strong>'; ?>
                 </li>
                 <li>
@@ -103,7 +103,7 @@ $_code = $this->getMethodCode();
     </li>
     <li style="background-color: #fff; min-height: 25px;">&nbsp;</li>
     <p><center><?php echo $this->showText(); ?></center></p>
-    <?php 
+    <?php
     //dont show password field if user is logged in OR email is is already registered in system (when user checkout as guest)
     if($this->showPassword()):
     ?>
@@ -115,14 +115,14 @@ $_code = $this->getMethodCode();
     </li>
     <?php endif; ?>
     <li class="adyen_payment_creditcard_labels">
-    <div style="margin: 0 auto; max-width: 450px;">
+    <div style="margin: 0 auto; max-width: 285px;">
         <?php $count = 0;
         $ccTypes = $this->getCcAvailableTypes();
-        foreach ($ccTypes as $_typeCode => $_typeName): 
-           if ($_typeName != 'Maestro') :  ?>
+        foreach ($ccTypes as $_typeCode => $_typeName):
+           if ($_typeName != 'Maestro' && $_typeName != 'Discover' && $_typeName != 'Diners Club' && $_typeName != 'JCB' && $_typeName != 'Elo' && $_typeName != 'Hipercard') :  ?>
             <?php $_filename = $this->getSkinUrl('images/adyen/' . strtolower($_typeCode) . '_small.png'); ?>
             <img id="cc_installment_type_<?php echo $count; ?>" width="40" height="22" src="<?php echo $_filename; ?>" alt="" class="mid" />
-            <?php ++$count; 
+            <?php ++$count;
            endif;
         endforeach; ?></div>
         <input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" value=""/>
@@ -187,9 +187,9 @@ $_code = $this->getMethodCode();
         </div>
     </li>
     <?php endif;*/?>
-    <input type="hidden" name="payment[additional_data]" id="<?php echo $_code ?>_installments" value="3">
+    <!-- <input type="hidden" name="payment[additional_data]" id="<?php echo $_code ?>_installments" value="3"> -->
 
-    <?php if($this->canCreateBillingAgreement()): ?>
+    <?php /*if($this->canCreateBillingAgreement()): ?>
     <li id="adyen-cc-remember-these-details" class="adyen_payment_input_fields">
         <div class="input-box">
             <div class="v-fix">
@@ -204,10 +204,10 @@ $_code = $this->getMethodCode();
             $('adyen-cc-remember-these-details').hide();
         }
     </script>
-    <?php endif; ?>
+    <?php endif;*/ ?>
 
-    <script type="text/javascript">    
-        
+    <script type="text/javascript">
+
         var group_types = [];
         <?php foreach ($this->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
         group_types.push("<?php echo $_typeCode; ?>");

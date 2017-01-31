@@ -117,12 +117,6 @@
             e.preventDefault();
         });
 
-        function adyenposLoaded() {
-            adyenpos.on("barcodeReceived", function(barcode) {
-                ajaxCall(barcode);
-            });
-        }
-
         <?php if($this->hasAutoSubmitScanner()): ?>
             $('SubmitScan').observe('click', function(e){
                 var value =  $('inpscan').value;;

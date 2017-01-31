@@ -13,10 +13,10 @@
  * obtain it through the world-wide-web, please send an email
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
- * @category    Adyen
- * @package Adyen_Payment
- * @copyright   Copyright (c) 2011 Adyen (http://www.adyen.com)
- * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category	Adyen
+ * @package	Adyen_Payment
+ * @copyright	Copyright (c) 2011 Adyen (http://www.adyen.com)
+ * @license	http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 /**
  * @category   Payment Gateway
@@ -94,7 +94,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             $incrementId = $params->getData('merchantReference');
 
             if($incrementId) {
-                $this->_debugData['info'] = 'Add this notification with Order increment_id to queue: ' . $incrementId;
+                $this->_debugData['error'] = 'Add this notification with Order increment_id to queue: ' . $incrementId;
                 $this->_addNotificationToQueue($params);
             } else {
                 $this->_debugData['error'] = 'Empty merchantReference';
@@ -463,7 +463,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $this->_authorizePayment($order, $this->_paymentMethod);
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_REJECT:
-                // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is cancelled
+                // don't do anything it will send a CANCEL_OR_REFUND notification when this payment is captured
                 break;
             case Adyen_Payment_Model_Event::ADYEN_EVENT_MANUAL_REVIEW_ACCEPT:
                 // only process this if you are on auto capture. On manual capture you will always get Capture or CancelOrRefund notification
@@ -482,7 +482,6 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
                     $this->_debugData[$this->_count]['_processNotification info'] = 'Ignore this refund already done processing on AUTHROISATION';
                 }
                 break;
-            case Adyen_Payment_Model_Event::ADYEN_EVENT_OFFER_CLOSED:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CAPTURE_FAILED:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLATION:
             case Adyen_Payment_Model_Event::ADYEN_EVENT_CANCELLED:
@@ -891,7 +890,7 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
 
         $orderAmount = (int) Mage::helper('adyen')->formatAmount($order->getGrandTotal(), $orderCurrencyCode);
 
-        if($this->_isTotalAmount($orderAmount) || $this->_paymentMethodCode($order) == 'adyen_cc_installment') {
+        if( $this->_isTotalAmount($orderAmount) || $this->_paymentMethodCode($order) == 'adyen_cc_installment' ) {
             $this->_createInvoice($order);
         } else {
             $this->_debugData[$this->_count]['_prepareInvoice partial authorisation step1'] = 'This is a partial AUTHORISATION';
@@ -1186,11 +1185,12 @@ class Adyen_Payment_Model_ProcessNotification extends Mage_Core_Model_Abstract {
             ($createPendingInvoice && $autoCapture) ||
             ($createPendingInvoice && !$autoCapture && $captureNotification))
         {
-            if($this->_paymentMethodCode($order) == "adyen_cc_installment") {
-                $status = 'adyen_installment'; 
-            } else {
+            // if($this->_paymentMethodCode($order) == "adyen_cc_installment") {
+            //     $status = 'adyen_installment'; 
+            // } else {
                 $status = $this->_getConfigData('payment_authorized', 'adyen_abstract', $order->getStoreId());
-            }
+            //}
+            
 
             $this->_debugData[$this->_count]['_setPaymentAuthorized selected status'] = 'The status that is selected is:' . $status;
 

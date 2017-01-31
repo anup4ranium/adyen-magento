@@ -121,25 +121,27 @@ $_recurringDetails = $this->getRecurringDetails();
                         }
 
                         var cse_key_oneclick = <?php echo json_encode($this->getCsePublicKey()); ?>;
-                        var cse_options_oneclick_<?php echo $_code ?> = {
+                        var cse_options_oneclick = {
                             name:  'payment_encrypted_data_<?php echo $_code;?>'
                         };
 
-                        var cseUpdateOneClick_<?php echo $_code ?> = function() {
+                        var cseUpdateOneClick = function() {
 
                             try {
-                                // get closest form element
-                                var elementOneClick = $('payment_form_<?php echo $_code ?>');
-                                var cse_form_oneclick =  elementOneClick.match('form') ? elementOneClick : elementOneClick.up('form');
-                                // add this field to option
-                                cse_options_oneclick_<?php echo $_code ?>.fieldNameAttribute = "data-encrypted-name-oneclick-<?php echo $_code ?>";
+                                if (payment.currentMethod && payment.currentMethod == '<?php echo $_code ?>') {
+                                    // get closest form element
+                                    var elementOneClick = $('payment_form_<?php echo $_code ?>');
+                                    var cse_form_oneclick =  elementOneClick.match('form') ? elementOneClick : elementOneClick.up('form');
+                                    // add this field to option
+                                    cse_options_oneclick.fieldNameAttribute = "data-encrypted-name-oneclick-<?php echo $_code ?>";
 
-                                // do not validate because number does not exists for oneclick
-                                cse_options_oneclick_<?php echo $_code ?>.enableValidations = false;
+                                    // do not validate because number does not exists for oneclick
+                                    cse_options_oneclick.enableValidations = false;
 
-                                var cseFormOneClick = adyen.encrypt.createEncryptedForm(cse_form_oneclick, cse_key_oneclick, cse_options_oneclick_<?php echo $_code ?>);
-                                // encrypt data directly because submit button is not always on the page
-                                cseFormOneClick.createEncryptedField(cseFormOneClick.encrypt());
+                                    var cseFormOneClick = adyen.encrypt.createEncryptedForm(cse_form_oneclick, cse_key_oneclick, cse_options_oneclick);
+                                    // encrypt data directly because submit button is not always on the page
+                                    cseFormOneClick.createEncryptedField(cseFormOneClick.encrypt());
+                                }
                             } catch (e) {
                                 if (typeof console == "object") {
                                     console.error(e);
@@ -150,11 +152,11 @@ $_recurringDetails = $this->getRecurringDetails();
 
                         };
 
-                        var cseInitOneClick_<?php echo $_code ?> = function() {
+                        var cseInitOneClick = function() {
                             if (typeof adyen === 'undefined') {
                                 var script = document.createElement("script");
                                 script.type = "text/javascript";
-                                script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt_0_1_18.js'); ?>";
+                                script.src = "<?php echo $this->getJsUrl('adyen/payment/adyen.encrypt_0_1_16.js'); ?>";
                                 document.body.appendChild(script);
                             }
 
@@ -169,11 +171,11 @@ $_recurringDetails = $this->getRecurringDetails();
 
                             var fields = $$('#payment_form_<?php echo $_code ?> input, #payment_form_<?php echo $_code ?> textarea, #payment_form_<?php echo $_code ?> select');
                             fields.forEach(function(field) {
-                                field.observe('change', cseUpdateOneClick_<?php echo $_code ?>);
+                                field.observe('change', cseUpdateOneClick);
                             });
                         };
 
-                        cseInitOneClick_<?php echo $_code ?>();
+                        cseInitOneClick();
                     </script>
                 <?php endif;?>
 
